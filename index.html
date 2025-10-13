@@ -6,42 +6,263 @@
     <title>Been On Exam</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Luckiest+Guy&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-purple: #9f55ff;
-            --dark-bg: #121212;
-            --card-bg: #1e1e1e;
-            --border-color: rgba(159, 85, 255, 0.2);
-            --text-color: #e0e0e0;
-            --text-muted: #888888;
-            --glow-color: rgba(159, 85, 255, 0.5);
-            --error-color: #ff5555;
+            --primary-gold: #FFC700;
+            --light-green-bg: #A7D3A7;
+            --darker-green-bar: #558B2F;
+            --dark-wood: #5D4037;
+            --card-bg: rgba(245, 222, 179, 0.9); /* Wheat with opacity */
+            --border-color: rgba(93, 64, 55, 0.5);
+            --text-color: #3E2723; /* Dark Brown */
+            --text-muted: #6D4C41;
+            --glow-color: rgba(255, 199, 0, 0.6);
+            --error-color: #D32F2F;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Poppins', sans-serif; background-color: var(--dark-bg); color: var(--text-color); overflow-x: hidden; }
-        .dashboard-container { max-width: 1400px; margin: 0 auto; padding: 30px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; scroll-behavior: smooth; }
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            color: var(--text-color); 
+            overflow-x: hidden;
+            background-color: var(--light-green-bg);
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(255,255,255,0.4) 0%, transparent 40%), 
+                radial-gradient(circle at 85% 35%, rgba(255,255,255,0.35) 0%, transparent 35%);
+            background-attachment: fixed;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #4E342E; }
+        ::-webkit-scrollbar-thumb { background: var(--primary-gold); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #FFD700; }
+        
+        .top-marquee-container { 
+            background-color: var(--darker-green-bar);
+            padding: 8px 0;
+            font-weight: 600; 
+            font-size: 0.9rem;
+            border-bottom: 3px solid #33691E;
+        }
+        .top-marquee-container a {
+            text-decoration: none;
+            color: #E8F5E9;
+        }
+        
+        .dashboard-container { max-width: 1400px; margin: 0 auto; padding: 40px; }
         header { text-align: center; margin-bottom: 40px; }
-        header h1 { font-size: 3rem; font-weight: 700; background: linear-gradient(90deg, var(--text-color), var(--primary-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 1px; }
+        header h1 { 
+            font-family: 'Luckiest Guy', cursive;
+            font-size: 5rem; 
+            font-weight: 400;
+            color: var(--primary-gold);
+            letter-spacing: 2px;
+            text-shadow: -2px -2px 0 var(--dark-wood), 2px -2px 0 var(--dark-wood), -2px 2px 0 var(--dark-wood), 2px 2px 0 var(--dark-wood), 4px 4px 0 rgba(0,0,0,0.5);
+        }
         .search-wrapper { position: relative; width: 100%; max-width: 600px; margin: 0 auto 40px; }
-        #search-input { width: 100%; padding: 15px 20px 15px 50px; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-color); font-size: 1rem; outline: none; transition: border-color 0.3s ease, box-shadow 0.3s ease; }
-        #search-input:focus { border-color: var(--primary-purple); box-shadow: 0 0 15px var(--glow-color); }
+        #search-input { 
+            width: 100%; 
+            padding: 15px 20px 15px 50px; 
+            background-color: var(--card-bg); 
+            border: 2px solid var(--dark-wood);
+            border-radius: 10px; 
+            color: var(--text-color); 
+            font-size: 1rem; 
+            outline: none; 
+            transition: border-color 0.3s ease, box-shadow 0.3s ease; 
+        }
+        #search-input:focus { 
+            border-color: var(--primary-gold); 
+            box-shadow: 0 0 20px var(--glow-color); 
+        }
         .search-wrapper svg { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: var(--text-muted); }
-        .category-section { margin-bottom: 50px; }
-        .section-title { font-size: 1.8rem; margin-bottom: 20px; border-bottom: 2px solid var(--primary-purple); padding-bottom: 10px; display: inline-block; }
-        .content-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
-        .quiz-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; text-decoration: none; color: var(--text-color); display: flex; flex-direction: column; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; }
-        .quiz-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 10px 30px var(--glow-color); border-color: var(--primary-purple); }
+
+        .category-grid, .content-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        
+        .category-card, .quiz-card {
+            background-color: var(--card-bg);
+            border: 2px solid var(--dark-wood);
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            box-shadow: 5px 5px 0px rgba(0,0,0,0.3);
+        }
+        .category-card:hover, .quiz-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 8px 8px 0px rgba(0,0,0,0.3);
+            border-color: var(--primary-gold);
+        }
+        .category-card { padding: 25px; cursor: pointer; min-height: 160px; justify-content: space-between; }
+        .quiz-card { padding: 20px; }
+        
+        .category-card.secret .category-card-header svg { color: var(--error-color); }
+        .category-card-header { display: flex; align-items: center; margin-bottom: 15px; }
+        .category-card-header svg { width: 32px; height: 32px; margin-right: 15px; color: var(--primary-gold); flex-shrink: 0; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3));}
+        .category-card-header h2 { font-size: 1.5rem; font-weight: 600; }
+        .category-card-footer { font-size: 0.9rem; color: var(--text-muted); text-align: right; font-weight: 500;}
+        
         .card-header { display: flex; align-items: center; margin-bottom: 15px; }
-        .card-header svg { width: 24px; height: 24px; margin-right: 12px; color: var(--primary-purple); }
+        .card-header svg { width: 24px; height: 24px; margin-right: 12px; color: var(--primary-gold); flex-shrink: 0; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3)); }
         .card-header h3 { font-size: 1.25rem; font-weight: 600; flex-grow: 1; }
         .card-body p { font-size: 0.9rem; color: var(--text-muted); flex-grow: 1; }
-        .status-message { text-align: center; color: var(--text-muted); font-size: 1rem; padding: 40px 20px; background-color: var(--card-bg); border-radius: 10px; border: 1px solid var(--border-color); }
-        .status-message.error { color: var(--error-color); border-color: var(--error-color); }
-        footer { text-align: center; padding: 30px 0; margin-top: 40px; border-top: 1px solid var(--border-color); }
+        
+        .quiz-view-header { display: flex; align-items: center; margin-bottom: 30px; }
+        #back-to-categories-btn { 
+            background-color: var(--card-bg); 
+            border: 2px solid var(--dark-wood); 
+            color: var(--text-color); 
+            padding: 10px 20px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            font-size: 1rem; 
+            font-weight: 600; 
+            transition: all 0.2s ease; 
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.3);
+        }
+        #back-to-categories-btn:hover { 
+            background-color: #f0e1c0;
+            border-color: var(--primary-gold); 
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
+            transform: translateY(-2px);
+        }
+        #back-to-categories-btn svg { margin-right: 8px; }
+        .quiz-view-header .section-title { font-size: 2rem; margin-bottom: 0; margin-left: 20px; color: var(--dark-wood); text-shadow: 2px 2px 4px rgba(255,255,255,0.5);}
+
+        .status-message { text-align: center; color: var(--dark-wood); font-size: 1rem; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-shadow: 1px 1px 2px rgba(255,255,255,0.7); }
+        .loader { width: 50px; height: 50px; border: 5px solid rgba(0,0,0, 0.2); border-top: 5px solid var(--primary-gold); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        footer { text-align: center; padding: 40px 0; margin-top: 40px; border-top: 2px solid rgba(0,0,0,0.2); color: var(--text-color); }
+        footer a { color: var(--text-color); text-decoration: none; font-weight: 500; transition: color 0.3s ease; }
+        footer a:hover { color: var(--primary-gold); }
+        .footer-credits { display: flex; flex-direction: column; gap: 8px; }
+
+        .action-button { 
+            background-color: var(--primary-gold); 
+            color: var(--dark-wood); 
+            width: 50px; 
+            height: 50px; 
+            border-radius: 50%; 
+            border: 2px solid var(--dark-wood); 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 1000; 
+            box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+        }
+        .action-button:hover {
+            transform: scale(1.1) translateY(-2px);
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+        }
+        #back-to-top { position: fixed; bottom: 20px; right: 20px; opacity: 0; visibility: hidden; }
+        #back-to-top.visible { opacity: 1; visibility: visible; }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 2000; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-content { background-color: var(--card-bg); border: 2px solid var(--dark-wood); padding: 30px; border-radius: 10px; border-top: 4px solid var(--primary-gold); width: 90%; max-width: 400px; text-align: center; transform: scale(0.9); transition: transform 0.3s; box-shadow: 5px 5px 0 rgba(0,0,0,0.3); }
+        .modal-overlay.visible .modal-content { transform: scale(1); }
+        .modal-content h3 { margin-bottom: 15px; font-size: 1.5rem; }
+        .modal-content p { margin-bottom: 20px; color: var(--text-muted); }
+        #password-input { width: 100%; padding: 12px; background-color: #D2B48C; border: 2px solid var(--dark-wood); border-radius: 8px; color: var(--text-color); font-size: 1rem; margin-bottom: 10px; text-align: center; }
+        #password-error { color: var(--error-color); font-size: 0.9rem; height: 1.2em; margin-bottom: 10px; }
+        .modal-actions { display: flex; gap: 10px; }
+        .modal-btn { flex-grow: 1; padding: 12px; border: 2px solid var(--dark-wood); border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 3px 3px 0 rgba(0,0,0,0.3); }
+        .modal-btn.primary { background-color: var(--primary-gold); color: var(--dark-wood); }
+        .modal-btn.primary:hover { transform: translateY(-2px); box-shadow: 4px 4px 0 rgba(0,0,0,0.3); }
+        .modal-btn.secondary { background-color: var(--card-bg); color: var(--text-muted); }
+        .modal-btn.secondary:hover { background-color: #D2B48C; color: var(--text-color); transform: translateY(-2px); box-shadow: 4px 4px 0 rgba(0,0,0,0.3); }
+
+        #music-player-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 80px;
+        }
+        #music-player-toggle.playing {
+             background-color: #FFD700;
+        }
+        #music-player-modal {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 300px;
+            background-color: var(--card-bg);
+            border: 2px solid var(--dark-wood);
+            box-shadow: 5px 5px 0 rgba(0,0,0,0.3);
+            border-radius: 12px;
+            z-index: 999;
+            padding: 15px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: opacity 0.3s, visibility 0.3s, transform 0.3s;
+        }
+        #music-player-modal.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .music-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        #now-playing {
+            font-size: 0.8rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-muted);
+            flex-grow: 1;
+        }
+        .music-controls button {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            padding: 5px;
+            transition: transform 0.2s;
+        }
+        .music-controls button:hover {
+            color: var(--primary-gold);
+            transform: scale(1.1);
+        }
+        #track-list {
+            list-style: none;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        #track-list li {
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.2s, color 0.2s;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #track-list li:hover {
+            background-color: rgba(255, 199, 0, 0.1);
+        }
+        #track-list li.playing {
+            color: var(--primary-gold);
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
+    <div class="top-marquee-container">
+        <a href="https://saweria.co/beenspaceess" target="_blank">
+            <marquee behavior="scroll" direction="left" scrollamount="6">You tryna ace that exam but your wallet's on mute? This site ain't runnin' on magic, the server's hungry. Smash this link and drop a dime if you wanna see this site tomorrow. Keep it real.</marquee>
+        </a>
+    </div>
 
     <div class="dashboard-container">
         <header>
@@ -50,128 +271,331 @@
 
         <div class="search-wrapper">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" id="search-input" placeholder="Cari kuis...">
+            <input type="text" id="search-input" placeholder="Cari kategori...">
         </div>
         
         <main id="main-content">
-            <p class="status-message">Memuat daftar kuis...</p>
+            <div class="status-message">
+                <div class="loader"></div>
+                <span>Memuat daftar kuis...</span>
+            </div>
         </main>
-        
+
         <footer>
-            <!-- Konten footer bisa ditambahkan di sini jika perlu -->
+            <div class="footer-credits">
+                <a href="https://www.instagram.com/beenspace" target="_blank">Created by @beenspace</a>
+                <span>Search cool tools? Go to: <a href="https://github.com/muqorrobinize" target="_blank">@muqorrobinize</a></span>
+            </div>
         </footer>
+    </div>
+    
+    <div id="music-player-modal">
+        <div class="music-header">
+            <span id="now-playing">Pilih lagu...</span>
+            <div class="music-controls">
+                <button id="play-pause-btn" title="Play/Pause">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                </button>
+                <button id="stop-btn" title="Stop">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18"></rect></svg>
+                </button>
+            </div>
+        </div>
+        <ul id="track-list">
+            <li class="no-music">Memuat musik...</li>
+        </ul>
+    </div>
+
+    <button id="music-player-toggle" class="action-button" title="Buka Pemutar Musik">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+    </button>
+    
+    <button id="back-to-top" class="action-button" title="Kembali ke atas">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+    </button>
+    
+    <div id="password-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Akses Terbatas</h3>
+            <p>Kategori ini memerlukan password untuk membukanya.</p>
+            <form id="password-form">
+                <input type="password" id="password-input" placeholder="Masukkan password...">
+                <div id="password-error"></div>
+                <div class="modal-actions">
+                    <button type="button" id="close-modal-btn" class="modal-btn secondary">Batal</button>
+                    <button type="submit" class="modal-btn primary">Buka</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script>
-        // --- PENGATURAN ---
-        // GANTI DUA BARIS DI BAWAH INI SESUAI DENGAN PROYEK ANDA DI GITHUB
         const GITHUB_USERNAME = "muqorrobinize";
         const GITHUB_REPO = "beenonexam";
-        // --------------------------------------------------------------------
+        const SECRET_PASSWORD = 'enakajaluanjing';
 
         const mainContent = document.getElementById('main-content');
         const searchInput = document.getElementById('search-input');
+        const backToTopButton = document.getElementById('back-to-top');
+        const passwordModal = document.getElementById('password-modal');
+        const passwordForm = document.getElementById('password-form');
+        const passwordInput = document.getElementById('password-input');
+        const passwordError = document.getElementById('password-error');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        
+        // Music Player Elements
+        const musicPlayerToggle = document.getElementById('music-player-toggle');
+        const musicPlayerModal = document.getElementById('music-player-modal');
+        const nowPlayingEl = document.getElementById('now-playing');
+        const trackListEl = document.getElementById('track-list');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const audioPlayer = new Audio();
+        
         const fileIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>`;
-        let allQuizData = []; // Variabel untuk menyimpan semua data kuis
+        const folderIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`;
+        const lockIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
 
-        function renderItems(quizData, filter = '') {
+        let groupedQuizzes = {};
+
+        function renderCategoryView(filter = '') {
             mainContent.innerHTML = '';
-            
-            const filteredData = quizData.filter(item => 
-                item.filename.toLowerCase().replace(/_/g, ' ').includes(filter.toLowerCase())
+            document.querySelector('.search-wrapper').style.display = 'block';
+            searchInput.placeholder = "Cari kategori...";
+
+            const categoryGrid = document.createElement('div');
+            categoryGrid.className = 'category-grid';
+
+            let filteredCategories = Object.keys(groupedQuizzes).filter(category => 
+                category.toLowerCase().includes(filter.toLowerCase())
             );
-            
-            if (quizData.length === 0) {
-                 mainContent.innerHTML = `<p class="status-message">Tidak ada kuis yang ditemukan di folder 'kuis'. Silakan upload file kuis Anda ke GitHub.</p>`;
-                 return;
+
+            if (filteredCategories.length === 0) {
+                mainContent.innerHTML = `<p class="status-message">Tidak ada kategori yang cocok dengan "${filter}"</p>`;
+                return;
             }
 
-            const groupedQuizzes = filteredData.reduce((acc, item) => {
-                const parts = item.filename.split('_');
-                if (parts.length < 2) return acc;
+            filteredCategories.sort().forEach(category => {
+                const quizCount = groupedQuizzes[category].length;
+                const isSecret = /secret/i.test(category);
+                const card = document.createElement('div');
+                card.className = 'category-card';
+                if (isSecret) card.classList.add('secret');
+                card.setAttribute('role', 'button');
+                card.tabIndex = 0;
+                card.innerHTML = `
+                    <div>
+                        <div class="category-card-header">
+                            ${isSecret ? lockIcon : folderIcon}
+                            <h2>${category.replace(/secret/i, '').trim()}</h2>
+                        </div>
+                    </div>
+                    <div class="category-card-footer">
+                        ${isSecret ? 'Kategori Rahasia' : `${quizCount} Kuis Tersedia`}
+                    </div>
+                `;
                 
-                const category = parts[0].trim();
-                const quizName = parts[1].replace('.html', '').trim();
-                
-                if (!acc[category]) acc[category] = [];
-                acc[category].push({ ...item, quizName });
-                return acc;
-            }, {});
-
-            const sortedCategories = Object.keys(groupedQuizzes).sort();
-
-            if (sortedCategories.length === 0 && filter) {
-                mainContent.innerHTML = `<p class="status-message">Tidak ada kuis yang cocok dengan pencarian "${filter}"</p>`;
-            }
-
-            for (const category of sortedCategories) {
-                const section = document.createElement('section');
-                section.className = 'category-section';
-                const title = document.createElement('h2');
-                title.className = 'section-title';
-                title.textContent = category;
-                section.appendChild(title);
-                const grid = document.createElement('div');
-                grid.className = 'content-grid';
-                groupedQuizzes[category].forEach(item => {
-                    const card = document.createElement('a');
-                    card.href = `kuis/${item.filename}`;
-                    card.target = '_blank';
-                    card.className = 'quiz-card';
-                    card.innerHTML = `
-                        <div class="card-header">${fileIcon}<h3>${item.quizName}</h3></div>
-                        <div class="card-body"><p>${item.description}</p></div>
-                    `;
-                    grid.appendChild(card);
-                });
-                section.appendChild(grid);
-                mainContent.appendChild(section);
-            }
+                const action = isSecret ? () => promptForPassword(category) : () => renderQuizView(category);
+                card.addEventListener('click', action);
+                card.addEventListener('keydown', (e) => (e.key === 'Enter' || e.key === ' ') && action());
+                categoryGrid.appendChild(card);
+            });
+            mainContent.appendChild(categoryGrid);
         }
 
-        async function fetchAndRenderQuizzes() {
+        function renderQuizView(categoryName) {
+            mainContent.innerHTML = '';
+            document.querySelector('.search-wrapper').style.display = 'none';
+            searchInput.value = '';
+
+            const header = document.createElement('div');
+            header.className = 'quiz-view-header';
+            header.innerHTML = `
+                <button id="back-to-categories-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Kembali
+                </button>
+                <h2 class="section-title"><span>${categoryName.replace(/secret/i, '').trim()}</span></h2>
+            `;
+            header.querySelector('#back-to-categories-btn').addEventListener('click', () => renderCategoryView());
+            mainContent.appendChild(header);
+
+            const grid = document.createElement('div');
+            grid.className = 'content-grid';
+            
+            groupedQuizzes[categoryName].sort((a, b) => a.quizName.localeCompare(b.quizName)).forEach(item => {
+                const card = document.createElement('a');
+                card.href = `kuis/${item.filename}`;
+                card.target = '_blank';
+                card.className = 'quiz-card';
+                card.innerHTML = `
+                    <div class="card-header">${fileIcon}<h3>${item.quizName}</h3></div>
+                    <div class="card-body"><p>${item.description}</p></div>
+                `;
+                grid.appendChild(card);
+            });
+            mainContent.appendChild(grid);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function fetchAndProcessQuizzes() {
+            mainContent.innerHTML = `<div class="status-message"><div class="loader"></div><span>Memuat Kategori...</span></div>`;
             const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/kuis`;
             
             try {
                 const response = await fetch(apiUrl);
-                if (!response.ok) {
-                    throw new Error(`Gagal mengambil data dari GitHub (Status: ${response.status})`);
-                }
+                if (!response.ok) throw new Error(`GitHub API Error (Status: ${response.status})`);
                 const files = await response.json();
+                if (!Array.isArray(files)) throw new Error("Folder 'kuis' tidak ditemukan atau repo privat.");
 
-                if (!Array.isArray(files)) {
-                     throw new Error("Folder 'kuis' tidak ditemukan atau repository bersifat privat.");
-                }
-
-                allQuizData = files
+                const allQuizData = files
                     .filter(file => file.type === 'file' && file.name.endsWith('.html'))
                     .map(file => {
                         const quizName = file.name.split('_').slice(1).join(' ').replace('.html', '');
-                        return {
-                            filename: file.name,
-                            description: `Kumpulan soal dan latihan untuk ${quizName}.`
-                        };
+                        return { filename: file.name, description: `Kumpulan soal & latihan untuk ${quizName}.` };
                     });
                 
-                renderItems(allQuizData);
+                groupedQuizzes = allQuizData.reduce((acc, item) => {
+                    const parts = item.filename.split('_');
+                    if (parts.length < 2) return acc;
+                    const category = parts[0].trim();
+                    const quizName = parts.slice(1).join(' ').replace('.html', '').trim();
+                    if (!acc[category]) acc[category] = [];
+                    acc[category].push({ ...item, quizName });
+                    return acc;
+                }, {});
+                
+                renderCategoryView();
 
             } catch (error) {
                 console.error("Error:", error);
-                mainContent.innerHTML = `
-                    <div class="status-message error">
-                        <strong>Terjadi Kesalahan</strong><br>
-                        <p>Gagal memuat daftar kuis. Pastikan konfigurasi USERNAME dan REPO sudah benar di file index.html, dan folder 'kuis' ada di repository Anda.</p>
-                        <small>Detail: ${error.message}</small>
-                    </div>`;
+                mainContent.innerHTML = `<div class="status-message error"><strong>Terjadi Kesalahan</strong><p>Gagal memuat daftar kuis. Pastikan USERNAME dan REPO benar, dan folder 'kuis' ada di repo Anda.</p><small>Detail: ${error.message}</small></div>`;
             }
         }
 
-        searchInput.addEventListener('input', () => renderItems(allQuizData, searchInput.value));
+        function promptForPassword(categoryName) {
+            passwordModal.classList.add('visible');
+            passwordInput.focus();
+            passwordForm.onsubmit = (e) => {
+                e.preventDefault();
+                if (passwordInput.value === SECRET_PASSWORD) {
+                    passwordModal.classList.remove('visible');
+                    passwordInput.value = '';
+                    passwordError.textContent = '';
+                    renderQuizView(categoryName);
+                } else {
+                    passwordError.textContent = 'Password salah, coba lagi.';
+                    passwordInput.value = '';
+                }
+            };
+        }
         
-        // Mulai proses saat halaman dimuat
-        document.addEventListener('DOMContentLoaded', fetchAndRenderQuizzes);
+        async function fetchAndProcessMusic() {
+            const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/music`;
+            try {
+                const response = await fetch(apiUrl);
+                 if (response.status === 404) {
+                    trackListEl.innerHTML = `<li class="no-music">Folder 'music' tidak ditemukan.</li>`;
+                    return;
+                }
+                if (!response.ok) throw new Error(`GitHub API Error (Status: ${response.status})`);
+                const files = await response.json();
+                if (!Array.isArray(files)) {
+                     trackListEl.innerHTML = `<li class="no-music">Tidak ada musik.</li>`;
+                     return;
+                }
+
+                const musicFiles = files.filter(file => file.name.endsWith('.mp3') || file.name.endsWith('.wav'));
+
+                if (musicFiles.length === 0) {
+                    trackListEl.innerHTML = `<li class="no-music">Tidak ada musik di folder.</li>`;
+                    return;
+                }
+
+                trackListEl.innerHTML = '';
+                musicFiles.forEach(file => {
+                    const trackName = file.name.replace(/\.(mp3|wav)$/i, '').replace(/_/g, ' ');
+                    const li = document.createElement('li');
+                    li.textContent = trackName;
+                    li.dataset.src = file.download_url;
+                    li.addEventListener('click', () => {
+                        playTrack(li);
+                    });
+                    trackListEl.appendChild(li);
+                });
+
+            } catch(error) {
+                console.error("Music Error:", error);
+                trackListEl.innerHTML = `<li class="no-music">Gagal memuat musik.</li>`;
+            }
+        }
+
+        function playTrack(trackElement) {
+            const allTracks = trackListEl.querySelectorAll('li');
+            allTracks.forEach(t => t.classList.remove('playing'));
+
+            trackElement.classList.add('playing');
+            nowPlayingEl.textContent = trackElement.textContent;
+            audioPlayer.src = trackElement.dataset.src;
+            audioPlayer.play();
+            musicPlayerToggle.classList.add('playing');
+            updatePlayPauseIcon(true);
+        }
+
+        function updatePlayPauseIcon(isPlaying) {
+             playPauseBtn.innerHTML = isPlaying ?
+                `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`:
+                `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+        }
+        
+        playPauseBtn.addEventListener('click', () => {
+            if (!audioPlayer.src) return;
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+            } else {
+                audioPlayer.pause();
+            }
+        });
+
+        stopBtn.addEventListener('click', () => {
+            audioPlayer.pause();
+            audioPlayer.currentTime = 0;
+            nowPlayingEl.textContent = "Pilih lagu...";
+            trackListEl.querySelectorAll('li').forEach(t => t.classList.remove('playing'));
+        });
+        
+        audioPlayer.onplay = () => updatePlayPauseIcon(true);
+        audioPlayer.onpause = () => updatePlayPauseIcon(false);
+        audioPlayer.onended = () => {
+            const currentTrack = trackListEl.querySelector('li.playing');
+            const nextTrack = currentTrack ? currentTrack.nextElementSibling : null;
+            if(nextTrack) {
+                playTrack(nextTrack);
+            } else {
+                 stopBtn.click();
+            }
+        };
+
+        closeModalBtn.addEventListener('click', () => {
+            passwordModal.classList.remove('visible');
+            passwordInput.value = '';
+            passwordError.textContent = '';
+        });
+
+        searchInput.addEventListener('input', () => renderCategoryView(searchInput.value));
+        
+        window.addEventListener('scroll', () => backToTopButton.classList.toggle('visible', window.scrollY > 300));
+        backToTopButton.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+        
+        musicPlayerToggle.addEventListener('click', () => {
+            musicPlayerModal.classList.toggle('visible');
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchAndProcessQuizzes();
+            fetchAndProcessMusic();
+        });
     </script>
 </body>
 </html>
-
 
