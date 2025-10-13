@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rencana Penyiksaan Akademis</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for a custom look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Luckiest+Guy&display=swap" rel="stylesheet">
+    <!-- Icon Library -->
+    <script src="https://unpkg.com/phosphor-icons"></script>
+    <style>
+        /* Custom styles inspired by the theme */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #e8f5e9; /* Light minty green from theme */
+        }
+        .font-title {
+            font-family: 'Luckiest Guy', cursive;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+        }
+        .main-header {
+             background-color: #556B2F; /* Dark olive green */
+        }
+        .card {
+            background-color: #FFFDD0; /* Creamy beige */
+            border: 2px solid #D2B48C; /* Tan border */
+            box-shadow: 4px 4px 0px #D2B48C;
+        }
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: 80px repeat(5, minmax(0, 1fr));
+            grid-template-rows: auto repeat(22, 35px); /* Adjusted for 7am to 6pm */
+            gap: 4px;
+        }
+        .grid-header {
+            background-color: #D4E157;
+            border-radius: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            text-align: center;
+        }
+        .time-slot {
+            font-size: 11px;
+            color: #424242;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 2px;
+            grid-column: 1 / 2;
+        }
+        .event-card {
+            border-radius: 8px;
+            padding: 8px;
+            color: #333;
+            font-size: 12px;
+            overflow: hidden;
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .event-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+        .event-card .title {
+            font-weight: 700;
+            font-size: 13px;
+        }
+         .event-card .details {
+            font-size: 11px;
+            line-height: 1.3;
+        }
+        /* Color styles for events */
+        .bg-event-red { background-color: #FFCDD2; border-left: 4px solid #E57373; }
+        .bg-event-blue { background-color: #BBDEFB; border-left: 4px solid #64B5F6; }
+        .bg-event-yellow { background-color: #FFF9C4; border-left: 4px solid #FFF176; }
+        .bg-event-purple { background-color: #E1BEE7; border-left: 4px solid #BA68C8; }
+        .bg-event-green { background-color: #C8E6C9; border-left: 4px solid #81C784; }
+        .bg-event-pink { background-color: #F8BBD0; border-left: 4px solid #F06292; }
+        .bg-event-orange { background-color: #FFCCBC; border-left: 4px solid #FF8A65; }
+        .bg-ishoma { background-color: #CFD8DC; color: #546E7A; }
+    </style>
+</head>
+<body class="p-4 sm:p-6 lg:p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header Section -->
+        <header class="text-center p-4 mb-8 main-header rounded-2xl shadow-lg border-4 border-black">
+            <h1 class="font-title text-4xl sm:text-5xl text-yellow-300 tracking-wider">Rangkuman Penderitaan Akademis</h1>
+        </header>
+
+        <!-- Dashboard Section -->
+        <section class="mb-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Today's Schedule -->
+                <div class="card p-6 rounded-2xl">
+                    <h2 class="font-title text-3xl text-gray-800 mb-4">Realita Hari Ini (Jangan Menangis)</h2>
+                    <div id="today-schedule" class="space-y-3">
+                        <!-- JS will populate this -->
+                    </div>
+                </div>
+                <!-- Tomorrow's Schedule -->
+                <div class="card p-6 rounded-2xl">
+                    <h2 class="font-title text-3xl text-gray-800 mb-4">Penderitaan Berikutnya (Tak Ada Lari)</h2>
+                    <div id="tomorrow-schedule" class="space-y-3">
+                        <!-- JS will populate this -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Full Schedule Section -->
+        <section class="card p-4 sm:p-6 rounded-2xl">
+            <h2 class="font-title text-3xl text-gray-800 mb-4 text-center">Peta Menuju Kehampaan</h2>
+            
+            <!-- Week 1 -->
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold text-gray-700 mb-4">Minggu 5 (13 - 17 Oktober)</h3>
+                <div class="overflow-x-auto">
+                    <div id="week1-grid" class="schedule-grid min-w-[700px]">
+                        <!-- JS will populate this -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Week 2 -->
+            <div>
+                <h3 class="text-2xl font-bold text-gray-700 mb-4">Minggu 6 (20 - 24 Oktober)</h3>
+                <div class="overflow-x-auto">
+                    <div id="week2-grid" class="schedule-grid min-w-[700px]">
+                       <!-- JS will populate this -->
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Footer Section -->
+        <footer class="text-center mt-8">
+            <p class="text-sm text-gray-600">Dibuat di tengah malam dengan kafein dan keputusasaan.</p>
+        </footer>
+    </div>
+
+<script>
+    // --- DATA JADWAL ---
+    // Semua jadwal ada di sini, biar gampang diubah.
+    const scheduleData = [
+        // Minggu 5
+        { week: 1, day: 'Senin', date: '2025-10-13', startTime: '08:00', endTime: '10:00', title: 'K51.52', details: 'Prinsip kerja enzim (Biokimia)<br>dr. Afi Muntaha, M.Sc', color: 'blue' },
+        { week: 1, day: 'Senin', date: '2025-10-13', startTime: '11:00', endTime: '12:00', title: 'Histo 5 Gel A', color: 'white' },
+        { week: 1, day: 'Senin', date: '2025-10-13', startTime: '13:00', endTime: '14:00', title: 'Histo 5 Gel C', color: 'white' },
+        { week: 1, day: 'Senin', date: '2025-10-13', startTime: '15:00', endTime: '16:00', title: 'Histo 5 Gel B', color: 'white' },
+        { week: 1, day: 'Selasa', date: '2025-10-14', startTime: '13:00', endTime: '14:00', title: 'Histo 5 Gel E', color: 'white' },
+        { week: 1, day: 'Selasa', date: '2025-10-14', startTime: '15:00', endTime: '16:00', title: 'Histo 5 Gel D', color: 'white' },
+        { week: 1, day: 'Rabu', date: '2025-10-15', startTime: '08:30', endTime: '11:00', title: 'IDENT PK', color: 'yellow' },
+        { week: 1, day: 'Rabu', date: '2025-10-15', startTime: '13:00', endTime: '15:00', title: 'Tugas School of Kastrad', details: 'Katanya penting, kerjain gih.', color: 'orange' },
+        { week: 1, day: 'Kamis', date: '2025-10-16', startTime: '13:30', endTime: '15:00', title: 'IDENT ANATOMI', color: 'green' },
+        { week: 1, day: 'Jumat', date: '2025-10-17', startTime: '08:30', endTime: '11:00', title: 'IDENT HISTOLOGI', color: 'purple' },
+        { week: 1, day: 'Jumat', date: '2025-10-17', startTime: '13:00', endTime: '14:00', title: 'MKWK', color: 'white' },
+
+        // Minggu 6
+        { week: 2, day: 'Senin', date: '2025-10-20', startTime: '07:00', endTime: '08:00', title: 'DEADLINE PORTOFOLIO', details: 'Tgl 20 PUKUL 08.00. Jangan telat!', color: 'red' },
+        { week: 2, day: 'Senin', date: '2025-10-20', startTime: '09:00', endTime: '11:00', title: 'CBT 2', color: 'orange' },
+        { week: 2, day: 'Selasa', date: '2025-10-21', startTime: '09:00', endTime: '11:00', title: 'SOE', color: 'pink' },
+        { week: 2, day: 'Rabu', date: '2025-10-22', startTime: '09:30', endTime: '11:00', title: 'REMED CBT', color: 'orange' },
+        { week: 2, day: 'Rabu', date: '2025-10-22', startTime: '13:00', endTime: '14:30', title: 'REMIDI IDENT HISTOLOGI', color: 'purple' },
+        { week: 2, day: 'Kamis', date: '2025-10-23', startTime: '09:30', endTime: '11:00', title: 'REMED SOE', color: 'pink' },
+        { week: 2, day: 'Kamis', date: '2025-10-23', startTime: '13:00', endTime: '14:30', title: 'REMIDI IDENT ANATOMI', color: 'green' },
+        { week: 2, day: 'Jumat', date: '2025-10-24', startTime: '09:30', endTime: '11:00', title: 'REMIDI IDENT PK', color: 'yellow' },
+        { week: 2, day: 'Jumat', date: '2025-10-24', startTime: '11:00', endTime: '12:00', title: 'REMIDI IDENT BIOKIMIA', color: 'blue' },
+        { week: 2, day: 'Jumat', date: '2025-10-24', startTime: '13:30', endTime: '15:00', title: 'MKWK', color: 'white' },
+    ];
+    
+    const colorClasses = {
+        red: 'bg-event-red', blue: 'bg-event-blue', yellow: 'bg-event-yellow',
+        purple: 'bg-event-purple', green: 'bg-event-green', pink: 'bg-event-pink',
+        orange: 'bg-event-orange', white: 'bg-white border'
+    };
+
+    // --- FUNGSI ---
+    
+    // Fungsi untuk memformat tanggal YYYY-MM-DD
+    function formatDate(date) {
+        return date.toISOString().split('T')[0];
+    }
+
+    // Fungsi untuk membuat kartu agenda di dashboard
+    function createDashboardCard(event) {
+        return `
+            <div class="flex items-start space-x-3 p-3 rounded-lg ${colorClasses[event.color] || 'bg-gray-100'}">
+                <i class="ph-clock text-xl text-gray-600 mt-1"></i>
+                <div>
+                    <p class="font-semibold">${event.startTime} - ${event.endTime}</p>
+                    <p class="text-gray-800">${event.title}</p>
+                    ${event.details ? `<p class="text-sm text-gray-600">${event.details}</p>` : ''}
+                </div>
+            </div>
+        `;
+    }
+    
+    // Fungsi untuk mengisi dashboard
+    function populateDashboard() {
+        // Ganti baris ini dengan tanggal yang diinginkan untuk testing, misal: new Date('2025-10-13T09:00:00')
+        const today = new Date(); 
+        
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+
+        const todayStr = formatDate(today);
+        const tomorrowStr = formatDate(tomorrow);
+
+        const todayEvents = scheduleData.filter(e => e.date === todayStr).sort((a, b) => a.startTime.localeCompare(b.startTime));
+        const tomorrowEvents = scheduleData.filter(e => e.date === tomorrowStr).sort((a, b) => a.startTime.localeCompare(b.startTime));
+        
+        const todayContainer = document.getElementById('today-schedule');
+        const tomorrowContainer = document.getElementById('tomorrow-schedule');
+
+        todayContainer.innerHTML = todayEvents.length > 0 
+            ? todayEvents.map(createDashboardCard).join('')
+            : '<p class="text-gray-500">Tidak ada jadwal. Ketenangan sesaat sebelum badai berikutnya.</p>';
+        
+        tomorrowContainer.innerHTML = tomorrowEvents.length > 0 
+            ? tomorrowEvents.map(createDashboardCard).join('')
+            : '<p class="text-gray-500">Besok tampak kosong. Mungkin sistemnya lupa memasukkan jadwal remed mendadak.</p>';
+    }
+
+    // Fungsi untuk membuat jadwal grid lengkap
+    function createFullSchedule(containerId, weekNumber) {
+        const container = document.getElementById(containerId);
+        const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
+        
+        // Headers
+        let html = '<div class="grid-header">Waktu</div>' + days.map(d => `<div class="grid-header">${d}</div>`).join('');
+
+        // Time Slots (7 AM to 5 PM)
+        for (let i = 7; i <= 17; i++) {
+            html += `<div class="time-slot" style="grid-row: ${2 + (i-7)*2} / span 2;">${String(i).padStart(2, '0')}:00</div>`;
+        }
+
+        // ISHOMA
+        html += `<div class="event-card bg-ishoma col-start-2 col-end-7 row-start-12 row-end-14 flex items-center justify-center"><span class="title">ISHOMA</span></div>`;
+
+        // Events
+        const weekEvents = scheduleData.filter(e => e.week === weekNumber);
+        weekEvents.forEach(event => {
+            const startHour = parseInt(event.startTime.split(':')[0]);
+            const startMinute = parseInt(event.startTime.split(':')[1]);
+            const endHour = parseInt(event.endTime.split(':')[0]);
+            const endMinute = parseInt(event.endTime.split(':')[1]);
+
+            const startRow = 2 + (startHour - 7) * 2 + (startMinute / 30);
+            const endRow = 2 + (endHour - 7) * 2 + (endMinute / 30);
+            const dayCol = days.indexOf(event.day) + 2;
+
+            html += `
+                <div class="event-card ${colorClasses[event.color] || 'bg-gray-100'}" 
+                     style="grid-column: ${dayCol}; grid-row: ${startRow} / ${endRow};">
+                    <span class="title">${event.title}</span>
+                    ${event.details ? `<span class="details">${event.details}</span>` : ''}
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+    }
+
+    // --- INISIALISASI ---
+    // Menggunakan 'load' memastikan semua resource (termasuk script ikon) sudah siap
+    window.addEventListener('load', () => {
+        populateDashboard();
+        createFullSchedule('week1-grid', 1);
+        createFullSchedule('week2-grid', 2);
+        
+        // Cek secara berkala sampai library ikon siap, lalu jalankan.
+        const iconInterval = setInterval(() => {
+            if (window.phosphor) {
+                clearInterval(iconInterval);
+                try {
+                    window.phosphor.replace();
+                } catch (e) {
+                    console.error("Gagal menjalankan phosphor.replace():", e);
+                }
+            }
+        }, 100);
+    });
+</script>
+</body>
+</html>
