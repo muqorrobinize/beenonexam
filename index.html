@@ -16,13 +16,10 @@
             --text-color: #e0e0e0;
             --text-muted: #888888;
             --glow-color: rgba(159, 85, 255, 0.5);
+            --error-color: #ff5555;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Poppins', sans-serif; background-color: var(--dark-bg); color: var(--text-color); overflow-x: hidden; }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--dark-bg); }
-        ::-webkit-scrollbar-thumb { background: var(--primary-purple); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #b37cff; }
         .dashboard-container { max-width: 1400px; margin: 0 auto; padding: 30px; }
         header { text-align: center; margin-bottom: 40px; }
         header h1 { font-size: 3rem; font-weight: 700; background: linear-gradient(90deg, var(--text-color), var(--primary-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 1px; }
@@ -37,16 +34,11 @@
         .quiz-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 10px 30px var(--glow-color); border-color: var(--primary-purple); }
         .card-header { display: flex; align-items: center; margin-bottom: 15px; }
         .card-header svg { width: 24px; height: 24px; margin-right: 12px; color: var(--primary-purple); }
-        .card-header h3 { font-size: 1.25rem; font-weight: 600; }
+        .card-header h3 { font-size: 1.25rem; font-weight: 600; flex-grow: 1; }
         .card-body p { font-size: 0.9rem; color: var(--text-muted); flex-grow: 1; }
-        .donation-ticker-link { text-decoration: none; }
-        .donation-ticker { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 15px 20px; cursor: pointer; transition: background-color 0.3s ease, box-shadow 0.3s ease; overflow: hidden; margin-top: 50px; }
-        .donation-ticker:hover { background-color: #2a2a2a; box-shadow: 0 0 15px var(--glow-color); }
-        .donation-ticker marquee { font-size: 1rem; font-weight: 500; }
-        .donation-ticker .donation-text { color: var(--primary-purple); margin-right: 50px; }
+        .status-message { text-align: center; color: var(--text-muted); font-size: 1rem; padding: 40px 20px; background-color: var(--card-bg); border-radius: 10px; border: 1px solid var(--border-color); }
+        .status-message.error { color: var(--error-color); border-color: var(--error-color); }
         footer { text-align: center; padding: 30px 0; margin-top: 40px; border-top: 1px solid var(--border-color); }
-        footer a { color: var(--text-muted); text-decoration: none; font-weight: 500; transition: color 0.3s ease; }
-        footer a:hover { color: var(--primary-purple); }
     </style>
 </head>
 <body>
@@ -62,44 +54,35 @@
         </div>
         
         <main id="main-content">
-            <!-- Konten kuis yang dikelompokkan akan dibuat oleh JavaScript di sini -->
+            <p class="status-message">Memuat daftar kuis...</p>
         </main>
-
-        <a href="https://saweria.co/beenspaceess" target="_blank" class="donation-ticker-link" title="Dukung kami di Saweria!">
-            <div class="donation-ticker">
-                <marquee behavior="scroll" direction="left" scrollamount="5">
-                    <span class="donation-text">Dukung kami di Saweria agar terus update soal-soal baru!</span>
-                    <span class="donation-text">•••</span>
-                    <span class="donation-text">Klik di sini untuk memberikan dukungan</span>
-                </marquee>
-            </div>
-        </a>
-
+        
         <footer>
-            <a href="https://www.instagram.com/beenspace" target="_blank">Credit by @beenspace</a>
+            <!-- Konten footer bisa ditambahkan di sini jika perlu -->
         </footer>
     </div>
 
     <script>
-        // --- PUSAT DATA KUIS ---
-        // !!! JANGAN EDIT BAGIAN INI SECARA MANUAL !!!
-        // Baris ini akan diisi secara otomatis oleh skrip generate_dashboard.py
-        const quizData = [];
+        // --- PENGATURAN ---
+        // GANTI DUA BARIS DI BAWAH INI SESUAI DENGAN PROYEK ANDA DI GITHUB
+        const GITHUB_USERNAME = "muqorrobinize";
+        const GITHUB_REPO = "beenonexam";
+        // --------------------------------------------------------------------
 
-        const fileIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>`;
-        
         const mainContent = document.getElementById('main-content');
         const searchInput = document.getElementById('search-input');
+        const fileIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>`;
+        let allQuizData = []; // Variabel untuk menyimpan semua data kuis
 
-        function renderItems(filter = '') {
+        function renderItems(quizData, filter = '') {
             mainContent.innerHTML = '';
             
             const filteredData = quizData.filter(item => 
                 item.filename.toLowerCase().replace(/_/g, ' ').includes(filter.toLowerCase())
             );
-
+            
             if (quizData.length === 0) {
-                 mainContent.innerHTML = `<p style="color: var(--text-muted); text-align: center;">Belum ada kuis. Coba jalankan skrip 'python generate_dashboard.py' untuk membuat daftar kuis.</p>`;
+                 mainContent.innerHTML = `<p class="status-message">Tidak ada kuis yang ditemukan di folder 'kuis'. Silakan upload file kuis Anda ke GitHub.</p>`;
                  return;
             }
 
@@ -110,10 +93,7 @@
                 const category = parts[0].trim();
                 const quizName = parts[1].replace('.html', '').trim();
                 
-                if (!acc[category]) {
-                    acc[category] = [];
-                }
-                
+                if (!acc[category]) acc[category] = [];
                 acc[category].push({ ...item, quizName });
                 return acc;
             }, {});
@@ -121,26 +101,21 @@
             const sortedCategories = Object.keys(groupedQuizzes).sort();
 
             if (sortedCategories.length === 0 && filter) {
-                mainContent.innerHTML = `<p style="color: var(--text-muted); text-align: center;">Tidak ada kuis yang cocok dengan "${filter}"</p>`;
+                mainContent.innerHTML = `<p class="status-message">Tidak ada kuis yang cocok dengan pencarian "${filter}"</p>`;
             }
 
             for (const category of sortedCategories) {
                 const section = document.createElement('section');
                 section.className = 'category-section';
-
                 const title = document.createElement('h2');
                 title.className = 'section-title';
                 title.textContent = category;
                 section.appendChild(title);
-
                 const grid = document.createElement('div');
                 grid.className = 'content-grid';
-
                 groupedQuizzes[category].forEach(item => {
                     const card = document.createElement('a');
-                    // --- PERUBAHAN DI SINI ---
-                    // Link sekarang mengarah ke dalam folder 'kuis/'
-                    card.href = 'kuis/' + item.filename;
+                    card.href = `kuis/${item.filename}`;
                     card.target = '_blank';
                     card.className = 'quiz-card';
                     card.innerHTML = `
@@ -149,17 +124,54 @@
                     `;
                     grid.appendChild(card);
                 });
-
                 section.appendChild(grid);
                 mainContent.appendChild(section);
             }
         }
 
-        searchInput.addEventListener('input', () => renderItems(searchInput.value));
+        async function fetchAndRenderQuizzes() {
+            const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/kuis`;
+            
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(`Gagal mengambil data dari GitHub (Status: ${response.status})`);
+                }
+                const files = await response.json();
+
+                if (!Array.isArray(files)) {
+                     throw new Error("Folder 'kuis' tidak ditemukan atau repository bersifat privat.");
+                }
+
+                allQuizData = files
+                    .filter(file => file.type === 'file' && file.name.endsWith('.html'))
+                    .map(file => {
+                        const quizName = file.name.split('_').slice(1).join(' ').replace('.html', '');
+                        return {
+                            filename: file.name,
+                            description: `Kumpulan soal dan latihan untuk ${quizName}.`
+                        };
+                    });
+                
+                renderItems(allQuizData);
+
+            } catch (error) {
+                console.error("Error:", error);
+                mainContent.innerHTML = `
+                    <div class="status-message error">
+                        <strong>Terjadi Kesalahan</strong><br>
+                        <p>Gagal memuat daftar kuis. Pastikan konfigurasi USERNAME dan REPO sudah benar di file index.html, dan folder 'kuis' ada di repository Anda.</p>
+                        <small>Detail: ${error.message}</small>
+                    </div>`;
+            }
+        }
+
+        searchInput.addEventListener('input', () => renderItems(allQuizData, searchInput.value));
         
-        document.addEventListener('DOMContentLoaded', () => {
-            renderItems();
-        });
+        // Mulai proses saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', fetchAndRenderQuizzes);
     </script>
 </body>
 </html>
+
+
