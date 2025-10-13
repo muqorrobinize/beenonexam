@@ -17,26 +17,21 @@
             --text-muted: #888888;
             --glow-color: rgba(159, 85, 255, 0.5);
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Poppins', sans-serif; background-color: var(--dark-bg); color: var(--text-color); overflow-x: hidden; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--dark-bg); }
         ::-webkit-scrollbar-thumb { background: var(--primary-purple); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #b37cff; }
-
         .dashboard-container { max-width: 1400px; margin: 0 auto; padding: 30px; }
         header { text-align: center; margin-bottom: 40px; }
         header h1 { font-size: 3rem; font-weight: 700; background: linear-gradient(90deg, var(--text-color), var(--primary-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 1px; }
-        
         .search-wrapper { position: relative; width: 100%; max-width: 600px; margin: 0 auto 40px; }
         #search-input { width: 100%; padding: 15px 20px 15px 50px; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-color); font-size: 1rem; outline: none; transition: border-color 0.3s ease, box-shadow 0.3s ease; }
         #search-input:focus { border-color: var(--primary-purple); box-shadow: 0 0 15px var(--glow-color); }
         .search-wrapper svg { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: var(--text-muted); }
-
         .category-section { margin-bottom: 50px; }
         .section-title { font-size: 1.8rem; margin-bottom: 20px; border-bottom: 2px solid var(--primary-purple); padding-bottom: 10px; display: inline-block; }
-        
         .content-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
         .quiz-card { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 20px; text-decoration: none; color: var(--text-color); display: flex; flex-direction: column; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; }
         .quiz-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 10px 30px var(--glow-color); border-color: var(--primary-purple); }
@@ -44,13 +39,11 @@
         .card-header svg { width: 24px; height: 24px; margin-right: 12px; color: var(--primary-purple); }
         .card-header h3 { font-size: 1.25rem; font-weight: 600; }
         .card-body p { font-size: 0.9rem; color: var(--text-muted); flex-grow: 1; }
-        
         .donation-ticker-link { text-decoration: none; }
         .donation-ticker { background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 15px 20px; cursor: pointer; transition: background-color 0.3s ease, box-shadow 0.3s ease; overflow: hidden; margin-top: 50px; }
         .donation-ticker:hover { background-color: #2a2a2a; box-shadow: 0 0 15px var(--glow-color); }
         .donation-ticker marquee { font-size: 1rem; font-weight: 500; }
         .donation-ticker .donation-text { color: var(--primary-purple); margin-right: 50px; }
-
         footer { text-align: center; padding: 30px 0; margin-top: 40px; border-top: 1px solid var(--border-color); }
         footer a { color: var(--text-muted); text-decoration: none; font-weight: 500; transition: color 0.3s ease; }
         footer a:hover { color: var(--primary-purple); }
@@ -89,11 +82,9 @@
 
     <script>
         // --- PUSAT DATA KUIS ---
-        const quizData = [
-            // Format: { filename: "KATEGORI_Nama Kuis.html", description: "Deskripsi singkat kuis." },
-            
-            // Tambahkan data kuis Anda di sini
-        ];
+        // !!! JANGAN EDIT BAGIAN INI SECARA MANUAL !!!
+        // Baris ini akan diisi secara otomatis oleh skrip generate_dashboard.py
+        const quizData = [];
 
         const fileIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>`;
         
@@ -108,7 +99,7 @@
             );
 
             if (quizData.length === 0) {
-                 mainContent.innerHTML = `<p style="color: var(--text-muted); text-align: center;">Belum ada kuis. Silakan tambahkan data kuis di file index.html.</p>`;
+                 mainContent.innerHTML = `<p style="color: var(--text-muted); text-align: center;">Belum ada kuis. Coba jalankan skrip 'python generate_dashboard.py' untuk membuat daftar kuis.</p>`;
                  return;
             }
 
@@ -148,8 +139,8 @@
                 groupedQuizzes[category].forEach(item => {
                     const card = document.createElement('a');
                     // --- PERUBAHAN DI SINI ---
-                    // Tidak lagi menggunakan folder 'kuis/', link langsung ke nama file.
-                    card.href = item.filename;
+                    // Link sekarang mengarah ke dalam folder 'kuis/'
+                    card.href = 'kuis/' + item.filename;
                     card.target = '_blank';
                     card.className = 'quiz-card';
                     card.innerHTML = `
@@ -172,4 +163,3 @@
     </script>
 </body>
 </html>
-
