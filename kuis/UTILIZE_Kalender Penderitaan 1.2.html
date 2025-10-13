@@ -207,8 +207,10 @@
     
     // Fungsi untuk mengisi dashboard
     function populateDashboard() {
-        // Ganti baris ini dengan tanggal yang diinginkan untuk testing, misal: new Date('2025-10-13T09:00:00')
-        const today = new Date(); 
+        // SIMULASI TANGGAL: Untuk demonstrasi, kita anggap "hari ini" adalah 14 Oktober 2025.
+        // Anda bisa mengubah tanggal di bawah ini untuk melihat jadwal pada hari yang berbeda.
+        // Untuk menggunakan tanggal asli saat ini, ganti baris di bawah dengan: const today = new Date();
+        const today = new Date('2025-10-14T09:00:00'); // <--- Tanggal disimulasikan di sini
         
         const tomorrow = new Date(today);
         tomorrow.setDate(today.getDate() + 1);
@@ -293,3 +295,4 @@
 </script>
 </body>
 </html>
+
