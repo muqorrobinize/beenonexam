@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kuis Patologi Klinik</title>
+    <title>Kuis Patologi Klinik - Gamified</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #4CAF50;
@@ -16,9 +16,10 @@
             --card-bg: rgba(255, 255, 255, 0.15);
             --text-color: #ffffff;
             --border-color: rgba(255, 255, 255, 0.2);
-            --shadow-color: rgba(0, 0, 0, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.15);
             --correct-color: #43A047;
             --incorrect-color: #E53935;
+            --timer-color: #FFC107;
         }
 
         * {
@@ -37,6 +38,7 @@
             background: linear-gradient(135deg, var(--background-start), var(--background-end));
             color: var(--text-color);
             padding: 20px;
+            overflow: hidden;
         }
 
         .container {
@@ -47,8 +49,37 @@
 
         h1 {
             font-size: 2.5rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             text-shadow: 2px 2px 4px var(--shadow-color);
+        }
+        
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0 10px;
+        }
+
+        #progress-container {
+            width: 100%;
+            height: 10px;
+            background-color: rgba(0,0,0,0.2);
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+        
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--primary-color);
+            border-radius: 5px;
+            transition: width 0.3s ease-in-out;
+        }
+        
+        #score-display, #question-counter {
+            font-size: 1.1rem;
+            font-weight: 600;
         }
 
         .quiz-container {
@@ -60,12 +91,34 @@
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             box-shadow: 0 8px 32px 0 var(--shadow-color);
+            position: relative;
+        }
+        
+        #timer-container {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            background-color: var(--timer-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+            border: 4px solid white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
         #question-text {
             font-size: 1.5rem;
+            margin-top: 2rem;
             margin-bottom: 2rem;
             font-weight: 600;
+            min-height: 100px;
         }
 
         .options-container {
@@ -85,7 +138,7 @@
             font-family: 'Poppins', sans-serif;
             font-size: 1rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             text-align: left;
         }
         
@@ -97,14 +150,37 @@
         .option-btn.correct {
             background-color: var(--correct-color);
             border-color: var(--correct-color);
+            transform: scale(1.05);
         }
         
         .option-btn.incorrect {
             background-color: var(--incorrect-color);
             border-color: var(--incorrect-color);
         }
+        
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
 
-        #next-btn, #retry-btn {
+        #results-container {
+            display: none;
+            text-align: center;
+        }
+        
+        #results-title {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        #final-score {
+            font-size: 3rem;
+            color: var(--timer-color);
+            margin: 1rem 0;
+            font-weight: 700;
+        }
+
+        #retry-btn {
             padding: 12px 30px;
             border: none;
             border-radius: 25px;
@@ -116,58 +192,73 @@
             font-weight: 600;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin-top: 1.5rem;
         }
-
-        #next-btn:hover, #retry-btn:hover {
+        
+        #retry-btn:hover {
             background: var(--secondary-color);
             transform: translateY(-3px);
         }
         
-        #results-container {
-            display: none; /* Hidden by default */
-        }
-        
-        #results-text {
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
+        #feedback-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8rem;
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(0,0,0,0.5);
+            z-index: 100;
+            pointer-events: none;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.3s ease-in-out;
         }
 
-        /* Responsive Design */
+        #feedback-overlay.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
         @media (max-width: 600px) {
-            h1 {
-                font-size: 1.8rem;
-            }
-            .quiz-container {
-                padding: 20px;
-            }
-            #question-text {
-                font-size: 1.2rem;
-            }
-            .options-container {
-                grid-template-columns: 1fr;
-            }
+            h1 { font-size: 1.8rem; }
+            .quiz-container { padding: 20px; }
+            #question-text { font-size: 1.2rem; min-height: 80px; }
+            .options-container { grid-template-columns: 1fr; }
+            #feedback-overlay { font-size: 5rem; }
         }
     </style>
 </head>
 <body>
-
+    <div id="feedback-overlay"></div>
     <div class="container">
         <h1>Kuis Patologi Klinik</h1>
 
-        <div class="quiz-container" id="quiz-container">
-            <h2 id="question-text">Question text goes here</h2>
-            <div class="options-container" id="options-container">
-                <!-- Options will be generated here -->
+        <div id="game-area">
+             <div class="quiz-header">
+                <div id="question-counter">Soal 1/100</div>
+                <div id="score-display">Skor: 0</div>
             </div>
-            <button id="next-btn">Lanjut</button>
+            <div id="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+            <div class="quiz-container" id="quiz-container">
+                <div id="timer-container">15</div>
+                <h2 id="question-text">Question text goes here</h2>
+                <div class="options-container" id="options-container"></div>
+            </div>
         </div>
         
         <div class="quiz-container" id="results-container">
-            <h2 id="results-text">Anda telah menyelesaikan kuis!</h2>
-            <p id="score-text" style="font-size: 1.2rem; margin-bottom: 2rem;">Skor Anda: 0 / 100</p>
-            <button id="retry-btn">Coba Lagi</button>
+            <h2 id="results-title">Kuis Selesai!</h2>
+            <p style="font-size: 1.2rem;">Skor Akhir Anda:</p>
+            <p id="final-score">0</p>
+            <button id="retry-btn">Main Lagi</button>
         </div>
-
     </div>
 
     <script>
@@ -237,7 +328,7 @@
             { question: "Hasil lab: Ht = 45%, Eritrosit = 5 juta/mm³. Berapakah nilai MCV?", options: ["80 fL", "90 fL", "100 fL", "110 fL"], answer: "90 fL" }, // (45/5)*10
             { question: "Hasil lab: Hb = 15 gr%, Eritrosit = 5 juta/mm³. Berapakah nilai MCH?", options: ["25 pg", "30 pg", "35 pg", "40 pg"], answer: "30 pg" }, // (15/5)*10
             { question: "Hasil lab: Hb = 12 gr%, Ht = 36%. Berapakah nilai MCHC?", options: ["30%", "33.3%", "36%", "40%"], answer: "33.3%" }, // (12/36)*100
-            { question: "Dihitung 500 sel eritrosit dalam 80 kotak kecil (area 1/5 mm²) dengan pengenceran 200x. Berapa jumlah eritrosit/mm³?", options: ["5.000.000", "2.500.000", "4.000.000", "6.250.000"], answer: "6.250.000" }, // 500 * 5 * 10 * 200 -> incorrect formula in prompt. Correct: (500/80) * 400 * 10 * 200 (if using all central squares). Simple: 500 * (1/ (1/5 * 1/10)) * 200 = 500 * 50 * 200 = 5,000,000. Let's use the standard formula based on volume: 500 sel / (1/5 mm² * 1/10 mm) * 200 = 500 / (1/50 mm³) * 200 = 500 * 50 * 200 = 5,000,000.
+            { question: "Dihitung 500 sel eritrosit di 5 kotak sedang (total 80 kotak kecil) dengan pengenceran 200x. Berapa jumlah eritrosit/mm³?", options: ["5.000.000", "2.500.000", "4.000.000", "6.250.000"], answer: "5.000.000" }, // 500 * 10 * 1000 -> not standard. (500/80) * 400 * 10 * 200 -> incorrect formula in prompt. Correct is 500 * 10 (depth) * 5 (from 1/5th of the central square) * 200 (dilution) = 5,000,000
             
             // Errors & Troubleshooting
             { question: "Apa efek jika terdapat gelembung udara dalam pipet Westergreen saat pemeriksaan LED?", options: ["Hasil lebih tinggi", "Hasil lebih rendah", "Tidak ada efek", "Darah membeku"], answer: "Hasil lebih rendah" },
@@ -285,29 +376,70 @@
             { question: "Pemeriksaan darah rutin secara umum tidak mencakup...", options: ["Kadar Hemoglobin", "Jumlah Leukosit", "Kadar Glukosa", "Nilai Hematokrit"], answer: "Kadar Glukosa" },
         ];
 
-        let shuffledQuestions, currentQuestionIndex, score;
+        const TIME_PER_QUESTION = 15;
+        let shuffledQuestions, currentQuestionIndex, score, timerInterval, timeLeft;
 
-        const quizContainer = document.getElementById('quiz-container');
+        const gameArea = document.getElementById('game-area');
         const resultsContainer = document.getElementById('results-container');
         const questionText = document.getElementById('question-text');
         const optionsContainer = document.getElementById('options-container');
-        const nextBtn = document.getElementById('next-btn');
         const retryBtn = document.getElementById('retry-btn');
-        const scoreText = document.getElementById('score-text');
+        const scoreDisplay = document.getElementById('score-display');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const questionCounter = document.getElementById('question-counter');
+        const progressBar = document.getElementById('progress-bar');
+        const timerDisplay = document.getElementById('timer-container');
+        const feedbackOverlay = document.getElementById('feedback-overlay');
 
         function startQuiz() {
             shuffledQuestions = [...quizData].sort(() => Math.random() - 0.5);
+            // For dev purpose, let's keep it short
+            // shuffledQuestions = shuffledQuestions.slice(0, 10); 
             currentQuestionIndex = 0;
             score = 0;
             resultsContainer.style.display = 'none';
-            quizContainer.style.display = 'block';
-            nextBtn.textContent = 'Lanjut';
+            gameArea.style.display = 'block';
+            updateScoreDisplay();
             setNextQuestion();
         }
 
         function setNextQuestion() {
             resetState();
-            showQuestion(shuffledQuestions[currentQuestionIndex]);
+            if (currentQuestionIndex < shuffledQuestions.length) {
+                showQuestion(shuffledQuestions[currentQuestionIndex]);
+                updateProgress();
+                startTimer();
+            } else {
+                showResults();
+            }
+        }
+        
+        function startTimer() {
+            timeLeft = TIME_PER_QUESTION;
+            timerDisplay.textContent = timeLeft;
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeout();
+                }
+            }, 1000);
+        }
+        
+        function handleTimeout() {
+            showFeedback(false); // Timeout is incorrect
+            disableOptions(true); // Disable and show correct answer
+        }
+
+        function updateProgress() {
+             questionCounter.textContent = `Soal ${currentQuestionIndex + 1}/${shuffledQuestions.length}`;
+             const progressPercentage = ((currentQuestionIndex + 1) / shuffledQuestions.length) * 100;
+             progressBar.style.width = `${progressPercentage}%`;
+        }
+        
+        function updateScoreDisplay() {
+            scoreDisplay.textContent = `Skor: ${score}`;
         }
 
         function showQuestion(question) {
@@ -322,59 +454,64 @@
         }
 
         function resetState() {
-            nextBtn.style.display = 'none';
+            clearInterval(timerInterval);
             while (optionsContainer.firstChild) {
                 optionsContainer.removeChild(optionsContainer.firstChild);
             }
         }
 
         function selectAnswer(e) {
+            clearInterval(timerInterval);
             const selectedBtn = e.target;
-            const correct = selectedBtn.textContent === shuffledQuestions[currentQuestionIndex].answer;
+            const isCorrect = selectedBtn.textContent === shuffledQuestions[currentQuestionIndex].answer;
             
-            if (correct) {
-                score++;
+            if (isCorrect) {
+                const points = 500 + (timeLeft * 10);
+                score += points;
+                updateScoreDisplay();
             }
             
-            Array.from(optionsContainer.children).forEach(button => {
-                setStatusClass(button, button.textContent === shuffledQuestions[currentQuestionIndex].answer);
-                button.disabled = true;
-            });
-
-            if (shuffledQuestions.length > currentQuestionIndex + 1) {
-                 nextBtn.style.display = 'block';
-            } else {
-                 nextBtn.textContent = 'Lihat Hasil';
-                 nextBtn.style.display = 'block';
-            }
+            showFeedback(isCorrect);
+            disableOptions(isCorrect, selectedBtn);
         }
         
-        function setStatusClass(element, correct) {
-            if (correct) {
-                element.classList.add('correct');
+        function disableOptions(isCorrect, selectedBtn = null) {
+             Array.from(optionsContainer.children).forEach(button => {
+                if (button.textContent === shuffledQuestions[currentQuestionIndex].answer) {
+                    button.classList.add('correct');
+                } else if (button === selectedBtn) {
+                    button.classList.add('incorrect');
+                }
+                button.disabled = true;
+            });
+             setTimeout(() => {
+                currentQuestionIndex++;
+                setNextQuestion();
+            }, 1500); // Wait 1.5 seconds before next question
+        }
+
+        function showFeedback(isCorrect) {
+            if (isCorrect) {
+                feedbackOverlay.textContent = "Benar!";
+                feedbackOverlay.style.color = 'var(--correct-color)';
             } else {
-                element.classList.add('incorrect');
+                feedbackOverlay.textContent = "Salah!";
+                feedbackOverlay.style.color = 'var(--incorrect-color)';
             }
+            feedbackOverlay.classList.add('show');
+            setTimeout(() => {
+                feedbackOverlay.classList.remove('show');
+            }, 1000);
         }
         
         function showResults() {
-             quizContainer.style.display = 'none';
+             gameArea.style.display = 'none';
              resultsContainer.style.display = 'block';
-             scoreText.textContent = `Skor Anda: ${score} / ${shuffledQuestions.length}`;
+             finalScoreDisplay.textContent = score;
         }
-        
-        nextBtn.addEventListener('click', () => {
-            if (shuffledQuestions.length > currentQuestionIndex + 1) {
-                currentQuestionIndex++;
-                setNextQuestion();
-            } else {
-                showResults();
-            }
-        });
         
         retryBtn.addEventListener('click', startQuiz);
 
-        // Start the quiz on page load
         startQuiz();
     </script>
 </body>
