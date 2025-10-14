@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pusat Timer & Alarm</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for a custom look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Luckiest+Guy&display=swap" rel="stylesheet">
+    <!-- Icon Library -->
+    <script src="https://unpkg.com/phosphor-icons"></script>
+    <!-- Tone.js for audio generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <style>
+        /* Custom styles inspired by the theme */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #e8f5e9;
+        }
+        .font-title {
+            font-family: 'Luckiest Guy', cursive;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+        }
+        .main-header {
+             background-color: #556B2F;
+        }
+        .card {
+            background-color: #FFFDD0;
+            border: 2px solid #D2B48C;
+            box-shadow: 4px 4px 0px #D2B48C;
+            transition: all 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 6px 6px 0px #D2B48C;
+        }
+        .timer-display {
+            font-family: 'Luckiest Guy', cursive;
+            font-size: 5rem;
+            letter-spacing: 0.1em;
+            color: #333;
+        }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s;
+            border: 2px solid black;
+            box-shadow: 3px 3px 0px black;
+        }
+        .btn:active {
+            transform: translate(3px, 3px);
+            box-shadow: none;
+        }
+        .btn-green { background-color: #A5D6A7; }
+        .btn-yellow { background-color: #FFF59D; }
+        .btn-red { background-color: #EF9A9A; }
+    </style>
+</head>
+<body class="p-4 sm:p-6 lg:p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header Section -->
+        <header class="text-center p-4 mb-8 main-header rounded-2xl shadow-lg border-4 border-black">
+            <h1 class="font-title text-4xl sm:text-5xl text-yellow-300 tracking-wider">Pusat Timer & Alarm</h1>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Pomodoro Timer Card -->
+            <div class="card p-6 rounded-2xl flex flex-col items-center">
+                <h2 class="font-title text-3xl text-gray-800 mb-2">Timer Pomodoro</h2>
+                <p id="pomodoro-status" class="mb-4 text-gray-600 font-semibold">Sesi Belajar</p>
+                <div id="pomodoro-display" class="timer-display mb-6">25:00</div>
+                <div class="flex space-x-4">
+                    <button id="pomo-start" class="btn btn-green">Mulai</button>
+                    <button id="pomo-pause" class="btn btn-yellow">Jeda</button>
+                    <button id="pomo-reset" class="btn btn-red">Reset</button>
+                </div>
+            </div>
+
+            <!-- Custom Alarm Card -->
+            <div class="card p-6 rounded-2xl flex flex-col items-center">
+                <h2 class="font-title text-3xl text-gray-800 mb-4">Alarm Kustom</h2>
+                <div class="mb-4">
+                    <input type="time" id="alarm-time" class="p-2 border-2 border-gray-400 rounded-lg text-2xl">
+                </div>
+                <div class="mb-4">
+                    <label for="alarm-sound" class="block text-center font-semibold mb-2">Pilih Suara Alarm:</label>
+                    <select id="alarm-sound" class="p-2 border-2 border-gray-400 rounded-lg">
+                        <option value="digital">Digital Klasik</option>
+                        <option value="siren">Sirine Darurat</option>
+                        <option value="chaos">Kacau Balau</option>
+                    </select>
+                </div>
+                <div class="flex space-x-4">
+                    <button id="set-alarm" class="btn btn-green">Atur Alarm</button>
+                    <button id="clear-alarm" class="btn btn-red">Hapus</button>
+                    <button id="test-sound" class="btn btn-yellow">Tes Suara</button>
+                </div>
+                 <p id="alarm-status" class="mt-4 text-gray-600 font-semibold h-6"></p>
+            </div>
+        </main>
+        
+        <!-- Footer Section -->
+        <footer class="text-center mt-8">
+            <p class="text-sm text-gray-600">Dirancang untuk membantu Anda menaklukkan hari.</p>
+        </footer>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Inisialisasi Audio ---
+        let audioStarted = false;
+        const initAudio = async () => {
+            if (!audioStarted) {
+                await Tone.start();
+                audioStarted = true;
+                console.log('Audio context started');
+            }
+        };
+
+        // --- Suara Alarm (Berisik!) ---
+        const alarmSounds = {
+            'digital': new Tone.Synth({
+                oscillator: { type: 'square' },
+                envelope: { attack: 0.01, decay: 0.1, sustain: 0.2, release: 0.1 }
+            }).toDestination(),
+            'siren': new Tone.Oscillator(440, "sine").toDestination(),
+            'chaos': new Tone.PolySynth(Tone.Synth, {
+                oscillator: { type: 'sawtooth' },
+                envelope: { attack: 0.01, decay: 0.5, sustain: 0.1, release: 0.5 }
+            }).toDestination()
+        };
+        let sirenInterval;
+
+        function playAlarm(soundType) {
+            stopAllAlarms();
+            if (soundType === 'digital') {
+                const now = Tone.now();
+                alarmSounds.digital.triggerAttackRelease('C6', '8n', now);
+                alarmSounds.digital.triggerAttackRelease('G6', '8n', now + 0.2);
+                alarmSounds.digital.triggerAttackRelease('C6', '8n', now + 0.4);
+                alarmSounds.digital.triggerAttackRelease('G6', '8n', now + 0.6);
+            } else if (soundType === 'siren') {
+                alarmSounds.siren.start();
+                let freq = 440;
+                let direction = 1;
+                sirenInterval = setInterval(() => {
+                    freq += 10 * direction;
+                    if (freq > 880 || freq < 440) direction *= -1;
+                    alarmSounds.siren.frequency.rampTo(freq, 0.1);
+                }, 100);
+            } else if (soundType === 'chaos') {
+                 alarmSounds.chaos.triggerAttackRelease(['C4', 'D#4', 'G#4'], '1n');
+            }
+        }
+
+        function stopAllAlarms() {
+            if (alarmSounds.siren.state === 'started') alarmSounds.siren.stop();
+            if (sirenInterval) clearInterval(sirenInterval);
+        }
+
+        // --- Logika Pomodoro ---
+        const pomoDisplay = document.getElementById('pomodoro-display');
+        const pomoStatus = document.getElementById('pomodoro-status');
+        let pomoInterval;
+        let pomoSeconds = 25 * 60;
+        let pomoState = 'work'; // work, short, long
+        let sessionCount = 0;
+        let isPaused = true;
+
+        const updatePomoDisplay = () => {
+            const minutes = Math.floor(pomoSeconds / 60);
+            const seconds = pomoSeconds % 60;
+            pomoDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        };
+
+        const switchPomoState = () => {
+            if (pomoState === 'work') {
+                sessionCount++;
+                if (sessionCount % 4 === 0) {
+                    pomoState = 'long';
+                    pomoStatus.textContent = 'Istirahat Panjang';
+                    pomoSeconds = 15 * 60;
+                } else {
+                    pomoState = 'short';
+                    pomoStatus.textContent = 'Istirahat Singkat';
+                    pomoSeconds = 5 * 60;
+                }
+            } else {
+                pomoState = 'work';
+                pomoStatus.textContent = 'Sesi Belajar';
+                pomoSeconds = 25 * 60;
+            }
+            playAlarm('digital');
+            updatePomoDisplay();
+        };
+
+        document.getElementById('pomo-start').addEventListener('click', () => {
+            initAudio();
+            if (isPaused) {
+                isPaused = false;
+                pomoInterval = setInterval(() => {
+                    if (pomoSeconds > 0) {
+                        pomoSeconds--;
+                        updatePomoDisplay();
+                    } else {
+                        switchPomoState();
+                    }
+                }, 1000);
+            }
+        });
+
+        document.getElementById('pomo-pause').addEventListener('click', () => {
+            isPaused = true;
+            clearInterval(pomoInterval);
+        });
+
+        document.getElementById('pomo-reset').addEventListener('click', () => {
+            isPaused = true;
+            clearInterval(pomoInterval);
+            pomoState = 'work';
+            pomoStatus.textContent = 'Sesi Belajar';
+            pomoSeconds = 25 * 60;
+            sessionCount = 0;
+            updatePomoDisplay();
+        });
+
+        // --- Logika Alarm Kustom ---
+        const alarmTimeInput = document.getElementById('alarm-time');
+        const alarmStatus = document.getElementById('alarm-status');
+        let alarmInterval;
+        let scheduledAlarm = null;
+
+        document.getElementById('set-alarm').addEventListener('click', () => {
+            initAudio();
+            const timeValue = alarmTimeInput.value;
+            if (!timeValue) {
+                alarmStatus.textContent = "Pilih waktu dulu!";
+                return;
+            }
+            const [hours, minutes] = timeValue.split(':');
+            scheduledAlarm = { hours, minutes };
+            alarmStatus.textContent = `Alarm diatur untuk ${hours}:${minutes}`;
+
+            if (alarmInterval) clearInterval(alarmInterval);
+            alarmInterval = setInterval(checkAlarm, 1000);
+        });
+        
+        const checkAlarm = () => {
+            if (!scheduledAlarm) return;
+            const now = new Date();
+            if (now.getHours() == scheduledAlarm.hours && now.getMinutes() == scheduledAlarm.minutes) {
+                const selectedSound = document.getElementById('alarm-sound').value;
+                playAlarm(selectedSound);
+                // Keep playing until cleared
+                setTimeout(() => stopAllAlarms(), 10000); // Stop after 10s to avoid annoyance
+                clearAlarm();
+            }
+        };
+
+        const clearAlarm = () => {
+            clearInterval(alarmInterval);
+            scheduledAlarm = null;
+            alarmStatus.textContent = "Alarm dihapus.";
+        };
+
+        document.getElementById('clear-alarm').addEventListener('click', clearAlarm);
+
+        document.getElementById('test-sound').addEventListener('click', () => {
+            initAudio();
+            const selectedSound = document.getElementById('alarm-sound').value;
+            playAlarm(selectedSound);
+            setTimeout(() => stopAllAlarms(), 2000); // Stop after 2 seconds
+        });
+        
+        updatePomoDisplay(); // Initial display
+    });
+</script>
+</body>
+</html>
+
