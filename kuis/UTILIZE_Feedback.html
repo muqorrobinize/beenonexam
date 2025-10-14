@@ -19,10 +19,7 @@
         .btn:active { transform: translate(3px, 3px); box-shadow: none; }
         .btn-blue { background-color: #90CAF9; }
         .btn-red { background-color: #EF9A9A; }
-        .message-card { background-color: #fafad2; border-left: 5px solid #D2B48C; word-wrap: break-word; position: relative; }
-        .delete-btn { display: none; position: absolute; top: 0.5rem; right: 0.5rem; background: none; border: none; font-size: 1.5rem; line-height: 1; cursor: pointer; color: #ef9a9a; }
-        .admin-mode .delete-btn { display: block; }
-        .delete-btn:hover { color: #dc2626; }
+        .btn-green { background-color: #A5D6A7; }
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); z-index: 50; display: flex; justify-content: center; align-items: center; }
     </style>
 </head>
@@ -34,257 +31,149 @@
         </header>
 
         <!-- Feedback Form Card -->
-        <main id="feedback-section" class="card p-8 rounded-2xl mb-10">
-            <!-- Form content remains the same -->
-             <h2 class="font-title text-3xl text-gray-800 mb-2">Punya Ide, Kritik, atau Cuma Mau Curhat?</h2>
-            <p class="text-gray-600 mb-6">Pilih untuk memajang pesanmu di papan publik atau kirim sebagai rahasia langsung ke author.</p>
+        <main id="feedback-section" class="card p-8 rounded-2xl">
+            <h2 class="font-title text-3xl text-gray-800 mb-2">Punya Ide, Kritik, atau Saran?</h2>
+            <p class="text-gray-600 mb-6">Semua pesan akan dikirim secara pribadi dan aman langsung ke author. Silakan isi formulir di bawah ini.</p>
             
             <form id="feedback-form" action="https://formspree.io/f/mgvnprev" method="POST">
                 <div class="mb-4">
                     <label for="name" class="block font-semibold mb-2">Nama Samaran (Opsional):</label>
                     <input type="text" id="name" name="name" class="w-full p-3 border-2 border-gray-400 rounded-lg" placeholder="e.g. Pejuang Semester Akhir">
                 </div>
-                <div class="mb-4">
+                <div class="mb-6">
                     <label for="message" class="block font-semibold mb-2">Pesanmu:</label>
                     <textarea id="message" name="message" rows="5" class="w-full p-3 border-2 border-gray-400 rounded-lg" placeholder="Tulis apa saja di sini..." required></textarea>
-                </div>
-                <div class="mb-6">
-                    <p class="block font-semibold mb-2">Opsi Pengiriman:</p>
-                    <div class="flex items-center space-x-4">
-                        <div class="flex items-center">
-                            <input type="radio" id="pajang-ya" name="submissionType" value="public" class="h-5 w-5" checked>
-                            <label for="pajang-ya" class="ml-2">Pajang di Papan Pesan</label>
-                        </div>
-                        <div class="flex items-center">
-                            <input type="radio" id="pajang-tidak" name="submissionType" value="private" class="h-5 w-5">
-                            <label for="pajang-tidak" class="ml-2">Kirim sebagai Rahasia</label>
-                        </div>
-                    </div>
                 </div>
                 <button type="submit" class="btn btn-blue w-full text-xl">Kirim Pesan!</button>
             </form>
             <p id="form-status" class="mt-4 text-center font-semibold"></p>
         </main>
-
-        <!-- Displayed Messages Section -->
-        <section id="pajang-section">
-            <h2 class="font-title text-3xl text-gray-800 mb-4 text-center">Papan Pesan Publik</h2>
-            <p id="loading-messages" class="text-center text-gray-500">Memuat pesan...</p>
-            <div id="pajang-grid" class="space-y-4">
-                <!-- Public messages will be loaded here -->
-            </div>
-        </section>
         
         <!-- Admin Panel (Hidden by default) -->
         <section id="admin-panel" class="hidden mt-8 card p-8 rounded-2xl bg-gray-200 border-gray-500">
             <h2 class="font-title text-3xl text-gray-800 mb-4">Markas Besar Admin</h2>
             <div class="space-y-4">
-                <a href="https://formspree.io/dashboard" target="_blank" class="block btn bg-green-300 w-full text-center">Buka Dasbor Pesan Rahasia</a>
-                <button id="toggle-form-button" class="btn btn-red w-full">Tutup Papan Pesan untuk Umum</button>
+                <a href="https://formspree.io/f/mgvnprev/submissions" target="_blank" class="block btn bg-green-300 w-full text-center">Lihat Semua Pesan Masuk</a>
+                <button id="toggle-form-button" class="btn btn-red w-full">Tutup Formulir untuk Umum</button>
             </div>
         </section>
 
+        <!-- Footer Section with Admin Login -->
         <footer class="text-center mt-8">
             <p class="text-sm text-gray-600">Dibuat dengan kopi dan sedikit keajaiban.</p>
             <button id="admin-login-button" class="text-xs text-gray-400 mt-2 hover:underline">Masuk sebagai Admin</button>
         </footer>
     </div>
     
-    <!-- Custom Modals -->
+    <!-- Admin Login Modal -->
     <div id="password-modal" class="modal-overlay hidden">
-        <div class="card p-8 rounded-2xl w-full max-w-sm">
-            <h3 class="font-title text-2xl mb-4 text-center">Akses Admin</h3>
-            <input type="password" id="password-input" class="w-full p-3 border-2 border-gray-400 rounded-lg mb-4" placeholder="Kata Sandi...">
+        <div class="card p-6 rounded-2xl w-full max-w-sm">
+            <h3 class="font-title text-2xl mb-4">Akses Terbatas</h3>
+            <p class="mb-4">Masukkan kata sandi Admin untuk melanjutkan.</p>
+            <input type="password" id="password-input" class="w-full p-3 border-2 border-gray-400 rounded-lg mb-4">
             <p id="password-error" class="text-red-500 text-center mb-4 h-5"></p>
-            <div class="flex justify-between space-x-4">
-                <button id="password-cancel" class="btn btn-red flex-1">Batal</button>
-                <button id="password-submit" class="btn btn-blue flex-1">Masuk</button>
+            <div class="flex justify-end space-x-2">
+                <button id="cancel-password-btn" class="btn bg-gray-300">Batal</button>
+                <button id="submit-password-btn" class="btn btn-blue">Masuk</button>
             </div>
         </div>
     </div>
 
-    <div id="confirm-modal" class="modal-overlay hidden">
-        <div class="card p-8 rounded-2xl w-full max-w-sm">
-            <h3 class="font-title text-2xl mb-4 text-center">Konfirmasi Hapus</h3>
-            <p class="text-center mb-6">Yakin ingin menghapus pesan ini secara permanen?</p>
-            <div class="flex justify-between space-x-4">
-                <button id="confirm-cancel" class="btn btn-blue flex-1">Batal</button>
-                <button id="confirm-delete" class="btn btn-red flex-1">Ya, Hapus</button>
-            </div>
-        </div>
-    </div>
 
-<script type="module">
-    // Firebase Imports
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, onSnapshot, serverTimestamp, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import { getAuth, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-    // --- Firebase Config (Provided by Environment) ---
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'feedback-app-default';
-    let db, auth;
-
-    try {
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
-        auth = getAuth(app);
-    } catch (e) { console.error("Firebase Gagal diinisialisasi.", e); document.getElementById('pajang-section').innerHTML = '<p class="text-center text-red-500">Gagal terhubung ke server pesan.</p>'; }
-    
-    // --- Firebase Authentication ---
-    const authenticate = async () => {
-        try {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); } 
-            else { await signInAnonymously(auth); }
-            console.log("Autentikasi Firebase berhasil.");
-            listenToPublicMessages();
-        } catch (error) { console.error("Error saat autentikasi:", error); }
-    };
-
-    // --- DOM Elements ---
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // DOM Elements
     const adminLoginButton = document.getElementById('admin-login-button');
     const adminPanel = document.getElementById('admin-panel');
-    const form = document.getElementById('feedback-form');
-    const pajangGrid = document.getElementById('pajang-grid');
+    const feedbackSection = document.getElementById('feedback-section');
+    const toggleFormButton = document.getElementById('toggle-form-button');
     const passwordModal = document.getElementById('password-modal');
-    const confirmModal = document.getElementById('confirm-modal');
+    const passwordInput = document.getElementById('password-input');
+    const passwordError = document.getElementById('password-error');
+    const cancelPasswordBtn = document.getElementById('cancel-password-btn');
+    const submitPasswordBtn = document.getElementById('submit-password-btn');
     
     const ADMIN_PASSWORD = "emggwganteng";
 
     // --- Admin & Modal Logic ---
     adminLoginButton.addEventListener('click', () => {
+        passwordInput.value = '';
+        passwordError.textContent = '';
         passwordModal.classList.remove('hidden');
-        document.getElementById('password-input').focus();
+        passwordInput.focus();
     });
 
-    document.getElementById('password-cancel').addEventListener('click', () => passwordModal.classList.add('hidden'));
-    document.getElementById('password-submit').addEventListener('click', () => {
-        const input = document.getElementById('password-input');
-        const errorP = document.getElementById('password-error');
-        if (input.value === ADMIN_PASSWORD) {
-            adminPanel.classList.remove('hidden');
-            document.body.classList.add('admin-mode');
+    cancelPasswordBtn.addEventListener('click', () => {
+        passwordModal.classList.add('hidden');
+    });
+
+    const handleAdminLogin = () => {
+        if (passwordInput.value === ADMIN_PASSWORD) {
             passwordModal.classList.add('hidden');
-            input.value = '';
-            errorP.textContent = '';
+            adminPanel.classList.remove('hidden');
         } else {
-            errorP.textContent = 'Kata sandi salah!';
+            passwordError.textContent = 'Kata sandi salah!';
+        }
+    };
+    
+    submitPasswordBtn.addEventListener('click', handleAdminLogin);
+    passwordInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            handleAdminLogin();
         }
     });
-    
-    // --- Form Visibility Logic ---
-    const feedbackSection = document.getElementById('feedback-section');
-    const toggleFormButton = document.getElementById('toggle-form-button');
+
+    // --- Toggle Form Visibility Logic ---
     const updateFormVisibility = () => {
         const isHidden = localStorage.getItem('feedbackFormHidden') === 'true';
         feedbackSection.classList.toggle('hidden', isHidden);
-        toggleFormButton.textContent = isHidden ? 'Buka Kembali Papan Pesan' : 'Tutup Papan Pesan untuk Umum';
+        toggleFormButton.textContent = isHidden ? 'Buka Kembali Formulir' : 'Tutup Formulir untuk Umum';
         toggleFormButton.classList.toggle('btn-red', !isHidden);
         toggleFormButton.classList.toggle('btn-green', isHidden);
     };
+
     toggleFormButton.addEventListener('click', () => {
         const isHidden = localStorage.getItem('feedbackFormHidden') === 'true';
         localStorage.setItem('feedbackFormHidden', !isHidden);
         updateFormVisibility();
     });
 
-    // --- Form Submission ---
-    form.addEventListener("submit", async (event) => { /* ... same as before, no changes needed ... */ });
+    // --- Form Submission Logic (Formspree) ---
+    const form = document.getElementById('feedback-form');
+    const formStatus = document.getElementById('form-status');
     
-    // --- Display & Delete Public Messages ---
-    function listenToPublicMessages() {
-        if (!db) return;
-        const q = query(collection(db, `/artifacts/${appId}/public/data/feedback`));
-        onSnapshot(q, (snapshot) => {
-            const loadingMessages = document.getElementById('loading-messages');
-            if(loadingMessages) loadingMessages.classList.add('hidden');
-            
-            pajangGrid.innerHTML = '';
-            if (snapshot.empty) { pajangGrid.innerHTML = '<p class="text-center text-gray-500">Belum ada pesan yang dipajang.</p>'; return; }
+    async function handleSubmit(event) {
+        event.preventDefault();
+        const data = new FormData(event.target);
+        formStatus.textContent = "Mengirim...";
+        formStatus.style.color = 'gray';
 
-            const messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            messages.sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0));
-
-            messages.forEach(msg => {
-                const messageCard = document.createElement('div');
-                messageCard.className = 'message-card p-4 rounded-lg';
-                messageCard.innerHTML = `
-                    <button data-id="${msg.id}" class="delete-btn" title="Hapus pesan">&times;</button>
-                    <p class="font-bold text-gray-800 pr-8">${escapeHTML(msg.name)}</p>
-                    <p class="text-gray-700">${escapeHTML(msg.message)}</p>
-                `;
-                pajangGrid.appendChild(messageCard);
-            });
+        fetch(event.target.action, {
+            method: form.method,
+            body: data,
+            headers: { 'Accept': 'application/json' }
+        }).then(response => {
+            if (response.ok) {
+                formStatus.textContent = "Pesan terkirim! Terima kasih.";
+                formStatus.style.color = 'green';
+                form.reset();
+            } else {
+                response.json().then(data => {
+                    formStatus.textContent = data.errors ? data.errors.map(e => e.message).join(', ') : "Oops! Ada masalah.";
+                    formStatus.style.color = 'red';
+                });
+            }
+        }).catch(error => {
+            formStatus.textContent = "Oops! Ada masalah koneksi.";
+            formStatus.style.color = 'red';
         });
     }
-
-    pajangGrid.addEventListener('click', (e) => {
-        if (e.target && e.target.classList.contains('delete-btn')) {
-            const docId = e.target.dataset.id;
-            confirmModal.dataset.docId = docId; // Store ID to use later
-            confirmModal.classList.remove('hidden');
-        }
-    });
-
-    document.getElementById('confirm-cancel').addEventListener('click', () => {
-        confirmModal.classList.add('hidden');
-    });
-
-    document.getElementById('confirm-delete').addEventListener('click', async () => {
-        const docId = confirmModal.dataset.docId;
-        if (docId) {
-            try {
-                await deleteDoc(doc(db, `/artifacts/${appId}/public/data/feedback`, docId));
-            } catch (error) {
-                console.error("Error menghapus pesan:", error);
-            } finally {
-                confirmModal.classList.add('hidden');
-            }
-        }
-    });
-    
-    function escapeHTML(str) {
-        const div = document.createElement('div');
-        div.appendChild(document.createTextNode(str || ''));
-        return div.innerHTML;
-    }
+    form.addEventListener("submit", handleSubmit);
 
     // --- Initial Load ---
     updateFormVisibility();
-    if (db) { authenticate(); }
-    
-    // Re-pasting unchanged parts for clarity
-    const formStatus = document.getElementById('form-status');
-
-    form.addEventListener("submit", async function handleSubmit(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const submissionType = formData.get('submissionType');
-
-        if (submissionType === 'public') {
-            if (!db) { formStatus.textContent = "Error: Database tidak terhubung."; formStatus.style.color = 'red'; return; }
-            const name = formData.get('name') || "Anonim";
-            const message = formData.get('message');
-            try {
-                await addDoc(collection(db, `/artifacts/${appId}/public/data/feedback`), { name: name, message: message, timestamp: serverTimestamp() });
-                formStatus.textContent = "Pesanmu berhasil dipajang!";
-                formStatus.style.color = 'green';
-                form.reset();
-            } catch (error) { console.error("Error menyimpan ke Firestore:", error); formStatus.textContent = "Gagal memajang pesan."; formStatus.style.color = 'red'; }
-        } else {
-            fetch(event.target.action, {
-                method: form.method,
-                body: formData,
-                headers: { 'Accept': 'application/json' }
-            }).then(response => {
-                if (response.ok) { formStatus.textContent = "Pesan rahasia terkirim! Terima kasih."; formStatus.style.color = 'green'; form.reset(); } 
-                else { formStatus.textContent = "Oops! Gagal mengirim pesan rahasia."; formStatus.style.color = 'red'; }
-            }).catch(() => { formStatus.textContent = "Oops! Gagal mengirim pesan rahasia."; formStatus.style.color = 'red'; });
-        }
-    });
-
+});
 </script>
-
 </body>
 </html>
 
