@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rencana Penyiksaan Akademis</title>
+    <title>Jadwal Akademis</title>
     <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts for a custom look -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Luckiest+Guy&display=swap" rel="stylesheet">
     <!-- Icon Library -->
     <script src="https://unpkg.com/phosphor-icons"></script>
@@ -88,28 +88,48 @@
         .bg-event-pink { background-color: #F8BBD0; border-left: 4px solid #F06292; }
         .bg-event-orange { background-color: #FFCCBC; border-left: 4px solid #FF8A65; }
         .bg-ishoma { background-color: #CFD8DC; color: #546E7A; }
+        
+        /* Countdown styles */
+        .countdown-timer span {
+            display: inline-block;
+            margin: 0 5px;
+        }
+        .countdown-label {
+            font-size: 0.9rem;
+            font-family: 'Poppins', sans-serif;
+            display: block;
+            margin-top: -8px;
+        }
     </style>
 </head>
 <body class="p-4 sm:p-6 lg:p-8">
     <div class="max-w-7xl mx-auto">
         <!-- Header Section -->
         <header class="text-center p-4 mb-8 main-header rounded-2xl shadow-lg border-4 border-black">
-            <h1 class="font-title text-4xl sm:text-5xl text-yellow-300 tracking-wider">Rangkuman Penderitaan Akademis</h1>
+            <h1 class="font-title text-4xl sm:text-5xl text-yellow-300 tracking-wider">Jadwal Semester</h1>
         </header>
+
+        <!-- Countdown Collection Section -->
+        <section class="mb-10">
+            <h2 class="text-2xl font-bold text-gray-700 mb-4">Hitung Mundur Agenda Penting</h2>
+            <div id="countdown-collection" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- JS will populate this area with countdown cards -->
+            </div>
+        </section>
 
         <!-- Dashboard Section -->
         <section class="mb-10">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <!-- Today's Schedule -->
                 <div class="card p-6 rounded-2xl">
-                    <h2 class="font-title text-3xl text-gray-800 mb-4">Realita Hari Ini (Jangan Menangis)</h2>
+                    <h2 class="font-title text-3xl text-gray-800 mb-4">Jadwal Hari Ini</h2>
                     <div id="today-schedule" class="space-y-3">
                         <!-- JS will populate this -->
                     </div>
                 </div>
                 <!-- Tomorrow's Schedule -->
                 <div class="card p-6 rounded-2xl">
-                    <h2 class="font-title text-3xl text-gray-800 mb-4">Penderitaan Berikutnya (Tak Ada Lari)</h2>
+                    <h2 class="font-title text-3xl text-gray-800 mb-4">Jadwal Besok</h2>
                     <div id="tomorrow-schedule" class="space-y-3">
                         <!-- JS will populate this -->
                     </div>
@@ -119,7 +139,7 @@
 
         <!-- Full Schedule Section -->
         <section class="card p-4 sm:p-6 rounded-2xl">
-            <h2 class="font-title text-3xl text-gray-800 mb-4 text-center">Peta Menuju Kehampaan</h2>
+            <h2 class="font-title text-3xl text-gray-800 mb-4 text-center">Jadwal Lengkap</h2>
             
             <!-- Week 1 -->
             <div class="mb-8">
@@ -144,13 +164,12 @@
         
         <!-- Footer Section -->
         <footer class="text-center mt-8">
-            <p class="text-sm text-gray-600">Dibuat di tengah malam dengan kafein dan keputusasaan.</p>
+            <p class="text-sm text-gray-600">Dibuat untuk manajemen waktu yang lebih baik.</p>
         </footer>
     </div>
 
 <script>
     // --- DATA JADWAL ---
-    // Semua jadwal ada di sini, biar gampang diubah.
     const scheduleData = [
         // Minggu 5
         { week: 1, day: 'Senin', date: '2025-10-13', startTime: '08:00', endTime: '10:00', title: 'K51.52', details: 'Prinsip kerja enzim (Biokimia)<br>dr. Afi Muntaha, M.Sc', color: 'blue' },
@@ -166,9 +185,9 @@
         { week: 1, day: 'Jumat', date: '2025-10-17', startTime: '13:00', endTime: '14:00', title: 'MKWK', color: 'white' },
 
         // Minggu 6
-        { week: 2, day: 'Senin', date: '2025-10-20', startTime: '07:00', endTime: '08:00', title: 'DEADLINE PORTOFOLIO', details: 'Tgl 20 PUKUL 08.00. Jangan telat!', color: 'red' },
-        { week: 2, day: 'Senin', date: '2025-10-20', startTime: '09:00', endTime: '11:00', title: 'CBT 2', color: 'orange' },
-        { week: 2, day: 'Selasa', date: '2025-10-21', startTime: '09:00', endTime: '11:00', title: 'SOE', color: 'pink' },
+        { week: 2, day: 'Senin', date: '2025-10-20', startTime: '07:00', endTime: '08:00', title: 'DEADLINE PORTOFOLIO', details: 'Tgl 20 PUKUL 08.00. Jangan telat!', color: 'red', isCountdown: true },
+        { week: 2, day: 'Senin', date: '2025-10-20', startTime: '09:00', endTime: '11:00', title: 'CBT 2', color: 'orange', isCountdown: true },
+        { week: 2, day: 'Selasa', date: '2025-10-21', startTime: '09:00', endTime: '11:00', title: 'SOE', color: 'pink', isCountdown: true },
         { week: 2, day: 'Rabu', date: '2025-10-22', startTime: '09:30', endTime: '11:00', title: 'REMED CBT', color: 'orange' },
         { week: 2, day: 'Rabu', date: '2025-10-22', startTime: '13:00', endTime: '14:30', title: 'REMIDI IDENT HISTOLOGI', color: 'purple' },
         { week: 2, day: 'Kamis', date: '2025-10-23', startTime: '09:30', endTime: '11:00', title: 'REMED SOE', color: 'pink' },
@@ -186,12 +205,10 @@
 
     // --- FUNGSI ---
     
-    // Fungsi untuk memformat tanggal YYYY-MM-DD
     function formatDate(date) {
         return date.toISOString().split('T')[0];
     }
 
-    // Fungsi untuk membuat kartu agenda di dashboard
     function createDashboardCard(event) {
         return `
             <div class="flex items-start space-x-3 p-3 rounded-lg ${colorClasses[event.color] || 'bg-gray-100'}">
@@ -205,12 +222,8 @@
         `;
     }
     
-    // Fungsi untuk mengisi dashboard
     function populateDashboard() {
-        // SIMULASI TANGGAL: Untuk demonstrasi, kita anggap "hari ini" adalah 14 Oktober 2025.
-        // Anda bisa mengubah tanggal di bawah ini untuk melihat jadwal pada hari yang berbeda.
-        // Untuk menggunakan tanggal asli saat ini, ganti baris di bawah dengan: const today = new Date();
-        const today = new Date('2025-10-14T09:00:00'); // <--- Tanggal disimulasikan di sini
+        const today = new Date(); // Menggunakan tanggal aktual saat ini
         
         const tomorrow = new Date(today);
         tomorrow.setDate(today.getDate() + 1);
@@ -226,30 +239,25 @@
 
         todayContainer.innerHTML = todayEvents.length > 0 
             ? todayEvents.map(createDashboardCard).join('')
-            : '<p class="text-gray-500">Tidak ada jadwal. Ketenangan sesaat sebelum badai berikutnya.</p>';
+            : '<p class="text-gray-500">Tidak ada jadwal hari ini.</p>';
         
         tomorrowContainer.innerHTML = tomorrowEvents.length > 0 
             ? tomorrowEvents.map(createDashboardCard).join('')
-            : '<p class="text-gray-500">Besok tampak kosong. Mungkin sistemnya lupa memasukkan jadwal remed mendadak.</p>';
+            : '<p class="text-gray-500">Tidak ada jadwal untuk besok.</p>';
     }
 
-    // Fungsi untuk membuat jadwal grid lengkap
     function createFullSchedule(containerId, weekNumber) {
         const container = document.getElementById(containerId);
         const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
         
-        // Headers
         let html = '<div class="grid-header">Waktu</div>' + days.map(d => `<div class="grid-header">${d}</div>`).join('');
 
-        // Time Slots (7 AM to 5 PM)
         for (let i = 7; i <= 17; i++) {
             html += `<div class="time-slot" style="grid-row: ${2 + (i-7)*2} / span 2;">${String(i).padStart(2, '0')}:00</div>`;
         }
 
-        // ISHOMA
         html += `<div class="event-card bg-ishoma col-start-2 col-end-7 row-start-12 row-end-14 flex items-center justify-center"><span class="title">ISHOMA</span></div>`;
 
-        // Events
         const weekEvents = scheduleData.filter(e => e.week === weekNumber);
         weekEvents.forEach(event => {
             const startHour = parseInt(event.startTime.split(':')[0]);
@@ -273,14 +281,63 @@
         container.innerHTML = html;
     }
 
+    function setupCountdowns() {
+        const collectionContainer = document.getElementById('countdown-collection');
+        const countdownEvents = scheduleData.filter(e => e.isCountdown);
+
+        if(countdownEvents.length === 0) {
+            collectionContainer.innerHTML = '<p class="text-gray-500 col-span-full">Tidak ada agenda penting yang akan datang.</p>';
+            return;
+        }
+
+        countdownEvents.forEach((event, index) => {
+            const targetDate = new Date(`${event.date}T${event.startTime}`).getTime();
+            const cardId = `countdown-card-${index}`;
+
+            const card = document.createElement('div');
+            card.className = 'card p-4 rounded-xl text-center';
+            card.innerHTML = `
+                <p class="font-semibold text-gray-700 mb-2">${event.title}</p>
+                <div id="${cardId}" class="countdown-timer font-title text-3xl sm:text-4xl text-gray-800">
+                    <!-- Timer here -->
+                </div>
+            `;
+            collectionContainer.appendChild(card);
+
+            const timerElement = document.getElementById(cardId);
+
+            const interval = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = targetDate - now;
+
+                if (distance < 0) {
+                    clearInterval(interval);
+                    timerElement.innerHTML = "Waktu Habis!";
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                timerElement.innerHTML = `
+                    <span>${days}<span class="countdown-label">Hari</span></span>
+                    <span>${hours}<span class="countdown-label">Jam</span></span>
+                    <span>${minutes}<span class="countdown-label">Menit</span></span>
+                    <span>${seconds}<span class="countdown-label">Detik</span></span>
+                `;
+            }, 1000);
+        });
+    }
+
     // --- INISIALISASI ---
-    // Menggunakan 'load' memastikan semua resource (termasuk script ikon) sudah siap
     window.addEventListener('load', () => {
         populateDashboard();
         createFullSchedule('week1-grid', 1);
         createFullSchedule('week2-grid', 2);
+        setupCountdowns();
         
-        // Cek secara berkala sampai library ikon siap, lalu jalankan.
         const iconInterval = setInterval(() => {
             if (window.phosphor) {
                 clearInterval(iconInterval);
@@ -295,4 +352,3 @@
 </script>
 </body>
 </html>
-
