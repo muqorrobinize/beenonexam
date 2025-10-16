@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcard Jaringan Epitel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #4A0E0B; /* Warna dasar merah anggur */
+            background: linear-gradient(to right, #6D211F, #4A0E0B);
+            overflow: hidden;
+        }
+        .main-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .card-container {
+            perspective: 1500px;
+            width: 90vw;
+            max-width: 400px;
+            height: 500px;
+            cursor: pointer;
+            z-index: 10; /* Pastikan kartu utama di atas animasi */
+        }
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+        .card-container.is-flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 1.5rem;
+            border: 8px solid #D4AF37;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .card-front {
+            background: linear-gradient(145deg, #8C2B29, #6D211F);
+            color: #FFFFFF;
+        }
+        .card-back {
+            background: linear-gradient(145deg, #4A0E0B, #3B0A08);
+            color: #FFFFFF;
+            transform: rotateY(180deg);
+        }
+        .card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            border-bottom: 2px solid #D4AF37;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .card-category {
+            background-color: rgba(212, 175, 55, 0.2);
+            color: #FFD700;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-top: 15px;
+            border: 1px solid #D4AF37;
+        }
+        .card-content {
+            font-size: 1rem;
+            line-height: 1.6;
+            width: 100%;
+            text-align: center;
+        }
+         .card-content ul {
+            list-style-position: inside;
+            text-align: left;
+            margin: 0 auto;
+            max-width: 90%;
+        }
+        .card-content li {
+            margin-bottom: 4px;
+        }
+        .nav-button {
+            background-color: #D4AF37;
+            color: #4A0E0B;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            text-transform: uppercase;
+        }
+        .nav-button:hover {
+            background-color: #FFD700;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+        }
+        .nav-button:disabled {
+            background-color: #555;
+            color: #999;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .card-counter {
+            background-color: rgba(0,0,0,0.5);
+            color: #FFD700;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 1rem;
+            border: 1px solid #D4AF37;
+        }
+        
+        /* Animasi Cascade Shuffle */
+        .shuffle-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 5;
+            pointer-events: none;
+        }
+        .shuffle-card {
+            position: absolute;
+            width: 90vw;
+            max-width: 400px;
+            height: 500px;
+            background: linear-gradient(145deg, #4A0E0B, #3B0A08);
+            border-radius: 1.5rem;
+            border: 8px solid #D4AF37;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transform-origin: center center;
+        }
+        .is-shuffling .shuffle-card {
+            animation: cascade-shuffle 1.2s cubic-bezier(0.6, 0.04, 0.98, 0.335) forwards;
+        }
+        @keyframes cascade-shuffle {
+            0% { transform: translate(0, 0) rotate(0); opacity: 0; }
+            20% { opacity: 1; }
+            80% {
+                transform: var(--transform-end);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(0, 0) rotate(0);
+                opacity: 0;
+            }
+        }
+
+        /* Modal Daftar Istilah */
+        .list-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .list-modal-overlay.is-open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .list-modal-content {
+            background: linear-gradient(145deg, #8C2B29, #6D211F);
+            color: white;
+            padding: 30px;
+            border-radius: 1.5rem;
+            border: 4px solid #D4AF37;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .modal-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            text-align: center;
+            color: #FFD700;
+            margin-bottom: 20px;
+        }
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #FFD700;
+            font-size: 2.5rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .term-list {
+            list-style: none;
+            padding: 0;
+        }
+        .term-list li {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .term-list li:hover {
+            background-color: rgba(212, 175, 55, 0.2);
+        }
+        .term-list li:last-child {
+            border-bottom: none;
+        }
+
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="text-center mb-8">
+        <h1 class="text-4xl md:text-5xl font-bold text-white" style="font-family: 'Playfair Display', serif; text-shadow: 3px 3px 6px rgba(0,0,0,0.7);">Flashcard Jaringan Epitel</h1>
+        <p class="text-lg text-gray-300 mt-2">Geser atau klik tombol untuk belajar.</p>
+    </div>
+
+    <div class="main-container">
+        <div id="shuffleContainer" class="shuffle-container"></div>
+        <div id="cardContainer" class="card-container mb-8">
+            <div id="cardInner" class="card-inner">
+                <div id="cardFront" class="card-face card-front"></div>
+                <div id="cardBack" class="card-face card-back"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="listModal" class="list-modal-overlay">
+        <div class="list-modal-content">
+            <button id="closeModalBtn" class="close-button">&times;</button>
+            <h2 class="modal-title">Daftar Istilah</h2>
+            <ul id="termList" class="term-list">
+                <!-- Dinamis diisi oleh JavaScript -->
+            </ul>
+        </div>
+    </div>
+
+
+    <div class="flex items-center space-x-4 mb-3">
+        <button id="prevBtn" class="nav-button">◁ Sebelumnya</button>
+        <div id="cardCounter" class="card-counter">1 / 37</div>
+        <button id="nextBtn" class="nav-button">Selanjutnya ▷</button>
+    </div>
+    <div class="flex items-center space-x-4 mt-3">
+      <button id="shuffleBtn" class="nav-button">Kocok Kartu 🎲</button>
+      <button id="listBtn" class="nav-button">Daftar Istilah 📖</button>
+    </div>
+
+    <script>
+        const flashcards = [
+            // Terminologi Dasar Epitel
+            { front: { title: "Simple (Lapis)", category: "Terminologi" }, back: { content: "Menandakan bahwa epitel hanya terdiri dari satu lapis sel.", category: "Definisi Lapisan" } },
+            { front: { title: "Stratified (Lapis)", category: "Terminologi" }, back: { content: "Menandakan bahwa epitel terdiri lebih dari satu lapis sel.", category: "Definisi Lapisan" } },
+            { front: { title: "Pseudostratified (Lapis)", category: "Terminologi" }, back: { content: "Tampak berlapis, namun sebenarnya hanya satu lapis sel karena semua sel menempel pada membran basal.", category: "Definisi Lapisan" } },
+            { front: { title: "Squamous (Bentuk)", category: "Terminologi" }, back: { content: "Sel berbentuk pipih atau datar.", category: "Definisi Bentuk Sel" } },
+            { front: { title: "Cuboidal (Bentuk)", category: "Terminologi" }, back: { content: "Sel berbentuk kubus.", category: "Definisi Bentuk Sel" } },
+            { front: { title: "Columnar (Bentuk)", category: "Terminologi" }, back: { content: "Sel berbentuk persegi panjang atau seperti kolom.", category: "Definisi Bentuk Sel" } },
+            { front: { title: "Transitional (Bentuk)", category: "Terminologi" }, back: { content: "Sel yang memiliki kemampuan untuk berubah bentuk, biasanya dari kuboid menjadi pipih saat teregang.", category: "Definisi Bentuk Sel" } },
+            
+            // Epitel Skuamous Simpleks
+            { front: { title: "Epitel Skuamous Simpleks", category: "Jenis Epitel" }, back: { content: "Satu lapis sel pipih. Termasuk mesotelium dan endotelium.", category: "Struktur" } },
+            { front: { title: "Struktur Epitel Skuamous Simpleks", category: "Struktur Jaringan" }, back: { content: "<ul><li><b>Inti pipih:</b> Mengikuti bentuk sel, meminimalkan ketebalan.</li><li><b>Sitoplasma tipis:</b> Memfasilitasi difusi dan filtrasi cepat.</li></ul>", category: "Fungsi Struktur" } },
+            { front: { title: "Fungsi Epitel Skuamous Simpleks", category: "Fungsi" }, back: { content: "<ul><li>Filtrasi</li><li>Difusi</li><li>Transport</li><li>Sekresi</li><li>Mengurangi gesekan</li></ul>", category: "Fungsi Jaringan" } },
+            { front: { title: "Letak Epitel Skuamous Simpleks", category: "Letak" }, back: { content: "Kapsula Bowman (ginjal), Alveoli (paru-paru), Endotelium (pembuluh darah), Mesotelium (pelapis organ).", category: "Lokasi" } },
+
+            // Epitel Kuboid Simpleks
+            { front: { title: "Epitel Kuboid Simpleks", category: "Jenis Epitel" }, back: { content: "Satu lapis sel berbentuk kubus dengan inti bulat di tengah.", category: "Struktur" } },
+            { front: { title: "Struktur Epitel Kuboid Simpleks", category: "Struktur Jaringan" }, back: { content: "<ul><li><b>Inti bulat & sentral:</b> Menandakan sel aktif secara metabolik.</li><li><b>Volume sitoplasma besar:</b> Cukup untuk organel yang berperan dalam sekresi dan absorpsi.</li></ul>", category: "Fungsi Struktur" } },
+            { front: { title: "Fungsi Epitel Kuboid Simpleks", category: "Fungsi" }, back: { content: "<ul><li>Sekresi</li><li>Absorpsi (penyerapan)</li><li>Proteksi ringan</li><li>Transportasi</li></ul>", category: "Fungsi Jaringan" } },
+            { front: { title: "Letak Epitel Kuboid Simpleks", category: "Letak" }, back: { content: "Tubulus kolektivus atau duktus papilaris di regio medula ginjal.", category: "Lokasi" } },
+            
+            // Epitel Kolumner Simpleks
+            { front: { title: "Epitel Kolumner Simpleks", category: "Jenis Epitel" }, back: { content: "Satu lapis sel berbentuk tinggi (kolumner) dengan inti oval di dekat basal. Beberapa memiliki mikrovili.", category: "Struktur" } },
+            { front: { title: "Struktur Epitel Kolumner Simpleks", category: "Struktur Jaringan" }, back: { content: "<ul><li><b>Mikrovili (Striated border):</b> Meningkatkan luas permukaan untuk absorpsi maksimal.</li><li><b>Sel Goblet:</b> Menghasilkan mukus untuk lubrikasi dan proteksi.</li></ul>", category: "Fungsi Struktur" } },
+            { front: { title: "Fungsi Epitel Kolumner Simpleks", category: "Fungsi" }, back: { content: "<ul><li>Penyerapan nutrisi (usus)</li><li>Menghasilkan lendir pelindung (lambung)</li></ul>", category: "Fungsi Jaringan" } },
+            { front: { title: "Letak Epitel Kolumner Simpleks", category: "Letak" }, back: { content: "Pada vili di mukosa intestinum (usus).", category: "Lokasi" } },
+            
+            // Epitel Skuamous Kompleks Berkeratin
+            { front: { title: "Epitel Skuamous Kompleks Berkeratin", category: "Jenis Epitel" }, back: { content: "Berlapis-lapis sel dengan lapisan superfisial (terluar) terdiri dari sel mati yang mengandung keratin.", category: "Struktur" } },
+            { front: { title: "Struktur Epitel Skuamous Berkeratin", category: "Struktur Jaringan" }, back: { content: "<ul><li><b>Stratum Corneum (Keratin):</b> Lapisan sel mati yang keras, kedap air, melindungi dari abrasi & dehidrasi.</li><li><b>Stratum Basale:</b> Lapisan sel paling bawah untuk regenerasi sel.</li></ul>", category: "Fungsi Struktur" } },
+            { front: { title: "Fungsi Epitel Skuamous Kompleks Berkeratin", category: "Fungsi" }, back: { content: "Memberikan perlindungan terhadap abrasi, invasi bakteri, dan kekeringan.", category: "Fungsi Jaringan" } },
+            { front: { title: "Letak Epitel Skuamous Kompleks Berkeratin", category: "Letak" }, back: { content: "Pada lapisan epidermis kulit tebal (contoh: telapak tangan atau kaki).", category: "Lokasi" } },
+            { front: { title: "5 Lapisan Epidermis", category: "Terminologi" }, back: { content: "Dari superfisial ke profunda: Stratum Corneum, Lucidum, Granulosum, Spinosum, Basale.", category: "Struktur Kulit" } },
+
+            // Epitel Skuamous Kompleks Non-Keratin
+            { front: { title: "Epitel Skuamous Kompleks Non-Keratin", category: "Jenis Epitel" }, back: { content: "Berlapis-lapis sel dengan lapisan superfisial terdiri dari sel hidup yang masih memiliki inti.", category: "Struktur" } },
+            { front: { title: "Struktur Epitel Skuamous Non-Keratin", category: "Struktur Jaringan" }, back: { content: "<ul><li><b>Sel permukaan berinti:</b> Menjaga permukaan jaringan tetap lembap dan hidup.</li><li><b>Lapisan Basal:</b> Terus membelah untuk menggantikan sel di atasnya.</li></ul>", category: "Fungsi Struktur" } },
+            { front: { title: "Fungsi Epitel Skuamous Kompleks Non-Keratin", category: "Fungsi" }, back: { content: "Membentuk lapisan yang lembap dan protektif.", category: "Fungsi Jaringan" } },
+            { front: { title: "Letak Epitel Skuamous Kompleks Non-Keratin", category: "Letak" }, back: { content: "Esofagus, vagina, kanalis ani, dan rongga mulut.", category: "Lokasi" } },
+
+            // Epitel Transisional
+            { front: { title: "Epitel Transisional", category: "Jenis Epitel" }, back: { content: "Epitel berlapis yang bentuk selnya dapat berubah (transisi) sebagai respons terhadap peregangan. Memiliki sel payung (facet cell) di permukaan.", category: "Struktur" } },
+            { front: { title: "Struktur Epitel Transisional", category: "Struktur Jaringan" }, back: { content: "<ul><li><b>Sel Payung (Facet Cell):</b> Sel permukaan besar yang dapat memipih saat meregang.</li><li><b>Plak protein apikal:</b> Membuat membran sel kedap air dan melindungi dari toksisitas urin.</li></ul>", category: "Fungsi Struktur" } },
+            { front: { title: "Fungsi Epitel Transisional", category: "Fungsi" }, back: { content: "Memungkinkan peregangan organ dan membentuk penghalang osmotik protektif terhadap urin.", category: "Fungsi Jaringan" } },
+            { front: { title: "Letak Epitel Transisional", category: "Letak" }, back: { content: "Khusus pada sistem urinarius: kaliks renalis, ureter, dan vesica urinaria (kandung kemih).", category: "Lokasi" } },
+
+            // Epitel Kolumner Pseudokompleks
+            { front: { title: "Epitel Kolumner Pseudokompleks", category: "Jenis Epitel" }, back: { content: "Tampak berlapis tapi sebenarnya selapis. Inti sel berada pada ketinggian berbeda. Memiliki silia atau stereosilia di permukaan.", category: "Struktur" } },
+            { front: { title: "Struktur Epitel Pseudokompleks", category: "Struktur Jaringan" }, back: { content: "<ul><li><b>Silia/Stereosilia:</b> Silia untuk menggerakkan mukus, Stereosilia (mikrovili panjang) untuk absorpsi.</li><li><b>Sel Basal:</b> Sel punca untuk regenerasi sel kolumner.</li></ul>", category: "Fungsi Struktur" } },
+            { front: { title: "Fungsi Epitel Kolumner Pseudokompleks", category: "Fungsi" }, back: { content: "<ul><li>Saluran napas: Membersihkan udara</li><li>Tuba uterina: Mengangkut oosit</li><li>Epididimis: Menyerap cairan (dengan stereosilia)</li></ul>", category: "Fungsi Jaringan" } },
+            { front: { title: "Letak Epitel Kolumner Pseudokompleks", category: "Letak" }, back: { content: "Saluran pernapasan (trakea), tuba uterina, dan epididimis (dengan stereosilia).", category: "Lokasi" } }
+        ];
+
+        let currentCard = 0;
+        let isShuffling = false;
+
+        const cardContainer = document.getElementById('cardContainer');
+        const cardInner = document.getElementById('cardInner');
+        const cardFront = document.getElementById('cardFront');
+        const cardBack = document.getElementById('cardBack');
+        const cardCounter = document.getElementById('cardCounter');
+        const shuffleContainer = document.getElementById('shuffleContainer');
+        const listModal = document.getElementById('listModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const termList = document.getElementById('termList');
+        
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const listBtn = document.getElementById('listBtn');
+
+        function populateTermList() {
+            termList.innerHTML = '';
+            flashcards.forEach((card, index) => {
+                const li = document.createElement('li');
+                li.textContent = card.front.title;
+                li.dataset.index = index;
+                termList.appendChild(li);
+            });
+        }
+
+        function updateCard() {
+            const cardData = flashcards[currentCard];
+            
+            cardFront.innerHTML = `
+                <h2 class="card-title">${cardData.front.title}</h2>
+                <span class="card-category">${cardData.front.category}</span>
+            `;
+
+            cardBack.innerHTML = `
+                <div class="card-content">${cardData.back.content}</div>
+                <span class="card-category">${cardData.back.category}</span>
+            `;
+
+            cardContainer.classList.remove('is-flipped');
+            
+            cardCounter.textContent = `${currentCard + 1} / ${flashcards.length}`;
+            
+            prevBtn.disabled = currentCard === 0;
+            nextBtn.disabled = currentCard === flashcards.length - 1;
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function triggerShuffleAnimation() {
+            if (isShuffling) return;
+            isShuffling = true;
+            shuffleBtn.disabled = true;
+
+            const numShuffleCards = 7;
+            shuffleContainer.innerHTML = '';
+
+            for (let i = 0; i < numShuffleCards; i++) {
+                const card = document.createElement('div');
+                card.className = 'shuffle-card';
+                
+                const angle = (Math.random() - 0.5) * 60;
+                const x = (Math.random() - 0.5) * 200;
+                const y = (Math.random() - 0.5) * 100;
+                
+                card.style.setProperty('--transform-end', `translate(${x}px, ${y}px) rotate(${angle}deg)`);
+                card.style.animationDelay = `${i * 0.05}s`;
+                
+                shuffleContainer.appendChild(card);
+            }
+            
+            setTimeout(() => {
+                shuffleArray(flashcards);
+                currentCard = 0;
+                updateCard();
+                populateTermList(); // Update list order after shuffle
+                isShuffling = false;
+                shuffleBtn.disabled = false;
+                shuffleContainer.innerHTML = '';
+            }, 1200 + numShuffleCards * 50);
+        }
+
+
+        cardContainer.addEventListener('click', () => {
+            if (isShuffling) return;
+            cardContainer.classList.toggle('is-flipped');
+        });
+
+        nextBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            if (currentCard < flashcards.length - 1) {
+                currentCard++;
+                updateCard();
+            }
+        });
+
+        prevBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            if (currentCard > 0) {
+                currentCard--;
+                updateCard();
+            }
+        });
+        
+        shuffleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.body.classList.add('is-shuffling');
+            triggerShuffleAnimation();
+        });
+
+        listBtn.addEventListener('click', () => {
+            listModal.classList.add('is-open');
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            listModal.classList.remove('is-open');
+        });
+
+        listModal.addEventListener('click', (e) => {
+            if (e.target === listModal) {
+                 listModal.classList.remove('is-open');
+            }
+        });
+        
+        termList.addEventListener('click', (e) => {
+            if (e.target.tagName === 'LI') {
+                const index = parseInt(e.target.dataset.index, 10);
+                currentCard = index;
+                updateCard();
+                listModal.classList.remove('is-open');
+            }
+        });
+
+
+        // Initial Setup
+        populateTermList();
+        updateCard();
+    </script>
+
+</body>
+</html>
+
