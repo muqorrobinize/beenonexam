@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistik Mahasiswa FK Unsoed 25/26</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .card-container {
+            perspective: 1000px;
+        }
+        .stat-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transform-style: preserve-3d;
+            min-height: 280px; /* Set a minimum height for consistency */
+            cursor: pointer;
+        }
+        .stat-card:hover {
+            transform: translateY(-10px) rotateX(5deg) scale(1.02);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111827; /* Darker background */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+        
+        /* Modal Styles */
+        #modal {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+        #modal.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #modal-content {
+            transform: scale(0.95);
+            transition: transform 0.3s ease-in-out;
+        }
+        #modal.show #modal-content {
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen antialiased">
+
+    <div class="container mx-auto p-4 md:p-8">
+        
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-500 mb-2">
+                Deadmatch Rank 1.2
+            </h1>
+            <p class="text-gray-400 text-lg">Fakultas Kedokteran Unsoed - Angkatan 2025/2026</p>
+        </header>
+
+        <!-- Search Input -->
+        <div class="mb-8 max-w-2xl mx-auto">
+            <div class="relative">
+                <input type="text" id="searchInput" class="w-full bg-gray-800 border-2 border-gray-700 rounded-full py-3 px-6 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition duration-300" placeholder="Cari berdasarkan NIM, Nama, atau Peringkat...">
+                <svg class="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- Student Cards Grid -->
+        <div id="student-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+            <!-- Cards will be injected by JavaScript -->
+        </div>
+
+        <!-- Not Found Message -->
+        <div id="not-found" class="text-center py-20 hidden">
+            <h2 class="text-2xl font-bold text-gray-500">Mahasiswa tidak ditemukan.</h2>
+            <p class="text-gray-600">Coba kata kunci pencarian yang lain.</p>
+        </div>
+
+    </div>
+    
+    <!-- Fullscreen Modal -->
+    <div id="modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div id="modal-content" class="bg-gray-800 rounded-2xl w-full max-w-4xl relative p-6 md:p-8 border border-gray-700 shadow-2xl">
+            <button id="close-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <div id="modal-body" class="grid md:grid-cols-2 gap-8 items-center">
+                <!-- Modal content will be injected here -->
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- DATA MAHASISWA LENGKAP ---
+        // Data ini telah digabungkan dari kedua file PDF dan ditambahkan variabel Anatomi & Peringkat.
+        const studentData = [
+            { nim: 'G1A025001', nama: 'MUSTIKA ZHAFARINA', identifikasi: 72.78, biokimia: 70, histologi: 52, anatomi: 0, cbt1: 55.1, cbt2: 70, cbt3: 44, rataCBT: 49.55, soe: 37, nilaiAkhir: 53.5452, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025002', nama: 'ANINDITA RAHMAZYANTI', identifikasi: 70, biokimia: 82.91, histologi: 52, anatomi: 0, cbt1: 78.2, cbt2: 65, cbt3: 57.3, rataCBT: 67.75, soe: 48, nilaiAkhir: 66.0615, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025003', nama: 'RONALD JASON NOVIANTO', identifikasi: 43.33, biokimia: 46.25, histologi: 60, anatomi: 0, cbt1: 62.8, cbt2: 30, cbt3: 58.7, rataCBT: 60.75, soe: 41, nilaiAkhir: 51.8922, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025004', nama: 'WANDA WIDYASWARA', identifikasi: 66.5, biokimia: 86.67, histologi: 71.25, anatomi: 0, cbt1: 66.7, cbt2: 45.3, cbt3: 65, rataCBT: 56, soe: 42, nilaiAkhir: 59.2928, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025005', nama: 'NATASYA PUTRI AZALIA', identifikasi: 55, biokimia: 57.91, histologi: 32.5, anatomi: 0, cbt1: 70, cbt2: 34.7, cbt3: 44.9, rataCBT: 39.8, soe: 46, nilaiAkhir: 46.2915, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025006', nama: 'ALIF MUHAMMAD SATRIAS', identifikasi: 89.17, biokimia: 42, histologi: 50.83, anatomi: 0, cbt1: 83.3, cbt2: 90, cbt3: 51.3, rataCBT: 75.65, soe: 71, nilaiAkhir: 78.0818, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025007', nama: 'ANGGUN SEKAR AMALIA', identifikasi: 75.5, biokimia: 29.58, histologi: 55.83, anatomi: 0, cbt1: 80, cbt2: 48, cbt3: 57.7, rataCBT: 49.65, soe: 40, nilaiAkhir: 46.032, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025008', nama: 'MUHAMMAD RIZKI MAULANA', identifikasi: 87.91, biokimia: 43, histologi: 65, anatomi: 0, cbt1: 68, cbt2: 85, cbt3: 44, rataCBT: 50.85, soe: 37, nilaiAkhir: 51.2342, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025009', nama: 'IVANA WIDYA PARAMITA', identifikasi: 81.67, biokimia: 65.41, histologi: 62, anatomi: 0, cbt1: 67.9, cbt2: 75, cbt3: 52, rataCBT: 59.95, soe: 56, nilaiAkhir: 62.8268, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025010', nama: 'MIFTAKHUL RIZKY ALWI ZAKARIA', identifikasi: 76.67, biokimia: 89.58, histologi: 70, anatomi: 0, cbt1: 71.8, cbt2: 90, cbt3: 62.7, rataCBT: 67.25, soe: 50, nilaiAkhir: 69.5623, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025011', nama: 'RIFA AFRIANTI PRIMANTO', identifikasi: 43, biokimia: 23.33, histologi: 45, anatomi: 0, cbt1: 50, cbt2: 38.7, cbt3: 42.3, rataCBT: 40.5, soe: 46, nilaiAkhir: 39.7495, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025012', nama: 'ARZETA HAFIFATUZZAHROH', identifikasi: 89.83, biokimia: 77.91, histologi: 45, anatomi: 0, cbt1: 88.5, cbt2: 95, cbt3: 72, rataCBT: 80.25, soe: 50, nilaiAkhir: 74.9962, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025013', nama: 'ALYSA ILMI AULIA', identifikasi: 80.5, biokimia: 81.25, histologi: 75, anatomi: 0, cbt1: 89.7, cbt2: 100, cbt3: 78.7, rataCBT: 84.2, soe: 50, nilaiAkhir: 77.7825, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025014', nama: 'NURUL UZMA ARIFINIANTI', identifikasi: 70.16, biokimia: 77, histologi: 75, anatomi: 0, cbt1: 87.2, cbt2: 95, cbt3: 73.3, rataCBT: 80.25, soe: 53, nilaiAkhir: 74.5294, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025015', nama: 'NASHWA RIHADATUL \'AISY', identifikasi: 51.6, biokimia: 53.75, histologi: 71.5, anatomi: 0, cbt1: 70, cbt2: 62.7, cbt3: 73.1, rataCBT: 67.9, soe: 48, nilaiAkhir: 60.9415, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025016', nama: 'HAIBA ZAHWA ADNINDYA ZIEN', identifikasi: 75.83, biokimia: 85, histologi: 60, anatomi: 0, cbt1: 79.5, cbt2: 57.3, cbt3: 85, rataCBT: 68.4, soe: 62, nilaiAkhir: 70.9847, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025017', nama: 'ARKAAN ARRASYID S', identifikasi: 84.16, biokimia: 80.41, histologi: 75, anatomi: 0, cbt1: 75, cbt2: 85.3, cbt3: 92.3, rataCBT: 88.8, soe: 63, nilaiAkhir: 81.3759, huruf: 'A', keterangan: 'LULUS' },
+            { nim: 'G1A025018', nama: 'ANDHIKA NUR HAKIM', identifikasi: 85.16, biokimia: 77.1, histologi: 80, anatomi: 0, cbt1: 64, cbt2: 70, cbt3: 73.1, rataCBT: 68.55, soe: 60, nilaiAkhir: 70.2044, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025019', nama: 'ILHAM RAMADHAN TAUFIQ', identifikasi: 11.33, biokimia: 1.67, histologi: 24, anatomi: 0, cbt1: 10, cbt2: 33.3, cbt3: 37.2, rataCBT: 35.25, soe: 10, nilaiAkhir: 21.9152, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025020', nama: 'SYIFA AULIA WIDIANA', identifikasi: 45.83, biokimia: 67.75, histologi: 33.5, anatomi: 0, cbt1: 70.5, cbt2: 65, cbt3: 44, rataCBT: 57.25, soe: 54, nilaiAkhir: 56.8872, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025021', nama: 'NAYRAH BARIZKY RITONGA', identifikasi: 40.83, biokimia: 80.83, histologi: 58.5, anatomi: 0, cbt1: 65.4, cbt2: 85, cbt3: 49.3, rataCBT: 57.35, soe: 40, nilaiAkhir: 57.6792, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025022', nama: 'NATASYA AURA PUTRI AHMAD', identifikasi: 57.17, biokimia: 60.83, histologi: 57, anatomi: 0, cbt1: 60.3, cbt2: 42.5, cbt3: 52, rataCBT: 56.15, soe: 52, nilaiAkhir: 55.5398, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025023', nama: 'LUTHFI FADHILAH FATURAHMAN', identifikasi: 44.5, biokimia: 71.25, histologi: 56, anatomi: 0, cbt1: 60.3, cbt2: 52.5, cbt3: 56, rataCBT: 58.15, soe: 82, nilaiAkhir: 62.8325, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025024', nama: 'NABILA QURROTA A\'INI', identifikasi: 29, biokimia: 22.08, histologi: 62, anatomi: 0, cbt1: 45, cbt2: 37.3, cbt3: 42.3, rataCBT: 39.8, soe: 30, nilaiAkhir: 35.332, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025025', nama: 'LOVINA DINA KAMILA', identifikasi: 93.33, biokimia: 95.83, histologi: 90.5, anatomi: 0, cbt1: 90, cbt2: 89.3, cbt3: 92.3, rataCBT: 90.8, soe: 60, nilaiAkhir: 86.1892, huruf: 'A', keterangan: 'LULUS' },
+            { nim: 'G1A025026', nama: 'AVELIKA LADYSA SHANETIN', identifikasi: 59.5, biokimia: 65.41, histologi: 61.5, anatomi: 0, cbt1: 75, cbt2: 50.7, cbt3: 64.1, rataCBT: 57.4, soe: 70, nilaiAkhir: 62.0615, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025027', nama: 'SHARFINA AURIZMA TITANIA WARDANI', identifikasi: 82.66, biokimia: 82.92, histologi: 49, anatomi: 0, cbt1: 75, cbt2: 52, cbt3: 73.1, rataCBT: 62.55, soe: 54, nilaiAkhir: 66.0924, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025028', nama: 'RAFI HAZZA SAPUTRA', identifikasi: 85.25, biokimia: 85, histologi: 60, anatomi: 0, cbt1: 85, cbt2: 78.2, cbt3: 66.7, rataCBT: 72.45, soe: 27, nilaiAkhir: 67.5575, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025029', nama: 'FATWA DINATA', identifikasi: 79.33, biokimia: 89.58, histologi: 77.5, anatomi: 0, cbt1: 83.3, cbt2: 95, cbt3: 74.7, rataCBT: 79, soe: 68, nilaiAkhir: 79.3917, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025030', nama: 'REZA HARUN', identifikasi: 65.67, biokimia: 62.08, histologi: 52.5, anatomi: 0, cbt1: 65, cbt2: 49.3, cbt3: 64.1, rataCBT: 56.7, soe: 54, nilaiAkhir: 58.1173, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025031', nama: 'AZKIYA HUSNABILA', identifikasi: 79.67, biokimia: 91.67, histologi: 86, anatomi: 0, cbt1: 88.5, cbt2: 80, cbt3: 74.7, rataCBT: 81.6, soe: 64, nilaiAkhir: 79.8208, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025032', nama: 'DAVINA NATTAYA KOMARA', identifikasi: 47.16, biokimia: 86.66, histologi: 43, anatomi: 0, cbt1: 62.8, cbt2: 75, cbt3: 57.3, rataCBT: 60.05, soe: 55, nilaiAkhir: 62.2084, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025033', nama: 'MARIA CATHLEEN LIEM', identifikasi: 73, biokimia: 81.25, histologi: 81, anatomi: 0, cbt1: 90, cbt2: 48, cbt3: 44.9, rataCBT: 59.25, soe: 76, nilaiAkhir: 68.9925, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025034', nama: 'AYU WULAN PUTRIANA', identifikasi: 19.58, biokimia: 10, histologi: 43, anatomi: 0, cbt1: 70.5, cbt2: 35, cbt3: 33.3, rataCBT: 39.1, soe: 38, nilaiAkhir: 33.267, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025035', nama: 'KEISYA BEAUTY STANZA', identifikasi: 86.3, biokimia: 29.58, histologi: 71, anatomi: 0, cbt1: 90, cbt2: 50.7, cbt3: 76.9, rataCBT: 63.8, soe: 39, nilaiAkhir: 57.754, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025036', nama: 'MU\'AFA NAZHMIR ROBBANI', identifikasi: 22.5, biokimia: 12.92, histologi: 66.5, anatomi: 0, cbt1: 40, cbt2: 38.7, cbt3: 47.4, rataCBT: 43.05, soe: 30, nilaiAkhir: 34.883, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025037', nama: 'ZAWA HASNA\' ZAHIDAH', identifikasi: 62.17, biokimia: 63.75, histologi: 70, anatomi: 0, cbt1: 65, cbt2: 49.3, cbt3: 69.2, rataCBT: 59.25, soe: 54, nilaiAkhir: 59.8528, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025038', nama: 'ANWA FATHIMA BIDZIKRI', identifikasi: 33, biokimia: 63, histologi: 61.67, anatomi: 0, cbt1: 70, cbt2: 37.3, cbt3: 44.9, rataCBT: 41.1, soe: 25, nilaiAkhir: 44.4605, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025039', nama: 'MYCHA NAZILA SYAKIROH', identifikasi: 65.17, biokimia: 54.17, histologi: 71, anatomi: 0, cbt1: 69.2, cbt2: 80, cbt3: 49.3, rataCBT: 59.25, soe: 56, nilaiAkhir: 59.8258, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025040', nama: 'MUHAMMAD RAFI\' NAUFAREL', identifikasi: 66.17, biokimia: 47.5, histologi: 51.5, anatomi: 0, cbt1: 61.5, cbt2: 70, cbt3: 46.7, rataCBT: 54.1, soe: 36, nilaiAkhir: 51.6553, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025041', nama: 'BATRISYIA ATHA RINDRA JAFNI', identifikasi: 78.88, biokimia: 66.25, histologi: 56.5, anatomi: 0, cbt1: 65, cbt2: 57.3, cbt3: 65.4, rataCBT: 61.35, soe: 48, nilaiAkhir: 61.2967, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025042', nama: 'NAILA FIRDAUZI HARYADINA PUTRI', identifikasi: 91.93, biokimia: 75.83, histologi: 43.5, anatomi: 0, cbt1: 64.1, cbt2: 65, cbt3: 54.7, rataCBT: 59.4, soe: 54, nilaiAkhir: 63.6232, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025043', nama: 'ASIYAH', identifikasi: 31.67, biokimia: 48.3, histologi: 43.5, anatomi: 0, cbt1: 48.7, cbt2: 60, cbt3: 52, rataCBT: 50.35, soe: 30, nilaiAkhir: 44.9753, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025044', nama: 'KHANSA JAHFALATHA BALQIS', identifikasi: 45.33, biokimia: 76.67, histologi: 76, anatomi: 0, cbt1: 80, cbt2: 56, cbt3: 69.2, rataCBT: 62.6, soe: 41, nilaiAkhir: 60.5402, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025045', nama: 'NASYWA AMANIA HIDAYAT', identifikasi: 82.93, biokimia: 94.58, histologi: 52.5, anatomi: 0, cbt1: 80, cbt2: 65.3, cbt3: 87.2, rataCBT: 76.25, soe: 82, nilaiAkhir: 80.1107, huruf: 'A', keterangan: 'LULUS' },
+            { nim: 'G1A025046', nama: 'MONICA SANCI KONDAWE', identifikasi: 39.5, biokimia: 35, histologi: 37.67, anatomi: 0, cbt1: 25, cbt2: 26.7, cbt3: 32.1, rataCBT: 29.4, soe: 25, nilaiAkhir: 30.2753, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025047', nama: 'MUHAMMAD ALRIZA NASUTION', identifikasi: 54.88, biokimia: 45, histologi: 42.5, anatomi: 0, cbt1: 56.4, cbt2: 85, cbt3: 46.7, rataCBT: 51.55, soe: 23, nilaiAkhir: 47.1292, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025048', nama: 'HANIFA', identifikasi: 67.9, biokimia: 42.5, histologi: 69, anatomi: 0, cbt1: 57.7, cbt2: 80, cbt3: 52, rataCBT: 54.85, soe: 28, nilaiAkhir: 54.135, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025049', nama: 'RIFQAH ZULFA AFANIN', identifikasi: 56.17, biokimia: 81, histologi: 87, anatomi: 0, cbt1: 70.5, cbt2: 66.7, cbt3: 65, rataCBT: 68.6, soe: 28, nilaiAkhir: 63.1253, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025050', nama: 'MUHAMMAD NAUVAL PANJI AL HAKIM', identifikasi: 13.72, biokimia: 7.25, histologi: 5, anatomi: 0, cbt1: 15, cbt2: 28, cbt3: 33.3, rataCBT: 30.65, soe: 24, nilaiAkhir: 22.8673, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025051', nama: 'AMIRA BALQIS ASSABA', identifikasi: 49.5, biokimia: 64.2, histologi: 49.5, anatomi: 0, cbt1: 79.5, cbt2: 65, cbt3: 58.7, rataCBT: 69.1, soe: 69, nilaiAkhir: 68.295, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025052', nama: 'CLAIRINE ZERLINA HANIFAH', identifikasi: 72.08, biokimia: 65.5, histologi: 30, anatomi: 0, cbt1: 66.7, cbt2: 70, cbt3: 53.3, rataCBT: 60, soe: 41, nilaiAkhir: 60.1355, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025053', nama: 'CHRISTIAN PRAJADI', identifikasi: 79.17, biokimia: 58.5, histologi: 51.17, anatomi: 0, cbt1: 44.9, cbt2: 25, cbt3: 44, rataCBT: 44.45, soe: 42, nilaiAkhir: 41.8953, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025054', nama: 'ALFI NISA DAMAYANTI', identifikasi: 76.67, biokimia: 79.58, histologi: 62, anatomi: 0, cbt1: 95, cbt2: 62.7, cbt3: 76.9, rataCBT: 69.8, soe: 63, nilaiAkhir: 71.6873, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025055', nama: 'VANISSA FATHIAH ARDANI', identifikasi: 71.5, biokimia: 83.75, histologi: 70.17, anatomi: 0, cbt1: 85, cbt2: 57.3, cbt3: 82.1, rataCBT: 69.7, soe: 68, nilaiAkhir: 72.3628, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025056', nama: 'SIGIT PRAMBUDI DIENTI', identifikasi: 61.5, biokimia: 74.42, histologi: 86.6, anatomi: 0, cbt1: 73.1, cbt2: 72.5, cbt3: 65.3, rataCBT: 69.2, soe: 58, nilaiAkhir: 70.1978, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025057', nama: 'MUHAMMAD UZAIR ABDILLAH', identifikasi: 78.3, biokimia: 51.67, histologi: 60, anatomi: 0, cbt1: 55, cbt2: 50.7, cbt3: 59, rataCBT: 54.85, soe: 24, nilaiAkhir: 51.0925, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025059', nama: 'MAYCO CAHYA TRI ADINANSYAH', identifikasi: 40, biokimia: 43.5, histologi: 58.8, anatomi: 0, cbt1: 55, cbt2: 52, cbt3: 52.6, rataCBT: 52.3, soe: 68, nilaiAkhir: 55.075, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025060', nama: 'NADIA CHERYL', identifikasi: 71.5, biokimia: 90, histologi: 46.1, anatomi: 0, cbt1: 69.2, cbt2: 80, cbt3: 57.3, rataCBT: 63.25, soe: 45, nilaiAkhir: 63.519, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025061', nama: 'NADIA CHAIRUNNISA OLIA PUTRI', identifikasi: 70.33, biokimia: 66.67, histologi: 43, anatomi: 0, cbt1: 60, cbt2: 64, cbt3: 73.1, rataCBT: 68.55, soe: 42, nilaiAkhir: 62.4552, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025062', nama: 'LOKANANTA ARKIE AMSAL', identifikasi: 68.6, biokimia: 79.58, histologi: 71.5, anatomi: 0, cbt1: 75, cbt2: 54.7, cbt3: 71.8, rataCBT: 63.25, soe: 49, nilaiAkhir: 64.451, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025063', nama: 'M.DANAR RAMADHAN TARUNA', identifikasi: 43.67, biokimia: 37.08, histologi: 70, anatomi: 0, cbt1: 65, cbt2: 52, cbt3: 74.4, rataCBT: 63.2, soe: 51, nilaiAkhir: 55.6223, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025064', nama: 'RAZITA KHAIRINA PRASAJA MARPAUNG', identifikasi: 74, biokimia: 66.67, histologi: 50.5, anatomi: 0, cbt1: 60, cbt2: 49.3, cbt3: 78.2, rataCBT: 63.75, soe: 38, nilaiAkhir: 59.8905, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025065', nama: 'IRSYAD WAHYU MUHARROM', identifikasi: 89.93, biokimia: 75.83, histologi: 56.5, anatomi: 0, cbt1: 75, cbt2: 60, cbt3: 75.6, rataCBT: 67.8, soe: 71, nilaiAkhir: 71.5932, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025066', nama: 'INGRID GAYATRI', identifikasi: 35.83, biokimia: 62, histologi: 27, anatomi: 0, cbt1: 55, cbt2: 40, cbt3: 52.6, rataCBT: 46.3, soe: 36, nilaiAkhir: 42.0445, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025067', nama: 'FADHILAH AZKA AFKARINA', identifikasi: 53.67, biokimia: 44, histologi: 49.5, anatomi: 0, cbt1: 75, cbt2: 45.3, cbt3: 65.4, rataCBT: 55.35, soe: 39, nilaiAkhir: 51.3603, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025068', nama: 'GABRIEL DANENDRA SETYAWAN', identifikasi: 81.83, biokimia: 98.75, histologi: 71, anatomi: 0, cbt1: 85, cbt2: 81.3, cbt3: 84.6, rataCBT: 82.95, soe: 37, nilaiAkhir: 76.6922, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025069', nama: 'AMILAH AMATURRAHIM AL MUJAHIDAH', identifikasi: 76, biokimia: 40.41, histologi: 57.5, anatomi: 0, cbt1: 65, cbt2: 40, cbt3: 61.5, rataCBT: 50.75, soe: 30, nilaiAkhir: 47.5415, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025070', nama: 'FARID HAMZAH PUTRA PRATAMA', identifikasi: 72.43, biokimia: 25.83, histologi: 56.5, anatomi: 0, cbt1: 55, cbt2: 50.7, cbt3: 59, rataCBT: 54.85, soe: 43, nilaiAkhir: 50.0032, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025071', nama: 'JAMES SUDIANTO RACHMAPUTRA', identifikasi: 73, biokimia: 62.91, histologi: 60, anatomi: 0, cbt1: 30, cbt2: 68, cbt3: 74.4, rataCBT: 71.2, soe: 37, nilaiAkhir: 61.5665, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025072', nama: 'KHAIRUNNISA AZKA FADILA', identifikasi: 68, biokimia: 71, histologi: 59.2, anatomi: 0, cbt1: 85, cbt2: 61.3, cbt3: 83.3, rataCBT: 72.3, soe: 61, nilaiAkhir: 69.038, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025073', nama: 'ISYRAFUDDIN ABDUN YASYKUR', identifikasi: 88.83, biokimia: 76.25, histologi: 61.5, anatomi: 0, cbt1: 85, cbt2: 56, cbt3: 67.9, rataCBT: 61.95, soe: 59, nilaiAkhir: 67.1222, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025074', nama: 'TSALITSA AFIFAH NIDAUL HAQ', identifikasi: 57.08, biokimia: 71.5, histologi: 64.67, anatomi: 0, cbt1: 70, cbt2: 50.7, cbt3: 60.3, rataCBT: 55.5, soe: 31, nilaiAkhir: 53.3573, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025075', nama: 'AISYAH NUR AZIZAH', identifikasi: 51.25, biokimia: 48.17, histologi: 60, anatomi: 0, cbt1: 65, cbt2: 49.3, cbt3: 59, rataCBT: 54.15, soe: 44, nilaiAkhir: 52.0678, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025076', nama: 'WAHYUDI', identifikasi: 33.83, biokimia: 19.58, histologi: 33, anatomi: 0, cbt1: 30, cbt2: 42.7, cbt3: 29.5, rataCBT: 36.1, soe: 43, nilaiAkhir: 34.2617, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025077', nama: 'KAUTSAR PANDYA RAHADYAN', identifikasi: 11.33, biokimia: 21.67, histologi: 61.5, anatomi: 0, cbt1: 70, cbt2: 42.7, cbt3: 62.8, rataCBT: 52.75, soe: 33, nilaiAkhir: 41.9302, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025078', nama: 'CHRISTIAN ALLAN', identifikasi: 74, biokimia: 76.67, histologi: 75, anatomi: 0, cbt1: 90, cbt2: 72, cbt3: 89.7, rataCBT: 80.85, soe: 84, nilaiAkhir: 80.4555, huruf: 'A', keterangan: 'LULUS' },
+            { nim: 'G1A025079', nama: 'I DEWA AYU MADE SHINTA ANGELINA', identifikasi: 86.25, biokimia: 78.67, histologi: 71.5, anatomi: 0, cbt1: 75, cbt2: 70.7, cbt3: 76.9, rataCBT: 73.8, soe: 8, nilaiAkhir: 64.2528, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025080', nama: 'DZAKI AMRU SYAFI', identifikasi: 73.83, biokimia: 77.91, histologi: 52.5, anatomi: 0, cbt1: 90, cbt2: 68, cbt3: 79.5, rataCBT: 73.75, soe: 32, nilaiAkhir: 67.0412, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025081', nama: 'NAURA PUTRI ALEXANDRIA', identifikasi: 66.83, biokimia: 66, histologi: 71.67, anatomi: 0, cbt1: 80, cbt2: 46.7, cbt3: 65.4, rataCBT: 56.05, soe: 41, nilaiAkhir: 58.1502, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025082', nama: 'ARKAN FAWWAZ INDARJO', identifikasi: 87.08, biokimia: 54, histologi: 52, anatomi: 0, cbt1: 60, cbt2: 68, cbt3: 76.9, rataCBT: 72.45, soe: 52, nilaiAkhir: 68.067, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025083', nama: 'GHANIA NAILA NOOR DZAKIYYAH', identifikasi: 62, biokimia: 72, histologi: 44, anatomi: 0, cbt1: 57.5, cbt2: 64, cbt3: 67.9, rataCBT: 65.95, soe: 56, nilaiAkhir: 62.55, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025084', nama: 'ANINDYA SAFIRA RIYANTO', identifikasi: 67.83, biokimia: 73.3, histologi: 53, anatomi: 0, cbt1: 85, cbt2: 64, cbt3: 78.2, rataCBT: 71.1, soe: 68, nilaiAkhir: 70.7297, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025086', nama: 'UTHI FIDELA SALWA', identifikasi: 71.25, biokimia: 54.17, histologi: 76, anatomi: 0, cbt1: 80, cbt2: 65.3, cbt3: 79.5, rataCBT: 72.4, soe: 38, nilaiAkhir: 64.8828, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025087', nama: 'AUFADHIYA KHAIRANI PUTRI', identifikasi: 50, biokimia: 42.91, histologi: 19.67, anatomi: 0, cbt1: 45.3, cbt2: 75, cbt3: 50, rataCBT: 47.65, soe: 43, nilaiAkhir: 45.0218, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025088', nama: 'HANUM PRIMANDA KHAIRUNNISA', identifikasi: 83, biokimia: 50, histologi: 66.38, anatomi: 0, cbt1: 50, cbt2: 69.3, cbt3: 64.1, rataCBT: 66.7, soe: 51, nilaiAkhir: 64.9542, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025089', nama: 'IKA WIDIASTUTI', identifikasi: 78.3, biokimia: 75, histologi: 47.83, anatomi: 0, cbt1: 85, cbt2: 61.3, cbt3: 74.4, rataCBT: 67.85, soe: 50, nilaiAkhir: 65.4747, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025091', nama: 'CLAUDIA ZAR\'IN PUTRI JASMINE', identifikasi: 76.83, biokimia: 87.91, histologi: 71.5, anatomi: 0, cbt1: 56, cbt2: 66.7, cbt3: 61.35, rataCBT: 61.35, soe: 47, nilaiAkhir: 61.3812, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025092', nama: 'SIXTEENOVA ARINI RAHMATIKA', identifikasi: 92.91, biokimia: 89, histologi: 81, anatomi: 0, cbt1: 80, cbt2: 65.3, cbt3: 78.2, rataCBT: 71.75, soe: 56, nilaiAkhir: 74.3315, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025093', nama: 'AMEERA JASMINE ZAIN', identifikasi: 47.88, biokimia: 85, histologi: 85, anatomi: 0, cbt1: 90, cbt2: 56, cbt3: 73.1, rataCBT: 64.55, soe: 36, nilaiAkhir: 62.8642, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025094', nama: 'NADYANDRA ARETHA MAIRITZA', identifikasi: 35, biokimia: 72.5, histologi: 80.67, anatomi: 0, cbt1: 65.3, cbt2: 85, cbt3: 64.1, rataCBT: 64.7, soe: 27, nilaiAkhir: 60.6453, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025095', nama: 'NADINE PRAMESTHA ARDHANI', identifikasi: 86.6, biokimia: 76, histologi: 86.5, anatomi: 0, cbt1: 70, cbt2: 76, cbt3: 91, rataCBT: 83.5, soe: 57, nilaiAkhir: 78.565, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025096', nama: 'AMELIA AZZAHRA', identifikasi: 72.16, biokimia: 60, histologi: 56.5, anatomi: 0, cbt1: 80, cbt2: 57.3, cbt3: 66.7, rataCBT: 62, soe: 46, nilaiAkhir: 64.3859, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025097', nama: 'RIFAT PRAMUDIA NASUTION', identifikasi: 85.41, biokimia: 83.33, histologi: 71.22, anatomi: 0, cbt1: 65, cbt2: 62.7, cbt3: 71.8, rataCBT: 67.25, soe: 46, nilaiAkhir: 65.7593, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025098', nama: 'JAHFAL AL FARISI', identifikasi: 42.5, biokimia: 45.8, histologi: 67.43, anatomi: 0, cbt1: 50, cbt2: 50.7, cbt3: 62.8, rataCBT: 56.75, soe: 84, nilaiAkhir: 60.2087, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025099', nama: 'ISTAVANIA NADIA MUFID', identifikasi: 73.17, biokimia: 92.9, histologi: 61.5, anatomi: 0, cbt1: 80, cbt2: 60, cbt3: 66.7, rataCBT: 63.35, soe: 31, nilaiAkhir: 63.6203, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025100', nama: 'RISTY PUTERI KUSUMA MAHARDIKANINGSIH', identifikasi: 68, biokimia: 85.41, histologi: 61.5, anatomi: 0, cbt1: 70, cbt2: 65.3, cbt3: 82.1, rataCBT: 73.7, soe: 76, nilaiAkhir: 74.8065, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025101', nama: 'CHELSEA ICHA PUTRI ANZANI', identifikasi: 45.5, biokimia: 45, histologi: 60.66, anatomi: 0, cbt1: 42.7, cbt2: 70, cbt3: 56.4, rataCBT: 49.55, soe: 33, nilaiAkhir: 47.9715, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025102', nama: 'DZAKWAN HAMMAM NAWAWI', identifikasi: 55.41, biokimia: 77.5, histologi: 51.5, anatomi: 0, cbt1: 75, cbt2: 70.7, cbt3: 79.5, rataCBT: 75.1, soe: 37, nilaiAkhir: 67.4444, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025103', nama: 'YAZMINE', identifikasi: 80, biokimia: 60.83, histologi: 72.08, anatomi: 0, cbt1: 65, cbt2: 69.3, cbt3: 66.7, rataCBT: 68, soe: 55, nilaiAkhir: 64.9817, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025104', nama: 'MAULIDIA ZULFA KARTIKA', identifikasi: 86.97, biokimia: 82.08, histologi: 81, anatomi: 0, cbt1: 75, cbt2: 77.3, cbt3: 74.4, rataCBT: 75.85, soe: 40, nilaiAkhir: 71.4443, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025105', nama: 'SAVANA RIZKY PURNAMA', identifikasi: 92.8, biokimia: 89.58, histologi: 65, anatomi: 0, cbt1: 80, cbt2: 76, cbt3: 87.2, rataCBT: 81.6, soe: 53, nilaiAkhir: 78.079, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025106', nama: 'YASMIN TAQIYAH TAMBUNAN', identifikasi: 87.08, biokimia: 55, histologi: 89.6, anatomi: 0, cbt1: 90, cbt2: 72, cbt3: 76.9, rataCBT: 74.45, soe: 70, nilaiAkhir: 77.101, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025107', nama: 'NACHAYA AROFAHNI WIJAYA', identifikasi: 59.16, biokimia: 61.5, histologi: 53.5, anatomi: 0, cbt1: 44, cbt2: 62.5, cbt3: 39.7, rataCBT: 41.85, soe: 31, nilaiAkhir: 45.164, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025108', nama: 'FRIDA MULIADEWI CHAERANI', identifikasi: 76.5, biokimia: 69.16, histologi: 47.5, anatomi: 0, cbt1: 69.3, cbt2: 80, cbt3: 76.9, rataCBT: 73.1, soe: 54, nilaiAkhir: 68.954, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025109', nama: 'GHANIY HILDAN RABBANI', identifikasi: 84.33, biokimia: 68.33, histologi: 71.5, anatomi: 0, cbt1: 75, cbt2: 69.3, cbt3: 79.5, rataCBT: 74.4, soe: 64, nilaiAkhir: 72.4542, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025110', nama: 'ALTAF FIAN JUNINDA', identifikasi: 75.17, biokimia: 59.58, histologi: 48.5, anatomi: 0, cbt1: 60, cbt2: 74.7, cbt3: 94.9, rataCBT: 84.8, soe: 36, nilaiAkhir: 69.0373, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025111', nama: 'FADELLA AZZAHRA', identifikasi: 50, biokimia: 54.16, histologi: 55, anatomi: 0, cbt1: 60, cbt2: 40, cbt3: 59, rataCBT: 49.5, soe: 45, nilaiAkhir: 50.124, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025112', nama: 'HANINDITA NASTITI AYUNINGTIAS', identifikasi: 85, biokimia: 81.67, histologi: 66.5, anatomi: 0, cbt1: 75, cbt2: 56, cbt3: 69.2, rataCBT: 62.6, soe: 51, nilaiAkhir: 66.1255, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025113', nama: 'TYANAYA RAHMA', identifikasi: 70.2, biokimia: 85.41, histologi: 81, anatomi: 0, cbt1: 85, cbt2: 64, cbt3: 74.4, rataCBT: 69.2, soe: 53, nilaiAkhir: 69.9495, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025114', nama: 'CHINTYA PUTRI NABILAH', identifikasi: 88.67, biokimia: 77.08, histologi: 43, anatomi: 0, cbt1: 80, cbt2: 50.7, cbt3: 75.6, rataCBT: 63.15, soe: 68, nilaiAkhir: 68.6473, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025115', nama: 'AISYA NURLANGIT FITRI', identifikasi: 68.17, biokimia: 63.75, histologi: 81, anatomi: 0, cbt1: 70, cbt2: 57.3, cbt3: 74.4, rataCBT: 65.85, soe: 53, nilaiAkhir: 64.0928, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025116', nama: 'AVISA ZANDRA CITAGAMI', identifikasi: 39.67, biokimia: 47.08, histologi: 43, anatomi: 0, cbt1: 60, cbt2: 49.3, cbt3: 64.1, rataCBT: 56.7, soe: 30, nilaiAkhir: 48.6723, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025117', nama: 'FIQYA SULISTIANI', identifikasi: 23.5, biokimia: 33.08, histologi: 24, anatomi: 0, cbt1: 55, cbt2: 38.7, cbt3: 43.6, rataCBT: 41.15, soe: 0, nilaiAkhir: 31.152, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025118', nama: 'RAHMA GRISELDA INDRASTATA', identifikasi: 56.67, biokimia: 62.91, histologi: 62, anatomi: 0, cbt1: 70, cbt2: 50.7, cbt3: 71.8, rataCBT: 61.25, soe: 55, nilaiAkhir: 60.4218, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025119', nama: 'KHESYIA NAFIA ATMOKO', identifikasi: 23.5, biokimia: 30, histologi: 6.25, anatomi: 0, cbt1: 46.7, cbt2: 15, cbt3: 39.7, rataCBT: 43.2, soe: 18, nilaiAkhir: 29.5425, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025120', nama: 'QAFFAL ZIAN QADSI', identifikasi: 38.04, biokimia: 53.17, histologi: 51.5, anatomi: 0, cbt1: 70, cbt2: 53.3, cbt3: 48.7, rataCBT: 51, soe: 43, nilaiAkhir: 48.7763, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025121', nama: 'AMIRA AZALIA', identifikasi: 52.5, biokimia: 35.38, histologi: 60.6, anatomi: 0, cbt1: 60, cbt2: 34.7, cbt3: 60.3, rataCBT: 47.5, soe: 44, nilaiAkhir: 47.006, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025122', nama: 'MUHAMMAD RASYID SURYA WICAKSONO', identifikasi: 20, biokimia: 5, histologi: 33.3, anatomi: 0, cbt1: 15.4, cbt2: 24.35, cbt3: 0, rataCBT: 24.35, soe: 56, nilaiAkhir: 23.105, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025123', nama: 'NAURA ALYA FASHIHA', identifikasi: 31.25, biokimia: 40.33, histologi: 51, anatomi: 0, cbt1: 53.3, cbt2: 50, cbt3: 47.4, rataCBT: 50.35, soe: 60, nilaiAkhir: 48.3222, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025124', nama: 'BUNGA PUTRI ANGGINA', identifikasi: 25.67, biokimia: 47, histologi: 45.4, anatomi: 0, cbt1: 50, cbt2: 53.3, cbt3: 48.7, rataCBT: 51, soe: 29, nilaiAkhir: 43.7503, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025125', nama: 'M. ANDHIKA PUTRA PRATAMA', identifikasi: 67.67, biokimia: 67.64, histologi: 66, anatomi: 0, cbt1: 80, cbt2: 62.7, cbt3: 76.9, rataCBT: 69.8, soe: 53, nilaiAkhir: 66.6563, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025126', nama: 'HANENDI FAREL SANTAUSO', identifikasi: 48.17, biokimia: 54.73, histologi: 40, anatomi: 0, cbt1: 50, cbt2: 36, cbt3: 59, rataCBT: 47.5, soe: 48, nilaiAkhir: 48.6348, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025127', nama: 'JOVITA BERNADINE AZALIA DWIASTHI', identifikasi: 56.17, biokimia: 71.25, histologi: 52, anatomi: 0, cbt1: 70, cbt2: 42.7, cbt3: 51.3, rataCBT: 47, soe: 48, nilaiAkhir: 52.9428, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025128', nama: 'RAISHA AQILA ARDANU', identifikasi: 60.22, biokimia: 91.25, histologi: 52.5, anatomi: 0, cbt1: 65, cbt2: 54.7, cbt3: 59, rataCBT: 56.85, soe: 30, nilaiAkhir: 57.7573, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025129', nama: 'NAZLA RIFDA AQILLAH', identifikasi: 49.83, biokimia: 62, histologi: 65.41, anatomi: 0, cbt1: 85, cbt2: 44, cbt3: 69.2, rataCBT: 56.6, soe: 49, nilaiAkhir: 57.5262, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025130', nama: 'SYAFIQ ATAULLAH GHAFFAR', identifikasi: 51.67, biokimia: 47, histologi: 31.25, anatomi: 0, cbt1: 40, cbt2: 41.3, cbt3: 53.8, rataCBT: 47.55, soe: 27, nilaiAkhir: 41.3828, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025131', nama: 'ZIDAN ADI HENDRIK TRI PUTRA', identifikasi: 72.17, biokimia: 53.89, histologi: 23.5, anatomi: 0, cbt1: 60, cbt2: 49.3, cbt3: 57.7, rataCBT: 53.5, soe: 31, nilaiAkhir: 50.6138, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025132', nama: 'FADHEL MUHAMMAD AIHAM', identifikasi: 18.83, biokimia: 28.75, histologi: 24, anatomi: 0, cbt1: 35, cbt2: 41.3, cbt3: 60.3, rataCBT: 50.8, soe: 30, nilaiAkhir: 39.2772, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025133', nama: 'AISYAH LOVIA ZAHRA ROCHMANA', identifikasi: 53.16, biokimia: 54.5, histologi: 54, anatomi: 0, cbt1: 80, cbt2: 44, cbt3: 55.1, rataCBT: 49.55, soe: 61, nilaiAkhir: 54.3344, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025134', nama: 'BAGAS ARIEF SETYA WARDANA', identifikasi: 54.33, biokimia: 48.75, histologi: 75.5, anatomi: 0, cbt1: 45, cbt2: 57.3, cbt3: 64.1, rataCBT: 60.7, soe: 32, nilaiAkhir: 52.8272, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025135', nama: 'KHAMIDYA SAFIRA', identifikasi: 60.17, biokimia: 90.4, histologi: 62, anatomi: 0, cbt1: 65, cbt2: 65.3, cbt3: 74.4, rataCBT: 69.85, soe: 66, nilaiAkhir: 70.8903, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025136', nama: 'RIKO RAHARDIAN PUTRA WARDANA', identifikasi: 37.42, biokimia: 48.33, histologi: 62, anatomi: 0, cbt1: 55, cbt2: 41.3, cbt3: 66.7, rataCBT: 54, soe: 59, nilaiAkhir: 52.8473, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025138', nama: 'TITEN WIGUNA', identifikasi: 29.83, biokimia: 45.41, histologi: 76, anatomi: 0, cbt1: 47.5, cbt2: 58.7, cbt3: 57.7, rataCBT: 58.2, soe: 37, nilaiAkhir: 49.9112, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025139', nama: 'FANISA MAULIDA RAHARJA', identifikasi: 44.67, biokimia: 75, histologi: 57.5, anatomi: 0, cbt1: 65, cbt2: 49.3, cbt3: 74.4, rataCBT: 61.85, soe: 36, nilaiAkhir: 55.5503, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025140', nama: 'DWINANDA FITRIANA PUTRI', identifikasi: 16.5, biokimia: 31.88, histologi: 45, anatomi: 0, cbt1: 35, cbt2: 36, cbt3: 44.9, rataCBT: 40.45, soe: 26, nilaiAkhir: 33.912, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025141', nama: 'BERMASAUT ADIPUTRA TAMPUBOLON', identifikasi: 38.16, biokimia: 33, histologi: 38.06, anatomi: 0, cbt1: 45, cbt2: 49.3, cbt3: 51.3, rataCBT: 50.3, soe: 52, nilaiAkhir: 48.8569, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025142', nama: 'ZASKIA YUFLIHA ALYA NISA', identifikasi: 42.67, biokimia: 48.75, histologi: 61.5, anatomi: 0, cbt1: 65, cbt2: 58.7, cbt3: 65.4, rataCBT: 62.05, soe: 40, nilaiAkhir: 52.8693, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025143', nama: 'SYAHRU SYABANA SETIYANTO', identifikasi: 63.83, biokimia: 65.41, histologi: 71.5, anatomi: 0, cbt1: 50, cbt2: 61.11, cbt3: 67.9, rataCBT: 64.505, soe: 46, nilaiAkhir: 60.7337, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025144', nama: 'NISRINA ATIRA AFLAH GUNNARTO', identifikasi: 26, biokimia: 24.17, histologi: 28, anatomi: 0, cbt1: 35, cbt2: 28, cbt3: 29.5, rataCBT: 28.75, soe: 34, nilaiAkhir: 29.0505, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025145', nama: 'HASAN TRI GUNAWAN', identifikasi: 69.33, biokimia: 87.91, histologi: 62, anatomi: 0, cbt1: 75, cbt2: 73.3, cbt3: 84.6, rataCBT: 78.95, soe: 71, nilaiAkhir: 77.2912, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025146', nama: 'NADHIRA YUSTRINA', identifikasi: 67.5, biokimia: 52, histologi: 78.75, anatomi: 0, cbt1: 57.5, cbt2: 41.3, cbt3: 61.5, rataCBT: 51.4, soe: 43, nilaiAkhir: 55.7625, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025147', nama: 'WAHYU CAN ARUM PUTRI RAMBIATI', identifikasi: 61, biokimia: 42, histologi: 74.1, anatomi: 0, cbt1: 55, cbt2: 52, cbt3: 65.4, rataCBT: 58.7, soe: 51, nilaiAkhir: 59.145, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025148', nama: 'ARSELAN RIZQY DARMAWAN', identifikasi: 73.75, biokimia: 65.41, histologi: 57, anatomi: 0, cbt1: 95, cbt2: 70.7, cbt3: 70.5, rataCBT: 70.6, soe: 52, nilaiAkhir: 67.569, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025149', nama: 'NARDIIN FATHIYYAH SUNYOTO', identifikasi: 42.3, biokimia: 75, histologi: 79, anatomi: 0, cbt1: 65, cbt2: 58.7, cbt3: 60.3, rataCBT: 59.5, soe: 72, nilaiAkhir: 63.867, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025150', nama: 'AQBIL REZKY BUNAYYA', identifikasi: 62.33, biokimia: 77.5, histologi: 46.5, anatomi: 0, cbt1: 80, cbt2: 37.3, cbt3: 28.2, rataCBT: 32.75, soe: 31, nilaiAkhir: 44.5847, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025151', nama: 'MUHAMMAD THORIQ AL ROSYID', identifikasi: 67.83, biokimia: 73.75, histologi: 57, anatomi: 0, cbt1: 70, cbt2: 64, cbt3: 67.9, rataCBT: 65.95, soe: 77, nilaiAkhir: 69.2122, huruf: 'B', keterangan: 'LULUS' },
+            { nim: 'G1A025152', nama: 'RAFI DINAN AL FARISI', identifikasi: 51.67, biokimia: 52, histologi: 67.91, anatomi: 0, cbt1: 62.5, cbt2: 38.7, cbt3: 57.7, rataCBT: 48.2, soe: 46, nilaiAkhir: 51.9018, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025153', nama: 'MUHAMMAD FARRELL ARCHARD ZHAFIF SUCIPTO', identifikasi: 23, biokimia: 52.5, histologi: 52.5, anatomi: 0, cbt1: 60, cbt2: 48, cbt3: 56.4, rataCBT: 52.2, soe: 59, nilaiAkhir: 51.24, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025154', nama: 'JOSEPHINE MELYNA EVANY ESTAFANA', identifikasi: 54.67, biokimia: 28, histologi: 66.6, anatomi: 0, cbt1: 90, cbt2: 52, cbt3: 65.4, rataCBT: 58.7, soe: 46, nilaiAkhir: 57.8803, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025155', nama: 'GAFIN AULIA RAHARJO', identifikasi: 57.17, biokimia: 81, histologi: 74.16, anatomi: 0, cbt1: 65, cbt2: 57.3, cbt3: 70.5, rataCBT: 63.9, soe: 50, nilaiAkhir: 62.8993, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025156', nama: 'CLEARY SHAYNA HANIN', identifikasi: 71.71, biokimia: 53.75, histologi: 42, anatomi: 0, cbt1: 50, cbt2: 37.3, cbt3: 43.6, rataCBT: 40.45, soe: 60, nilaiAkhir: 49.3014, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025157', nama: 'RAZZA RASENDRIYA NANDANA ARDI', identifikasi: 23.67, biokimia: 27.5, histologi: 62, anatomi: 0, cbt1: 40, cbt2: 33.3, cbt3: 41, rataCBT: 37.15, soe: 66, nilaiAkhir: 40.5703, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025159', nama: 'KEYSHA FAUSTA ZAINI', identifikasi: 32.16, biokimia: 71.5, histologi: 25.41, anatomi: 0, cbt1: 45, cbt2: 40, cbt3: 44.9, rataCBT: 42.45, soe: 44, nilaiAkhir: 40.2459, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025160', nama: 'NADIYA BINTANG RAZIA NIKO', identifikasi: 61.05, biokimia: 73.3, histologi: 55, anatomi: 0, cbt1: 70, cbt2: 45.3, cbt3: 65.4, rataCBT: 55.35, soe: 36, nilaiAkhir: 56.2895, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025161', nama: 'MOH. ILHAM ARDIATSYAH', identifikasi: 4.16, biokimia: 71.5, histologi: 15.83, anatomi: 0, cbt1: 30, cbt2: 29.3, cbt3: 33.3, rataCBT: 31.3, soe: 31, nilaiAkhir: 27.1289, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025163', nama: 'ASTRELLA AIMEE KHOIRUNNISA', identifikasi: 65, biokimia: 52.5, histologi: 58, anatomi: 0, cbt1: 50, cbt2: 58.7, cbt3: 75.6, rataCBT: 67.15, soe: 46, nilaiAkhir: 60.48, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025164', nama: 'ATHIFATUL JANNAH', identifikasi: 8, biokimia: 10.83, histologi: 23.5, anatomi: 0, cbt1: 40, cbt2: 36, cbt3: 37.2, rataCBT: 36.6, soe: 20, nilaiAkhir: 26.9495, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025165', nama: 'MUHAMMAD SYAFIEQ ADZKA', identifikasi: 73.26, biokimia: 61.5, histologi: 82.08, anatomi: 0, cbt1: 80, cbt2: 58.7, cbt3: 64.1, rataCBT: 61.4, soe: 39, nilaiAkhir: 62.4704, huruf: 'C', keterangan: 'BOLEH REMED' },
+            { nim: 'G1A025166', nama: 'SYIFA NURJANAH', identifikasi: 35.17, biokimia: 25, histologi: 52.5, anatomi: 0, cbt1: 47.5, cbt2: 46.7, cbt3: 57.7, rataCBT: 52.2, soe: 28, nilaiAkhir: 45.3053, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025167', nama: 'DIMAS ZAHRAN HERDYASSAGAF', identifikasi: 20, biokimia: 9.58, histologi: 45, anatomi: 0, cbt1: 45, cbt2: 34.7, cbt3: 34.6, rataCBT: 34.65, soe: 7, nilaiAkhir: 25.422, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025168', nama: 'FARREL MOZA DHIYAUL HAQ', identifikasi: 50.5, biokimia: 56.67, histologi: 51.5, anatomi: 0, cbt1: 30, cbt2: 45.3, cbt3: 70.5, rataCBT: 57.9, soe: 52, nilaiAkhir: 54.4005, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025169', nama: 'REECHARD BURHANUDIN FUADY', identifikasi: 54.67, biokimia: 70, histologi: 52.5, anatomi: 0, cbt1: 25, cbt2: 44, cbt3: 47.4, rataCBT: 45.7, soe: 14, nilaiAkhir: 41.5353, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025170', nama: 'ADDINI FATMA ARINI', identifikasi: 37.17, biokimia: 25.83, histologi: 24, anatomi: 0, cbt1: 50, cbt2: 33.3, cbt3: 42.3, rataCBT: 37.8, soe: 23, nilaiAkhir: 32.3998, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025171', nama: 'HANIN NAURA FARIHA', identifikasi: 39.5, biokimia: 39.58, histologi: 32, anatomi: 0, cbt1: 40, cbt2: 52, cbt3: 41, rataCBT: 46.5, soe: 35, nilaiAkhir: 42.0173, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025172', nama: 'AHMAD ABDUL HAQQI', identifikasi: 17.5, biokimia: 61.5, histologi: 49.58, anatomi: 0, cbt1: 60, cbt2: 53.3, cbt3: 57.7, rataCBT: 55.5, soe: 42, nilaiAkhir: 51.6042, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025174', nama: 'AHMAD MUQORROBIN', identifikasi: 33.33, biokimia: 35.83, histologi: 33.5, anatomi: 0, cbt1: 45, cbt2: 50.7, cbt3: 67.9, rataCBT: 59.3, soe: 42, nilaiAkhir: 48.8392, huruf: 'D', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025175', nama: 'AKBAR BAGUS SRI ZENA', identifikasi: 47.41, biokimia: 66, histologi: 50.41, anatomi: 0, cbt1: 65, cbt2: 48, cbt3: 52.6, rataCBT: 50.3, soe: 18, nilaiAkhir: 45.4484, huruf: 'E', keterangan: 'WAJIB REMED' },
+            { nim: 'G1A025176', nama: 'RAFID NAUFAL NURIMANUZAKI', identifikasi: 50, biokimia: 38, histologi: 26.67, anatomi: 0, cbt1: 30, cbt2: 38.7, cbt3: 47.4, rataCBT: 43.05, soe: 43, nilaiAkhir: 40.4055, huruf: 'E', keterangan: 'WAJIB REMED' },
+        ];
+
+
+        const studentGrid = document.getElementById('student-grid');
+        const searchInput = document.getElementById('searchInput');
+        const notFoundMessage = document.getElementById('not-found');
+        
+        // Modal elements
+        const modal = document.getElementById('modal');
+        const modalContent = document.getElementById('modal-content');
+        const modalBody = document.getElementById('modal-body');
+        const closeModalBtn = document.getElementById('close-modal');
+        let chartInstance = null; // To hold the chart object
+
+        // Function to calculate ranks
+        const calculateRanks = (students) => {
+            const sorted = [...students].sort((a, b) => b.nilaiAkhir - a.nilaiAkhir);
+            sorted.forEach((student, index) => {
+                const originalStudent = students.find(s => s.nim === student.nim);
+                if (index > 0 && sorted[index].nilaiAkhir === sorted[index - 1].nilaiAkhir) {
+                    originalStudent.rank = sorted[index - 1].rank;
+                } else {
+                    originalStudent.rank = index + 1;
+                }
+            });
+        };
+
+        // Function to determine card background color based on grade/status
+        const getCardStyle = (keterangan) => {
+            const upperKeterangan = keterangan.toUpperCase();
+            if (upperKeterangan === 'LULUS') {
+                return { gradient: 'from-emerald-500/80 to-teal-600/80', badge: 'bg-emerald-500', borderColor: 'border-emerald-400' };
+            }
+            if (upperKeterangan === 'BOLEH REMED') {
+                return { gradient: 'from-sky-500/80 to-indigo-600/80', badge: 'bg-sky-500', borderColor: 'border-sky-400' };
+            }
+            if (upperKeterangan.includes('WAJIB REMED')) {
+                return { gradient: 'from-amber-500/80 to-red-600/80', badge: 'bg-amber-500', borderColor: 'border-amber-400' };
+            }
+            return { gradient: 'from-gray-700/80 to-gray-800/80', badge: 'bg-gray-500', borderColor: 'border-gray-600' };
+        };
+
+        // Function to render the student cards
+        const renderCards = (students) => {
+            studentGrid.innerHTML = ''; // Clear existing cards
+            notFoundMessage.classList.toggle('hidden', students.length > 0);
+
+            students.forEach(student => {
+                const style = getCardStyle(student.keterangan);
+                
+                // Card is now a button to trigger the modal
+                const cardHTML = `
+                <div class="card-container">
+                    <button onclick="openModal('${student.nim}')" class="stat-card bg-gray-800/50 backdrop-blur-sm rounded-2xl p-5 border border-gray-700/50 shadow-lg relative overflow-hidden flex flex-col w-full text-left bg-gradient-to-br ${style.gradient}">
+                        <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full filter blur-[50px]"></div>
+                        
+                        <div class="flex justify-between items-center mb-3 z-10">
+                            <div class="flex-1 pr-2">
+                                <h2 class="font-bold text-lg leading-tight truncate">${student.nama}</h2>
+                                <p class="text-sm text-gray-400 font-mono">${student.nim}</p>
+                            </div>
+                            <div class="text-right flex-shrink-0">
+                                <p class="text-xs text-gray-300">RANK</p>
+                                <p class="text-4xl font-black text-white leading-none">#${student.rank}</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-3 text-center my-3 p-3 bg-black/20 rounded-lg z-10">
+                            <div>
+                                <p class="text-xs text-gray-300 uppercase tracking-wider">Nilai Akhir</p>
+                                <p class="text-2xl font-bold">${student.nilaiAkhir.toFixed(1)}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-300 uppercase tracking-wider">CBT</p>
+                                <p class="text-2xl font-bold">${student.rataCBT.toFixed(1)}</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-300 uppercase tracking-wider">SOE</p>
+                                <p class="text-2xl font-bold">${student.soe}</p>
+                            </div>
+                        </div>
+
+                        <div class="text-xs text-gray-300 mt-2 z-10 flex-grow">
+                            <p class="font-bold mb-1 text-white">Rincian Nilai:</p>
+                            <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+                                <div class="flex justify-between"><span>Rata-rata Ident.:</span> <span class="font-mono font-bold text-white">${student.identifikasi}</span></div>
+                                <div class="flex justify-between"><span>CBT Sesi 1:</span> <span class="font-mono font-bold text-white">${student.cbt1}</span></div>
+                                <div class="flex justify-between"><span>Biokimia:</span> <span class="font-mono font-bold text-white">${student.biokimia}</span></div>
+                                <div class="flex justify-between"><span>CBT Sesi 2:</span> <span class="font-mono font-bold text-white">${student.cbt2}</span></div>
+                                <div class="flex justify-between"><span>Histologi:</span> <span class="font-mono font-bold text-white">${student.histologi}</span></div>
+                                <div class="flex justify-between"><span>CBT Sesi 3:</span> <span class="font-mono font-bold text-white">${student.cbt3}</span></div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-3 text-center z-10">
+                            <span class="text-xs font-bold uppercase tracking-wider px-3 py-1 ${style.badge} rounded-full">${student.keterangan} (${student.huruf})</span>
+                        </div>
+                    </button>
+                </div>
+                `;
+                studentGrid.innerHTML += cardHTML;
+            });
+        };
+        
+        // --- MODAL FUNCTIONS ---
+        const openModal = (nim) => {
+            const student = studentData.find(s => s.nim === nim);
+            if (!student) return;
+
+            // Populate Modal
+            modalBody.innerHTML = `
+                <div>
+                    <h2 class="text-3xl font-bold tracking-tight">${student.nama}</h2>
+                    <p class="font-mono text-gray-400 mb-2">${student.nim}</p>
+                    <span class="text-sm font-bold uppercase tracking-wider px-3 py-1 ${getCardStyle(student.keterangan).badge} rounded-full">${student.keterangan} (${student.huruf})</span>
+                    <div class="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                        <div class="bg-gray-700/50 p-3 rounded-lg">
+                            <p class="text-sm text-gray-400">Peringkat</p>
+                            <p class="text-3xl font-bold">#${student.rank}</p>
+                        </div>
+                        <div class="bg-gray-700/50 p-3 rounded-lg">
+                            <p class="text-sm text-gray-400">Nilai Akhir</p>
+                            <p class="text-3xl font-bold">${student.nilaiAkhir.toFixed(2)}</p>
+                        </div>
+                        <div class="bg-gray-700/50 p-3 rounded-lg">
+                            <p class="text-sm text-gray-400">Rata-rata CBT</p>
+                            <p class="text-3xl font-bold">${student.rataCBT.toFixed(1)}</p>
+                        </div>
+                        <div class="bg-gray-700/50 p-3 rounded-lg">
+                            <p class="text-sm text-gray-400">SOE</p>
+                            <p class="text-3xl font-bold">${student.soe}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative w-full h-64 md:h-auto">
+                    <canvas id="spiderwebChart"></canvas>
+                </div>
+            `;
+            
+            // Show Modal
+            modal.classList.add('show');
+            
+            // Create Chart
+            const ctx = document.getElementById('spiderwebChart').getContext('2d');
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+            chartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Rata-rata Ident.', 'Biokimia', 'Histologi', 'Anatomi', 'Rata-rata CBT', 'SOE'],
+                    datasets: [{
+                        label: 'Nilai Mahasiswa',
+                        data: [student.identifikasi, student.biokimia, student.histologi, student.anatomi, student.rataCBT, student.soe],
+                        backgroundColor: 'rgba(45, 212, 191, 0.2)',
+                        borderColor: 'rgba(45, 212, 191, 1)',
+                        pointBackgroundColor: 'rgba(45, 212, 191, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(45, 212, 191, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(255, 255, 255, 0.2)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.2)' },
+                            pointLabels: { color: '#fff', font: {size: 12} },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                backdropColor: 'transparent',
+                                stepSize: 20
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        };
+        
+        const closeModal = () => {
+            modal.classList.remove('show');
+        }
+
+        // --- EVENT LISTENERS ---
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredStudents = studentData.filter(student => 
+                student.nama.toLowerCase().includes(searchTerm) ||
+                student.nim.toLowerCase().includes(searchTerm) ||
+                student.rank.toString().includes(searchTerm)
+            );
+            const sortedFiltered = filteredStudents.sort((a,b) => a.rank - b.rank);
+            renderCards(sortedFiltered);
+        });
+        
+        closeModalBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            calculateRanks(studentData);
+            const sortedByRank = [...studentData].sort((a,b) => a.rank - b.rank);
+            renderCards(sortedByRank);
+        });
+    </script>
+
+</body>
+</html>
+
