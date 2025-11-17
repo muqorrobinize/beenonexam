@@ -3,45 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Been On Exam 1.5 (Masterpiece)</title>
+    <title>Been On Exam 1.6 (Eksperimental)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Luckiest+Guy&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
     
-    <!-- Import Three.js (Untuk Latar Belakang 3D) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Three.js DIBUANG. Tidak lagi diperlukan. -->
     
     <style>
         /* === TEMA 1: FRESH BLUE (DEFAULT) === */
         :root {
-            --primary-color: #007BFF; /* Biru Cerah */
-            --bg-color: #F0F4F8; /* Latar Belakang Abu-abu Sangat Muda */
-            --bar-color: #0A2540; /* Navy Blue Tua (untuk bar atas) */
-            --border-shadow-color: #34495E; /* Abu-abu Kebiruan Tua */
-            --card-bg: rgba(255, 255, 255, 0.45); /* Kaca Buram - Putih */
+            --primary-color: #007BFF;
+            --bg-color: #F0F4F8;
+            --bar-color: #0A2540;
+            --border-shadow-color: #34495E;
+            --card-bg: rgba(255, 255, 255, 0.45);
             --border-color: rgba(52, 73, 94, 0.2);
             --text-color: #2C3E50;
             --text-muted: #6A7B8C;
             --glow-color: rgba(0, 123, 255, 0.4);
             --error-color: #D32F2F;
-            --particle-speed: 0.1; /* Kecepatan partikel normal */
+            /* Warna Aurora */
+            --aurora-1: #007bff;
+            --aurora-2: #34c7ff;
         }
 
         /* === TEMA 2: PORIS RED (DARK MODE) === */
         body.theme-poris {
-            --primary-color: #F44336; /* Merah Menyala */
-            --bg-color: #121212; /* Latar belakang hitam pekat */
+            --primary-color: #F44336;
+            --bg-color: #121212;
             --bar-color: #000000;
             --border-shadow-color: #2C2C2C;
-            --card-bg: rgba(30, 30, 30, 0.65); /* Kaca Buram - Gelap */
+            --card-bg: rgba(30, 30, 30, 0.65);
             --border-color: rgba(70, 70, 70, 0.5);
             --text-color: #F5F5F5;
             --text-muted: #A1A1A1;
             --glow-color: rgba(244, 67, 54, 0.6);
             font-family: 'Montserrat', sans-serif;
-            --particle-speed: 0.35; /* Kecepatan partikel lebih tinggi */
+            /* Warna Aurora */
+            --aurora-1: #f44336;
+            --aurora-2: #e91e63;
         }
         
         /* === TEMA 3: CLASSIC GREEN (ORIGINAL) === */
@@ -50,45 +53,120 @@
             --bg-color: #A7D3A7;
             --bar-color: #558B2F;
             --border-shadow-color: #5D4037;
-            --card-bg: rgba(245, 222, 179, 0.85); /* Sedikit tembus pandang */
+            --card-bg: rgba(245, 222, 179, 0.85);
             --border-color: rgba(93, 64, 55, 0.5);
             --text-color: #3E2723;
             --text-muted: #6D4C41;
             --glow-color: rgba(255, 199, 0, 0.6);
-            --particle-speed: 0.05; /* Kecepatan partikel lambat */
+            /* Warna Aurora */
+            --aurora-1: #FFC700;
+            --aurora-2: #8BC34A;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; scroll-behavior: smooth; }
         
-        /* === Latar Belakang 3D Canvas === */
-        #bg-canvas {
+        /* === KURSOR KUSTOM "GILA" === */
+        body { 
+            cursor: none; /* Sembunyikan kursor default */
+            font-family: 'Poppins', sans-serif; 
+            color: var(--text-color); 
+            overflow-x: hidden;
+            background-color: var(--bg-color);
+            transition: background-color 0.5s ease, color 0.5s ease;
+            position: relative; /* Diperlukan untuk pseudo-element aurora */
+        }
+        
+        #cursor-dot {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            left: 0; top: 0;
+            transform: translate(-50%, -50%);
+            z-index: 10001;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+        
+        #cursor-outline {
+            position: fixed;
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            left: 0; top: 0;
+            transform: translate(-50%, -50%);
+            z-index: 10000;
+            pointer-events: none;
+            transition: width 0.3s ease, height 0.3s ease, transform 0.3s ease, background-color 0.3s ease;
+        }
+        
+        /* Efek hover kursor */
+        .interactive-hover {
+            /* JavaScript akan menambahkan/menghapus kelas ini */
+        }
+        body.cursor-hover #cursor-outline {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(255,255,255,0.1);
+        }
+        body.cursor-hover #cursor-dot {
+            opacity: 0;
+        }
+        /* === AKHIR KURSOR KUSTOM === */
+
+
+        /* === LATAR BELAKANG AURORA ANIMASI === */
+        body::before {
+            content: "";
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1; /* Di belakang semua konten */
+            z-index: -1;
+            opacity: 0.6;
+            background: radial-gradient(circle at 20% 20%, var(--aurora-1) 0%, transparent 30%),
+                        radial-gradient(circle at 80% 70%, var(--aurora-2) 0%, transparent 30%);
+            animation: aurora 20s infinite alternate ease-in-out;
+            transition: background 0.5s ease;
         }
-        
-        body { 
-            font-family: 'Poppins', sans-serif; 
-            color: var(--text-color); 
-            overflow-x: hidden;
-            background-color: var(--bg-color); /* Fallback & warna untuk 3D scene */
-            transition: background-color 0.5s ease, color 0.5s ease;
+        body.theme-poris::before {
+             opacity: 0.3; /* Kurangi opasitas di mode gelap */
         }
-        
-        /* Transisi smooth untuk semua elemen */
-        .top-marquee-container, .dashboard-container, .category-card, .quiz-card, #search-input, .modal-content, #music-player-modal, #update-log-container, .view-btn, .action-button, #back-to-categories-btn, .subtitle a, #stats-container, .stats-card {
-            transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+        body.theme-classic::before {
+             opacity: 0.4;
         }
 
-        /* === EFEK GLASSMORPHISM (KACA BURAM) === */
+        @keyframes aurora {
+            0% {
+                background: radial-gradient(circle at 20% 20%, var(--aurora-1) 0%, transparent 30%),
+                            radial-gradient(circle at 80% 70%, var(--aurora-2) 0%, transparent 30%);
+            }
+            50% {
+                background: radial-gradient(circle at 70% 80%, var(--aurora-1) 0%, transparent 30%),
+                            radial-gradient(circle at 10% 30%, var(--aurora-2) 0%, transparent 30%);
+            }
+            100% {
+                background: radial-gradient(circle at 20% 20%, var(--aurora-1) 0%, transparent 30%),
+                            radial-gradient(circle at 80% 70%, var(--aurora-2) 0%, transparent 30%);
+            }
+        }
+        /* === AKHIR LATAR BELAKANG AURORA === */
+
+
+        /* Transisi smooth untuk semua elemen */
+        .top-marquee-container, .dashboard-container, .category-card, .quiz-card, #search-input, .modal-content, #music-player-modal, #update-log-container, .view-btn, .action-button, #back-to-categories-btn, .subtitle a, #stats-container, .stats-card {
+            transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease, transform 0.3s ease;
+        }
+
+        /* Efek Kaca Buram "Halus" */
         .glass-effect {
             background-color: var(--card-bg);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px); /* Safari support */
-            border: 1px solid var(--border-color); /* Border halus untuk efek kaca */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
         }
 
         ::-webkit-scrollbar { width: 8px; }
@@ -97,7 +175,9 @@
         ::-webkit-scrollbar-thumb:hover { background: #FFD700; }
         
         .top-marquee-container { 
-            background-color: var(--bar-color);
+            background-color: rgba(0,0,0,0.3); /* Latar transparan gelap */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             padding: 8px 0;
             font-weight: 600; 
             font-size: 0.9rem;
@@ -106,10 +186,6 @@
             overflow: hidden;
             white-space: nowrap;
             position: relative;
-            /* Terapkan efek kaca */
-            background-color: rgba(0,0,0,0.3); /* Latar belakang bar atas lebih gelap & transparan */
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
         }
         body.theme-poris .top-marquee-container,
         body.theme-classic .top-marquee-container {
@@ -119,43 +195,37 @@
              color: var(--primary-color);
         }
 
-        .marquee-content {
-            display: inline-block;
-            animation: marquee 60s linear infinite;
-        }
-        .marquee-content span {
-            display: inline-block;
-            padding-right: 50px;
-            color: #E8F5E9;
-        }
-        .marquee-content a {
-            color: var(--primary-color);
-            font-weight: 700;
-            text-decoration: underline;
-        }
-        body.theme-poris .marquee-content a {
-            color: var(--primary-color);
-        }
-        body.theme-classic .marquee-content a {
-            color: var(--primary-color);
-        }
+        .marquee-content { display: inline-block; animation: marquee 60s linear infinite; }
+        .marquee-content span { display: inline-block; padding-right: 50px; color: #E8F5E9; }
+        .marquee-content a { color: var(--primary-color); font-weight: 700; text-decoration: underline; }
+        body.theme-poris .marquee-content a { color: var(--primary-color); }
+        body.theme-classic .marquee-content a { color: var(--primary-color); }
         
-        @keyframes marquee {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
         .dashboard-container { max-width: 1400px; margin: 0 auto; padding: 40px; }
+        
+        /* === ANIMASI JUDUL "GILA" === */
         header { text-align: center; margin-bottom: 40px; }
         header h1 { 
             font-family: 'Luckiest Guy', cursive;
-            font-size: 5rem; 
+            font-size: 7rem; /* Lebih besar! */
             font-weight: 400;
             color: var(--primary-color);
             letter-spacing: 2px;
             text-shadow: -2px -2px 0 var(--border-shadow-color), 2px -2px 0 var(--border-shadow-color), -2px 2px 0 var(--border-shadow-color), 2px 2px 0 var(--border-shadow-color), 4px 4px 0 rgba(0,0,0,0.2);
             transition: color 0.5s ease, text-shadow 0.5s ease, font-family 0.5s ease;
             margin-bottom: 0;
+        }
+        /* Animasi Text-In */
+        header h1 span {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(20px) scale(0.8);
+            animation: textIn 0.5s ease forwards;
+        }
+        @keyframes textIn {
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
         
         .subtitle {
@@ -166,118 +236,65 @@
             font-weight: 500;
             transition: color 0.5s ease;
             font-family: 'Poppins', sans-serif;
+            /* Animasi subtitle */
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeIn 0.5s ease 0.8s forwards; /* Delay setelah h1 */
         }
-        .subtitle a {
-            color: var(--text-color);
-            font-weight: 600;
-            text-decoration: none;
-        }
-        .subtitle a:hover {
-            color: var(--primary-color);
-        }
+        .subtitle a { color: var(--text-color); font-weight: 600; text-decoration: none; }
+        .subtitle a:hover { color: var(--primary-color); }
 
-        body.theme-poris header h1 {
-            font-family: 'Orbitron', sans-serif;
-        }
-        body.theme-classic header h1 {
-             font-family: 'Luckiest Guy', cursive;
-        }
+        body.theme-poris header h1 { font-family: 'Orbitron', sans-serif; }
+        body.theme-classic header h1 { font-family: 'Luckiest Guy', cursive; }
 
-        /* === FITUR BARU: STATS CONTAINER === */
+        /* === STATS BARU (CENTERED) === */
         #stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            display: flex;
+            flex-wrap: wrap; /* Agar responsif di HP */
+            justify-content: center;
             gap: 20px;
             margin-bottom: 40px;
+            max-width: 1000px; /* Batas lebar kontainer */
+            margin-left: auto;
+            margin-right: auto;
         }
         .stats-card {
+            flex: 1; /* Tumbuh merata */
+            min-width: 250px; /* Lebar minimum */
+            max-width: 300px; /* Lebar maksimum */
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 5px 5px 0px var(--border-shadow-color);
             opacity: 0;
             animation: fadeIn 0.5s ease forwards;
+            /* HAPUS bayangan, ganti dengan 3D tilt */
+            /* box-shadow: 5px 5px 0px var(--border-shadow-color); */
+            border: 2px solid var(--border-shadow-color); /* Ganti shadow dengan border */
         }
-        .stats-card-header {
-            display: flex;
-            align-items: center;
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 10px;
-        }
-        .stats-card-header svg {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-            color: var(--primary-color);
-        }
-        .stats-card-value {
-            font-size: 2.25rem;
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-        .stats-card-label {
-            font-size: 0.9rem;
-            color: var(--text-muted);
-        }
-        /* Animasi delay untuk stats */
-        .stats-card:nth-child(1) { animation-delay: 0.1s; }
-        .stats-card:nth-child(2) { animation-delay: 0.2s; }
-        .stats-card:nth-child(3) { animation-delay: 0.3s; }
-        /* === AKHIR STATS CONTAINER === */
+        .stats-card-header { display: flex; align-items: center; font-size: 1rem; font-weight: 600; color: var(--text-muted); margin-bottom: 10px; }
+        .stats-card-header svg { width: 20px; height: 20px; margin-right: 10px; color: var(--primary-color); }
+        .stats-card-value { font-size: 2.25rem; font-weight: 700; color: var(--primary-color); }
+        .stats-card-label { font-size: 0.9rem; color: var(--text-muted); }
+        .stats-card:nth-child(1) { animation-delay: 0.9s; }
+        .stats-card:nth-child(2) { animation-delay: 1.0s; }
+        .stats-card:nth-child(3) { animation-delay: 1.1s; }
+        /* === AKHIR STATS BARU === */
 
 
         .search-wrapper { position: relative; width: 100%; max-width: 600px; margin: 0 auto; }
         
-        .view-controls {
-            display: flex;
-            justify-content: flex-end;
-            margin: -30px 0 15px 0;
-            gap: 10px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .view-btn {
-            border: 2px solid var(--border-shadow-color);
-            color: var(--text-muted);
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .view-btn:hover {
-            border-color: var(--primary-color);
-            color: var(--text-color);
-        }
-        .view-btn.active {
-            background-color: var(--primary-color);
-            color: #FFFFFF; /* Teks putih solid di tombol aktif */
-            border-color: var(--primary-color);
-        }
+        .view-controls { display: flex; justify-content: flex-end; margin: -30px 0 15px 0; gap: 10px; max-width: 600px; margin-left: auto; margin-right: auto; }
+        .view-btn { border: 2px solid var(--border-shadow-color); color: var(--text-muted); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .view-btn:hover { border-color: var(--primary-color); color: var(--text-color); }
+        .view-btn.active { background-color: var(--primary-color); color: #FFFFFF; border-color: var(--primary-color); }
         .view-btn svg { width: 20px; height: 20px; }
 
-        #search-input { 
-            width: 100%; 
-            padding: 15px 20px 15px 50px; 
-            border: 2px solid var(--border-shadow-color);
-            border-radius: 10px; 
-            color: var(--text-color); 
-            font-size: 1rem; 
-            outline: none; 
-            margin-bottom: 40px;
-        }
-        #search-input:focus { 
-            border-color: var(--primary-color); 
-            box-shadow: 0 0 20px var(--glow-color); 
-        }
+        #search-input { width: 100%; padding: 15px 20px 15px 50px; border: 2px solid var(--border-shadow-color); border-radius: 10px; color: var(--text-color); font-size: 1rem; outline: none; margin-bottom: 40px; }
+        #search-input:focus { border-color: var(--primary-color); box-shadow: 0 0 20px var(--glow-color); }
         .search-wrapper svg { position: absolute; left: 15px; top: 17.5px; transform: none; width: 20px; height: 20px; color: var(--text-muted); }
 
         .category-grid, .content-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
         
+        /* === EFEK 3D TILT "GILA" === */
         .category-card, .quiz-card {
             border: 2px solid var(--border-shadow-color);
             border-radius: 12px;
@@ -285,23 +302,16 @@
             color: var(--text-color);
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.5s ease, background-color 0.5s ease, min-height 0.3s ease;
-            box-shadow: 5px 5px 0px var(--border-shadow-color);
+            /* box-shadow: 5px 5px 0px var(--border-shadow-color); */ /* Hapus shadow */
             opacity: 0;
             animation: fadeIn 0.5s ease forwards;
+            /* Transisi untuk tilt */
+            transition: transform 0.2s ease-out, border-color 0.5s ease, background-color 0.5s ease;
         }
+        /* Terapkan 3D tilt */
         .category-card:hover, .quiz-card:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 8px 8px 0px var(--border-shadow-color);
+            transform: perspective(1000px) rotateY(var(--tilt-y, 0deg)) rotateX(var(--tilt-x, 0deg)) scale(1.05);
             border-color: var(--primary-color);
-        }
-        body.theme-classic .category-card,
-        body.theme-classic .quiz-card {
-             box-shadow: 5px 5px 0px var(--border-shadow-color);
-        }
-        body.theme-classic .category-card:hover,
-        body.theme-classic .quiz-card:hover {
-             box-shadow: 8px 8px 0px var(--border-shadow-color);
         }
         
         .category-card { padding: 25px; cursor: pointer; min-height: 160px; justify-content: space-between; }
@@ -313,26 +323,10 @@
         .category-card-header h2 { font-size: 1.5rem; font-weight: 600; }
         .category-card-footer { font-size: 0.9rem; color: var(--text-muted); text-align: right; font-weight: 500; transition: text-align 0.3s ease; }
         
-        .category-grid.list-view {
-            grid-template-columns: 1fr;
-            gap: 10px;
-        }
-        .category-grid.list-view .category-card {
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px 25px;
-            min-height: auto;
-        }
-        .category-grid.list-view .category-card-header {
-            margin-bottom: 0;
-            flex-grow: 1;
-        }
-        .category-grid.list-view .category-card-footer {
-            text-align: right;
-            flex-shrink: 0;
-            margin-left: 20px;
-        }
+        .category-grid.list-view { grid-template-columns: 1fr; gap: 10px; }
+        .category-grid.list-view .category-card { flex-direction: row; align-items: center; justify-content: space-between; padding: 15px 25px; min-height: auto; }
+        .category-grid.list-view .category-card-header { margin-bottom: 0; flex-grow: 1; }
+        .category-grid.list-view .category-card-footer { text-align: right; flex-shrink: 0; margin-left: 20px; }
 
         .card-header { display: flex; align-items: center; margin-bottom: 15px; }
         .card-header svg { width: 24px; height: 24px; margin-right: 12px; color: var(--primary-color); flex-shrink: 0; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3)); }
@@ -340,27 +334,9 @@
         .card-body p { font-size: 0.9rem; color: var(--text-muted); flex-grow: 1; }
         
         .quiz-view-header { display: flex; align-items: center; margin-bottom: 30px; }
-        #back-to-categories-btn { 
-            border: 2px solid var(--border-shadow-color); 
-            color: var(--text-color); 
-            padding: 10px 20px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            font-size: 1rem; 
-            font-weight: 600; 
-            box-shadow: 3px 3px 0px var(--border-shadow-color);
-        }
-        #back-to-categories-btn:hover { 
-            border-color: var(--primary-color); 
-            box-shadow: 4px 4px 0px var(--border-shadow-color);
-            transform: translateY(-2px);
-            background-color: var(--bg-color);
-        }
-        body.theme-classic #back-to-categories-btn:hover {
-             background-color: #f0e1c0;
-        }
+        #back-to-categories-btn { border: 2px solid var(--border-shadow-color); color: var(--text-color); padding: 10px 20px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; font-size: 1rem; font-weight: 600; box-shadow: 3px 3px 0px var(--border-shadow-color); }
+        #back-to-categories-btn:hover { border-color: var(--primary-color); box-shadow: 4px 4px 0px var(--border-shadow-color); transform: translateY(-2px); background-color: var(--bg-color); }
+        body.theme-classic #back-to-categories-btn:hover { background-color: #f0e1c0; }
         #back-to-categories-btn svg { margin-right: 8px; }
         .quiz-view-header .section-title { font-size: 2rem; margin-bottom: 0; margin-left: 20px; color: var(--border-shadow-color); text-shadow: 1px 1px 2px var(--bg-color);}
 
@@ -368,68 +344,24 @@
         .loader { width: 50px; height: 50px; border: 5px solid rgba(0,0,0, 0.2); border-top: 5px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* === SKELETON LOADER BARU === */
-        .skeleton-loader {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-        }
-        .skeleton-card {
-            background-color: var(--card-bg);
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            height: 160px;
-            padding: 25px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 5px 5px 0px var(--border-shadow-color);
-        }
-        .skeleton-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -150%;
-            width: 150%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            animation: shimmer 1.5s infinite;
-        }
-        body.theme-poris .skeleton-card::after {
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-        }
-        @keyframes shimmer {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(100%); }
-        }
-        /* === AKHIR SKELETON LOADER === */
-
+        .skeleton-loader { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .skeleton-card { background-color: var(--card-bg); border: 2px solid var(--border-color); border-radius: 12px; height: 160px; padding: 25px; position: relative; overflow: hidden; border-color: var(--border-shadow-color); }
+        .skeleton-card::after { content: ''; position: absolute; top: 0; left: -150%; width: 150%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent); animation: shimmer 1.5s infinite; }
+        body.theme-poris .skeleton-card::after { background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent); }
+        @keyframes shimmer { 0% { transform: translateX(0); } 100% { transform: translateX(100%); } }
 
         #update-log-container {
             border: 2px solid var(--border-shadow-color);
             border-radius: 12px;
             padding: 25px;
             margin-top: 40px;
-            box-shadow: 5px 5px 0px var(--border-shadow-color);
+            /* box-shadow: 5px 5px 0px var(--border-shadow-color); */ /* Hapus shadow */
             opacity: 0;
             animation: fadeIn 0.5s ease forwards;
-            animation-delay: 0.5s; /* Muncul setelah stats dan card */
+            animation-delay: 1.5s; /* Muncul terakhir */
         }
-        #update-log-container h2 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            color: var(--text-color);
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--border-color);
-            display: flex;
-            align-items: center;
-        }
-        #update-log-container h2 svg {
-            width: 24px;
-            height: 24px;
-            margin-right: 12px;
-            color: var(--primary-color);
-        }
+        #update-log-container h2 { font-size: 1.8rem; font-weight: 600; color: var(--text-color); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--border-color); display: flex; align-items: center; }
+        #update-log-container h2 svg { width: 24px; height: 24px; margin-right: 12px; color: var(--primary-color); }
         #update-log-list { list-style: none; max-height: 300px; overflow-y: auto; padding-right: 10px; }
         #update-log-list li { padding: 12px 0; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; }
         #update-log-list li:last-child { border-bottom: none; }
@@ -445,43 +377,14 @@
         footer a:hover { color: var(--primary-color); }
         .footer-credits { display: flex; flex-direction: column; gap: 8px; }
 
-        .action-button { 
-            background-color: var(--primary-color); 
-            color: #FFFFFF; /* Teks putih solid */
-            width: 50px; 
-            height: 50px; 
-            border-radius: 50%; 
-            border: 2px solid var(--border-shadow-color); 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            z-index: 1000; 
-            box-shadow: 3px 3px 0 var(--border-shadow-color);
-            /* Terapkan efek kaca juga */
-            background-color: var(--primary-color);
-        }
-        body.theme-classic .action-button {
-             color: var(--text-color);
-        }
-        .action-button:hover {
-            transform: scale(1.1) translateY(-2px);
-            box-shadow: 4px 4px 0 var(--border-shadow-color);
-        }
+        .action-button { background-color: var(--primary-color); color: #FFFFFF; width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--border-shadow-color); cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 1000; box-shadow: 3px 3px 0 var(--border-shadow-color); background-color: var(--primary-color); }
+        body.theme-classic .action-button { color: var(--text-color); }
+        .action-button:hover { transform: scale(1.1) translateY(-2px); box-shadow: 4px 4px 0 var(--border-shadow-color); }
         
         #back-to-top { position: fixed; bottom: 20px; right: 20px; opacity: 0; visibility: hidden; }
         #back-to-top.visible { opacity: 1; visibility: visible; }
-        
-        #music-player-toggle {
-            position: fixed;
-            bottom: 20px;
-            right: 80px;
-        }
-        #theme-toggle-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 140px;
-        }
+        #music-player-toggle { position: fixed; bottom: 20px; right: 80px; }
+        #theme-toggle-btn { position: fixed; bottom: 20px; right: 140px; }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 2000; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
         .modal-overlay.visible { opacity: 1; visibility: visible; }
@@ -498,29 +401,10 @@
         .modal-btn.secondary { background-color: var(--card-bg); color: var(--text-muted); }
         .modal-btn.secondary:hover { background-color: var(--bg-color); color: var(--text-color); transform: translateY(-2px); box-shadow: 4px 4px 0 var(--border-shadow-color); }
 
-        #music-player-toggle.playing {
-             background-color: var(--primary-color);
-        }
+        #music-player-toggle.playing { background-color: var(--primary-color); }
 
-        #music-player-modal {
-            position: fixed;
-            bottom: 80px;
-            right: 20px;
-            width: 300px;
-            border: 2px solid var(--border-shadow-color);
-            box-shadow: 5px 5px 0 var(--border-shadow-color);
-            border-radius: 12px;
-            z-index: 999;
-            padding: 15px;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(20px);
-        }
-        #music-player-modal.visible {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
+        #music-player-modal { position: fixed; bottom: 80px; right: 20px; width: 300px; border: 2px solid var(--border-shadow-color); box-shadow: 5px 5px 0 var(--border-shadow-color); border-radius: 12px; z-index: 999; padding: 15px; opacity: 0; visibility: hidden; transform: translateY(20px); }
+        #music-player-modal.visible { opacity: 1; visibility: visible; transform: translateY(0); }
         .music-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .music-header-info { display: flex; align-items: center; gap: 8px; overflow: hidden; }
         #now-playing { font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-muted); flex-grow: 1; }
@@ -550,11 +434,13 @@
 </head>
 <body>
     
-    <!-- Latar Belakang 3D akan di-mount di sini -->
-    <canvas id="bg-canvas"></canvas>
+    <!-- Kursor Kustom -->
+    <div id="cursor-dot"></div>
+    <div id="cursor-outline"></div>
     
     <div class="top-marquee-container">
         <div class="marquee-content">
+            <!-- Teks diduplikasi 2x agar animasi seamless -->
             <span>
                 Yo, for real, you think this magic just happens? Nah, the server's running on fumes and a prayer. You want to keep acing your exams? Then stop playing and slide some love to our <a href="https://saweria.co/beenspaceess" target="_blank">Saweria (yeah, click this shiny link)</a>. Don't be a ghost. Keep this joint alive. We ain't playin'. Your future self will thank you. Or not. Whatever. Just do it. This ain't a charity but it feels like one sometimes, you feel me? Keep the lights on, fam.
             </span>
@@ -572,7 +458,7 @@
             </p>
         </header>
 
-        <!-- Container Statistik Baru -->
+        <!-- Kontainer Statistik (Baru, Terpusat) -->
         <div id="stats-container">
             <!-- Stats akan di-render oleh JS di sini -->
         </div>
@@ -659,7 +545,7 @@
         const GITHUB_REPO = "beenonexam";
         const SECRET_PASSWORD = 'enakajaluanjing';
 
-        // ... (Semua elemen DOM lainnya) ...
+        // Elemen DOM
         const mainContent = document.getElementById('main-content');
         const searchInput = document.getElementById('search-input');
         const searchWrapper = document.querySelector('.search-wrapper');
@@ -669,7 +555,6 @@
         const passwordInput = document.getElementById('password-input');
         const passwordError = document.getElementById('password-error');
         const closeModalBtn = document.getElementById('close-modal-btn');
-        
         const musicPlayerToggle = document.getElementById('music-player-toggle');
         const musicPlayerModal = document.getElementById('music-player-modal');
         const nowPlayingEl = document.getElementById('now-playing');
@@ -678,135 +563,115 @@
         const stopBtn = document.getElementById('stop-btn');
         const shuffleBtn = document.getElementById('shuffle-btn');
         const showAllBtn = document.getElementById('show-all-btn');
-
         const updateLogList = document.getElementById('update-log-list');
         const statsContainer = document.getElementById('stats-container');
-        
         const themeToggleBtn = document.getElementById('theme-toggle-btn');
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorOutline = document.getElementById('cursor-outline');
+
+        // Variabel Tema
         const themes = ['theme-fresh', 'theme-poris', 'theme-classic'];
         let currentThemeIndex = 0;
 
+        // Variabel Musik
         let audioPlayer = new Audio();
         let nextAudioPlayer = new Audio();
         let fadeInterval = null;
-
         let musicPlaylist = [];
         let currentTrackIndex = -1;
         let isShuffle = false;
         
+        // Ikon
         const fileIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>`;
         const folderIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`;
         const lockIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
 
+        // Variabel Konten
         let groupedQuizzes = {};
         let currentView = 'grid';
         let gridViewBtn, listViewBtn, viewControls;
 
-        // === LOGIKA TIGA.JS (LATAR BELAKANG 3D) ===
-        let scene, camera, renderer, particles, clock;
-        let mouseX = 0, mouseY = 0;
-        let windowHalfX = window.innerWidth / 2;
-        let windowHalfY = window.innerHeight / 2;
-
-        function initThree() {
-            try {
-                scene = new THREE.Scene();
-                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-                camera.position.z = 50; // Mundurkan kamera
-
-                renderer = new THREE.WebGLRenderer({
-                    canvas: document.getElementById('bg-canvas'),
-                    alpha: true // Latar belakang transparan
-                });
-                renderer.setSize(window.innerWidth, window.innerHeight);
-
-                clock = new THREE.Clock();
-
-                // Buat Partikel
-                const particleCount = 5000;
-                const positions = new Float32Array(particleCount * 3);
-                for (let i = 0; i < particleCount * 3; i++) {
-                    positions[i] = (Math.random() - 0.5) * 200; // Sebar partikel lebih luas
+        // === LOGIKA KURSOR KUSTOM ===
+        function initCursor() {
+            window.addEventListener('mousemove', e => {
+                const posX = e.clientX;
+                const posY = e.clientY;
+                cursorDot.style.left = `${posX}px`;
+                cursorDot.style.top = `${posY}px`;
+                // Animasikan outline agar lebih mulus
+                cursorOutline.animate({
+                    left: `${posX}px`,
+                    top: `${posY}px`
+                }, { duration: 300, fill: 'forwards' });
+            });
+            
+            // Tambahkan listener ke body untuk mendelegasikan event
+            document.body.addEventListener('mouseover', (e) => {
+                if (e.target.matches('a, button, .category-card, .view-btn, .modal-btn, .stats-card, #track-list li, .music-controls button')) {
+                    document.body.classList.add('cursor-hover');
                 }
-
-                const geometry = new THREE.BufferGeometry();
-                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-                const material = new THREE.PointsMaterial({
-                    size: 0.1,
-                    color: 0xffffff, // Warna akan di-set oleh tema
+            });
+            
+            document.body.addEventListener('mouseout', (e) => {
+                if (e.target.matches('a, button, .category-card, .view-btn, .modal-btn, .stats-card, #track-list li, .music-controls button')) {
+                    document.body.classList.remove('cursor-hover');
+                }
+            });
+        }
+        
+        // === LOGIKA 3D TILT ===
+        function init3DTilt() {
+            // Gunakan event delegation pada main-content dan stats-container
+            const tiltContainers = [mainContent, statsContainer, document.getElementById('update-log-container')];
+            
+            tiltContainers.forEach(container => {
+                container.addEventListener('mousemove', (e) => {
+                    const card = e.target.closest('.category-card, .quiz-card, .stats-card, #update-log-container');
+                    if (!card) return;
+                    
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const width = rect.width;
+                    const height = rect.height;
+                    
+                    const tiltX = (y - height / 2) / height * -20; // Max 10deg
+                    const tiltY = (x - width / 2) / width * 20; // Max 10deg
+                    
+                    card.style.setProperty('--tilt-x', `${tiltX}deg`);
+                    card.style.setProperty('--tilt-y', `${tiltY}deg`);
                 });
 
-                particles = new THREE.Points(geometry, material);
-                scene.add(particles);
-
-                document.addEventListener('mousemove', onDocumentMouseMove, false);
-                window.addEventListener('resize', onWindowResize, false);
-                
-                updateThreeTheme(); // Set warna awal
-                animateThree();
-            } catch (e) {
-                console.error("Three.js gagal diinisialisasi:", e);
-                // Sembunyikan canvas jika error
-                document.getElementById('bg-canvas').style.display = 'none';
-            }
+                container.addEventListener('mouseleave', (e) => {
+                    const card = e.target.closest('.category-card, .quiz-card, .stats-card, #update-log-container');
+                    if (card) {
+                        card.style.setProperty('--tilt-x', '0deg');
+                        card.style.setProperty('--tilt-y', '0deg');
+                    }
+                }, true); // Gunakan capture phase untuk reset
+            });
         }
 
-        function animateThree() {
-            requestAnimationFrame(animateThree);
-
-            const elapsedTime = clock.getElapsedTime();
+        // === LOGIKA ANIMASI JUDUL ===
+        function initTitleAnimation() {
+            const h1 = document.querySelector('header h1');
+            if (!h1 || h1.dataset.animated) return; // Jangan animasikan ulang
             
-            // Animasi partikel
-            particles.rotation.x = elapsedTime * 0.05;
-            particles.rotation.y = elapsedTime * 0.1;
-            
-            // Pergerakan kamera berdasarkan mouse
-            camera.position.x += (mouseX - camera.position.x) * 0.05;
-            camera.position.y += (-mouseY - camera.position.y) * 0.05;
-            camera.lookAt(scene.position);
-
-            renderer.render(scene, camera);
+            h1.dataset.animated = "true";
+            const text = h1.textContent;
+            h1.innerHTML = ''; // Kosongkan
+            text.split('').forEach((letter, index) => {
+                const span = document.createElement('span');
+                span.textContent = letter === ' ' ? '\u00A0' : letter; // Handle spasi
+                span.style.animationDelay = `${index * 0.05}s`;
+                h1.appendChild(span);
+            });
         }
 
-        function onWindowResize() {
-            windowHalfX = window.innerWidth / 2;
-            windowHalfY = window.innerHeight / 2;
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-
-        function onDocumentMouseMove(event) {
-            mouseX = (event.clientX - windowHalfX) / 50; // Kurangi intensitas gerakan
-            mouseY = (event.clientY - windowHalfY) / 50;
-        }
-
-        function updateThreeTheme() {
-            if (!renderer || !particles) return; // Pastikan three.js sudah siap
-
-            const style = getComputedStyle(document.body);
-            const particleColor = style.getPropertyValue('--primary-color').trim();
-            const bgColor = style.getPropertyValue('--bg-color').trim();
-            const speed = parseFloat(style.getPropertyValue('--particle-speed').trim() || 0.1);
-
-            // Set warna background renderer
-            renderer.setClearColor(new THREE.Color(bgColor), 1);
-            
-            // Set warna partikel
-            particles.material.color.set(new THREE.Color(particleColor));
-            
-            // Set kecepatan rotasi (simulasi)
-            if (particles.rotation) {
-                particles.rotation.x = clock.getElapsedTime() * (speed * 0.5); // Atur kecepatan rotasi
-                particles.rotation.y = clock.getElapsedTime() * speed;
-            }
-        }
-
-        // === AKHIR LOGIKA TIGA.JS ===
-
-        
-        // --- FUNGSI CACHING ---
+        // === FUNGSI CACHING ===
+        function getCachedData(key, maxAgeMinutes = 10) { /* ... (sama) ... */ }
+        function setCachedData(key, payload) { /* ... (sama) ... */ }
+        // (Implementasi lengkap)
         function getCachedData(key, maxAgeMinutes = 10) {
             const item = localStorage.getItem(key);
             if (!item) return null;
@@ -823,7 +688,6 @@
                 return null;
             }
         }
-
         function setCachedData(key, payload) {
             const data = {
                 payload: payload,
@@ -842,17 +706,12 @@
             document.body.classList.add(themeName);
             localStorage.setItem('theme', themeName);
             currentThemeIndex = themes.indexOf(themeName);
-            
-            // PENTING: Update warna 3D setelah DOM/CSS di-update
-            setTimeout(updateThreeTheme, 0);
         }
-
         function cycleTheme() {
             currentThemeIndex = (currentThemeIndex + 1) % themes.length;
             const newTheme = themes[currentThemeIndex];
             setTheme(newTheme);
         }
-
         function loadTheme() {
             const savedTheme = localStorage.getItem('theme');
             if (savedTheme && themes.includes(savedTheme)) {
@@ -875,17 +734,13 @@
                 </div>
             `;
             searchWrapper.insertAdjacentHTML('afterend', viewControlsHTML);
-            
             gridViewBtn = document.getElementById('grid-view-btn');
             listViewBtn = document.getElementById('list-view-btn');
             viewControls = document.querySelector('.view-controls');
-
             gridViewBtn.addEventListener('click', () => setViewMode('grid'));
             listViewBtn.addEventListener('click', () => setViewMode('list'));
-
             loadViewMode();
         }
-
         function setViewMode(mode) {
             currentView = mode;
             localStorage.setItem('viewMode', mode);
@@ -900,7 +755,6 @@
                 listViewBtn.classList.remove('active');
             }
         }
-
         function loadViewMode() {
             currentView = localStorage.getItem('viewMode') || 'grid';
             if (currentView === 'list') {
@@ -912,14 +766,13 @@
         
         // --- RENDER KONTEN ---
         function renderCategoryView(filter = '') {
-            mainContent.innerHTML = ''; // Hapus skeleton loader/konten lama
+            mainContent.innerHTML = '';
             document.querySelector('.search-wrapper').style.display = 'block';
             if (viewControls) viewControls.style.display = 'flex';
             searchInput.placeholder = "Cari kategori...";
 
             const categoryGrid = document.createElement('div');
             categoryGrid.className = 'category-grid';
-            
             if (currentView === 'list') {
                 categoryGrid.classList.add('list-view');
             }
@@ -933,17 +786,17 @@
                 return;
             }
 
-            let animationDelay = 0; // Untuk animasi berurutan
+            let animationDelay = 0;
             filteredCategories.sort().forEach(category => {
                 const quizCount = groupedQuizzes[category].length;
                 const isSecret = /secret/i.test(category);
                 const card = document.createElement('div');
-                card.className = 'category-card glass-effect'; // Tambah glass-effect
+                card.className = 'category-card glass-effect';
                 if (isSecret) card.classList.add('secret');
                 card.setAttribute('role', 'button');
                 card.tabIndex = 0;
-                card.style.animationDelay = `${animationDelay}s`; // Terapkan delay
-                animationDelay += 0.05; // Tambah delay sedikit
+                card.style.animationDelay = `${animationDelay}s`;
+                animationDelay += 0.05;
                 
                 card.innerHTML = `
                     <div>
@@ -991,7 +844,7 @@
                 const card = document.createElement('a');
                 card.href = `kuis/${item.filename}`;
                 card.target = '_blank';
-                card.className = 'quiz-card glass-effect'; // Tambah glass-effect
+                card.className = 'quiz-card glass-effect';
                 card.style.animationDelay = `${animationDelay}s`;
                 animationDelay += 0.05;
                 
@@ -1007,7 +860,6 @@
 
         // --- FETCH DATA ---
 
-        // 1. Logika Kuis & Statistik
         function processQuizData(files) {
             const allQuizData = files
                 .filter(file => file.type === 'file' && file.name.endsWith('.html'))
@@ -1040,6 +892,7 @@
                     }
                 }
                 
+                // Render ke kontainer stats baru
                 statsContainer.innerHTML = `
                     <div class="stats-card glass-effect">
                         <div class="stats-card-header">
@@ -1080,9 +933,9 @@
                     ${Array(6).fill('<div class="skeleton-card"></div>').join('')}
                 </div>`;
             statsContainer.innerHTML = `
-                <div class="stats-card glass-effect skeleton-card" style="height: 150px"></div>
-                <div class="stats-card glass-effect skeleton-card" style="height: 150px"></div>
-                <div class="stats-card glass-effect skeleton-card" style="height: 150px"></div>
+                <div class="stats-card glass-effect skeleton-card" style="height: 150px; animation-delay: 0.9s;"></div>
+                <div class="stats-card glass-effect skeleton-card" style="height: 150px; animation-delay: 1.0s;"></div>
+                <div class="stats-card glass-effect skeleton-card" style="height: 150px; animation-delay: 1.1s;"></div>
             `;
 
             const cacheKey = 'cachedQuizzes';
@@ -1107,7 +960,7 @@
             } catch (error) {
                 console.error("Error:", error);
                 mainContent.innerHTML = `<div class="status-message error"><strong>Terjadi Kesalahan</strong><p>Gagal memuat daftar kuis. Ini bisa terjadi karena limit API GitHub. Coba lagi setelah beberapa saat.</p><small>Detail: ${error.message}</small></div>`;
-                statsContainer.innerHTML = ''; // Sembunyikan skeleton stats jika error
+                statsContainer.innerHTML = '';
             }
         }
 
@@ -1129,8 +982,18 @@
         }
         
         // --- MUSIC PLAYER ---
-        // ... (Fungsi getHiddenTracks, saveHiddenTracks, processMusicData, fetchAndProcessMusic, renderPlaylist, toggleHideTrack, playTrack, playNextTrack, updatePlayPauseIcon, startCrossfade, dan event listener tombol musik tetap sama seperti v1.4, HANYA SAJA setPorisTheme() DIHAPUS)
-        
+        // (Logika musik utuh dari v1.5, tidak ada perubahan)
+        function getHiddenTracks() { /* ... */ }
+        function saveHiddenTracks(hidden) { /* ... */ }
+        function processMusicData(files) { /* ... */ }
+        async function fetchAndProcessMusic() { /* ... */ }
+        function renderPlaylist() { /* ... */ }
+        function toggleHideTrack(index) { /* ... */ }
+        function playTrack(index) { /* ... */ }
+        function playNextTrack() { /* ... */ }
+        function updatePlayPauseIcon(isPlaying) { /* ... */ }
+        function startCrossfade() { /* ... */ }
+        // (Implementasi lengkap)
         function getHiddenTracks() {
             try {
                 const hidden = localStorage.getItem('hiddenTracks');
@@ -1139,11 +1002,9 @@
                 return [];
             }
         }
-
         function saveHiddenTracks(hidden) {
             localStorage.setItem('hiddenTracks', JSON.stringify(hidden));
         }
-
         function processMusicData(files) {
             if (!Array.isArray(files)) {
                 trackListEl.innerHTML = `<li class="no-music">Tidak ada musik.</li>`;
@@ -1167,7 +1028,6 @@
             }).sort((a, b) => a.name.localeCompare(b.name));
             renderPlaylist();
         }
-
         async function fetchAndProcessMusic() {
             const cacheKey = 'cachedMusic';
             const cachedData = getCachedData(cacheKey, 30);
@@ -1191,7 +1051,6 @@
                 trackListEl.innerHTML = `<li class="no-music">Gagal memuat musik.</li>`;
             }
         }
-
         function renderPlaylist() {
             trackListEl.innerHTML = '';
             musicPlaylist.forEach((track, index) => {
@@ -1217,7 +1076,6 @@
                 trackListEl.appendChild(li);
             });
         }
-
         function toggleHideTrack(index) {
             const track = musicPlaylist[index];
             track.hidden = !track.hidden;
@@ -1228,7 +1086,6 @@
             }
             renderPlaylist();
         }
-
         function playTrack(index) {
             if (index < 0 || index >= musicPlaylist.length || musicPlaylist[index].hidden) {
                 return;
@@ -1243,7 +1100,6 @@
             audioPlayer.play();
             renderPlaylist();
         }
-        
         function playNextTrack() {
             if (musicPlaylist.every(t => t.hidden)) return;
             let nextIndex = currentTrackIndex;
@@ -1252,14 +1108,12 @@
             } while (musicPlaylist[nextIndex].hidden);
             playTrack(nextIndex);
         }
-
         function updatePlayPauseIcon(isPlaying) {
              playPauseBtn.innerHTML = isPlaying ?
                 `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`:
                 `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
             musicPlayerToggle.classList.toggle('playing', isPlaying);
         }
-
         function startCrossfade() {
             clearInterval(fadeInterval);
             let nextIndex = currentTrackIndex;
@@ -1292,7 +1146,6 @@
                 }
             }, stepDuration);
         }
-        
         playPauseBtn.addEventListener('click', () => {
             if (audioPlayer.paused) {
                  if (!audioPlayer.src && musicPlaylist.length > 0) {
@@ -1304,7 +1157,6 @@
                 audioPlayer.pause();
             }
         });
-
         stopBtn.addEventListener('click', () => {
             clearInterval(fadeInterval);
             audioPlayer.pause();
@@ -1315,7 +1167,6 @@
             currentTrackIndex = -1;
             renderPlaylist();
         });
-
         shuffleBtn.addEventListener('click', () => {
             isShuffle = !isShuffle;
             shuffleBtn.classList.toggle('active', isShuffle);
@@ -1331,20 +1182,17 @@
             currentTrackIndex = musicPlaylist.findIndex(track => track.src === currentSrc);
             renderPlaylist();
         });
-
         showAllBtn.addEventListener('click', () => {
             musicPlaylist.forEach(track => track.hidden = false);
             saveHiddenTracks([]);
             renderPlaylist();
         });
-        
         audioPlayer.onplay = () => updatePlayPauseIcon(true);
         audioPlayer.onpause = () => {
             if (audioPlayer.volume > 0.1) {
                  updatePlayPauseIcon(false);
             }
         };
-        
         const timeUpdateForCrossfade = () => {
             const crossfadePoint = 3;
             if (audioPlayer.duration && (audioPlayer.duration - audioPlayer.currentTime) <= crossfadePoint) {
@@ -1352,7 +1200,6 @@
                 startCrossfade();
             }
         };
-
         audioPlayer.addEventListener('timeupdate', timeUpdateForCrossfade);
         audioPlayer.addEventListener('ended', playNextTrack);
 
@@ -1362,7 +1209,6 @@
             passwordInput.value = '';
             passwordError.textContent = '';
         });
-
         searchInput.addEventListener('input', () => renderCategoryView(searchInput.value));
         window.addEventListener('scroll', () => backToTopButton.classList.toggle('visible', window.scrollY > 300));
         backToTopButton.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
@@ -1372,11 +1218,14 @@
         themeToggleBtn.addEventListener('click', cycleTheme);
 
         // --- LOG PEMBARUAN ---
+        function formatCommitDate(dateString) { /* ... */ }
+        function processLogData(commits) { /* ... */ }
+        async function fetchUpdateLog() { /* ... */ }
+        // (Implementasi lengkap)
         function formatCommitDate(dateString) {
             const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
             return new Date(dateString).toLocaleString('id-ID', options).replace('.', ':');
         }
-
         function processLogData(commits) {
              if (commits.length === 0) {
                 updateLogList.innerHTML = '<li>Tidak ada log pembaruan yang ditemukan.</li>';
@@ -1395,7 +1244,6 @@
                 updateLogList.appendChild(li);
             });
         }
-
         async function fetchUpdateLog() {
             const cacheKey = 'cachedCommits';
             const cachedData = getCachedData(cacheKey, 5);
@@ -1418,10 +1266,12 @@
         
         // --- INISIALISASI ---
         document.addEventListener('DOMContentLoaded', () => {
-            loadTheme(); // Muat tema (harus sebelum initThree)
-            initThree(); // Inisialisasi latar belakang 3D
+            loadTheme();
+            initCursor(); // Inisialisasi kursor kustom
+            init3DTilt(); // Inisialisasi 3D tilt
+            initTitleAnimation(); // Inisialisasi animasi judul
             injectViewControls();
-            fetchAndProcessQuizzes(); // Ini akan memanggil renderStats dan renderCategory
+            fetchAndProcessQuizzes();
             fetchAndProcessMusic();
             fetchUpdateLog();
         });
