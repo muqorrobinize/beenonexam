@@ -3,147 +3,345 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Been On Exam</title>
+    <title>Been On Exam 1.5 (Masterpiece)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Luckiest+Guy&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet"> <!-- Font Cyberpunk Ditambahkan -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    
+    <!-- Import Three.js (Untuk Latar Belakang 3D) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
     <style>
+        /* === TEMA 1: FRESH BLUE (DEFAULT) === */
         :root {
-            --primary-gold: #FFC700;
-            --light-green-bg: #A7D3A7;
-            --darker-green-bar: #558B2F;
-            --dark-wood: #5D4037;
-            --card-bg: rgba(245, 222, 179, 0.9); /* Wheat with opacity */
-            --border-color: rgba(93, 64, 55, 0.5);
-            --text-color: #3E2723; /* Dark Brown */
-            --text-muted: #6D4C41;
-            --glow-color: rgba(255, 199, 0, 0.6);
+            --primary-color: #007BFF; /* Biru Cerah */
+            --bg-color: #F0F4F8; /* Latar Belakang Abu-abu Sangat Muda */
+            --bar-color: #0A2540; /* Navy Blue Tua (untuk bar atas) */
+            --border-shadow-color: #34495E; /* Abu-abu Kebiruan Tua */
+            --card-bg: rgba(255, 255, 255, 0.45); /* Kaca Buram - Putih */
+            --border-color: rgba(52, 73, 94, 0.2);
+            --text-color: #2C3E50;
+            --text-muted: #6A7B8C;
+            --glow-color: rgba(0, 123, 255, 0.4);
             --error-color: #D32F2F;
+            --particle-speed: 0.1; /* Kecepatan partikel normal */
         }
 
-        /* Tema Poris */
-        body.poris-theme {
-            --primary-gold: #e53e3e; /* Merah */
-            --light-green-bg: #1C1C1C; /* Dark Charcoal */
-            --darker-green-bar: #000000;
-            --dark-wood: #967259; /* Light Wood */
-            --card-bg: rgba(42, 42, 42, 0.9); /* Dark Card */
-            --text-color: #F5F5F5; /* Light Cream Text */
+        /* === TEMA 2: PORIS RED (DARK MODE) === */
+        body.theme-poris {
+            --primary-color: #F44336; /* Merah Menyala */
+            --bg-color: #121212; /* Latar belakang hitam pekat */
+            --bar-color: #000000;
+            --border-shadow-color: #2C2C2C;
+            --card-bg: rgba(30, 30, 30, 0.65); /* Kaca Buram - Gelap */
+            --border-color: rgba(70, 70, 70, 0.5);
+            --text-color: #F5F5F5;
             --text-muted: #A1A1A1;
-            --glow-color: rgba(229, 62, 62, 0.6);
+            --glow-color: rgba(244, 67, 54, 0.6);
             font-family: 'Montserrat', sans-serif;
+            --particle-speed: 0.35; /* Kecepatan partikel lebih tinggi */
+        }
+        
+        /* === TEMA 3: CLASSIC GREEN (ORIGINAL) === */
+        body.theme-classic {
+            --primary-color: #FFC700;
+            --bg-color: #A7D3A7;
+            --bar-color: #558B2F;
+            --border-shadow-color: #5D4037;
+            --card-bg: rgba(245, 222, 179, 0.85); /* Sedikit tembus pandang */
+            --border-color: rgba(93, 64, 55, 0.5);
+            --text-color: #3E2723;
+            --text-muted: #6D4C41;
+            --glow-color: rgba(255, 199, 0, 0.6);
+            --particle-speed: 0.05; /* Kecepatan partikel lambat */
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; scroll-behavior: smooth; }
+        
+        /* === Latar Belakang 3D Canvas === */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Di belakang semua konten */
+        }
+        
         body { 
             font-family: 'Poppins', sans-serif; 
             color: var(--text-color); 
             overflow-x: hidden;
-            background-color: var(--light-green-bg);
-            background-image: 
-                radial-gradient(circle at 15% 20%, rgba(255,255,255,0.4) 0%, transparent 40%), 
-                radial-gradient(circle at 85% 35%, rgba(255,255,255,0.35) 0%, transparent 35%);
-            background-attachment: fixed;
-            /* Transisi tema yang smooth */
-            transition: background-color 0.7s ease, color 0.7s ease;
+            background-color: var(--bg-color); /* Fallback & warna untuk 3D scene */
+            transition: background-color 0.5s ease, color 0.5s ease;
         }
         
-        /* Transisi smooth untuk elemen lain */
-        .top-marquee-container, .dashboard-container, .category-card, .quiz-card, #search-input, .modal-content, #music-player-modal {
-            transition: background-color 0.7s ease, color 0.7s ease, border-color 0.7s ease;
+        /* Transisi smooth untuk semua elemen */
+        .top-marquee-container, .dashboard-container, .category-card, .quiz-card, #search-input, .modal-content, #music-player-modal, #update-log-container, .view-btn, .action-button, #back-to-categories-btn, .subtitle a, #stats-container, .stats-card {
+            transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
+        }
+
+        /* === EFEK GLASSMORPHISM (KACA BURAM) === */
+        .glass-effect {
+            background-color: var(--card-bg);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px); /* Safari support */
+            border: 1px solid var(--border-color); /* Border halus untuk efek kaca */
         }
 
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #4E342E; }
-        ::-webkit-scrollbar-thumb { background: var(--primary-gold); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #FFD700; }
         
         .top-marquee-container { 
-            background-color: var(--darker-green-bar);
+            background-color: var(--bar-color);
             padding: 8px 0;
             font-weight: 600; 
             font-size: 0.9rem;
-            border-bottom: 3px solid #33691E;
+            border-bottom: 3px solid var(--primary-color);
+            color: #E8F5E9;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+            /* Terapkan efek kaca */
+            background-color: rgba(0,0,0,0.3); /* Latar belakang bar atas lebih gelap & transparan */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        body.theme-poris .top-marquee-container,
+        body.theme-classic .top-marquee-container {
+             border-bottom: 3px solid #33691E;
+        }
+        body.theme-poris .top-marquee-container a {
+             color: var(--primary-color);
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 60s linear infinite;
+        }
+        .marquee-content span {
+            display: inline-block;
+            padding-right: 50px;
             color: #E8F5E9;
         }
-        .top-marquee-container a {
-            color: var(--primary-gold);
+        .marquee-content a {
+            color: var(--primary-color);
             font-weight: 700;
             text-decoration: underline;
         }
+        body.theme-poris .marquee-content a {
+            color: var(--primary-color);
+        }
+        body.theme-classic .marquee-content a {
+            color: var(--primary-color);
+        }
         
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
         .dashboard-container { max-width: 1400px; margin: 0 auto; padding: 40px; }
         header { text-align: center; margin-bottom: 40px; }
         header h1 { 
             font-family: 'Luckiest Guy', cursive;
             font-size: 5rem; 
             font-weight: 400;
-            color: var(--primary-gold);
+            color: var(--primary-color);
             letter-spacing: 2px;
-            text-shadow: -2px -2px 0 var(--dark-wood), 2px -2px 0 var(--dark-wood), -2px 2px 0 var(--dark-wood), 2px 2px 0 var(--dark-wood), 4px 4px 0 rgba(0,0,0,0.5);
-            transition: color 0.7s ease, text-shadow 0.7s ease, font-family 0.7s ease;
+            text-shadow: -2px -2px 0 var(--border-shadow-color), 2px -2px 0 var(--border-shadow-color), -2px 2px 0 var(--border-shadow-color), 2px 2px 0 var(--border-shadow-color), 4px 4px 0 rgba(0,0,0,0.2);
+            transition: color 0.5s ease, text-shadow 0.5s ease, font-family 0.5s ease;
+            margin-bottom: 0;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-top: -15px;
+            margin-bottom: 30px;
+            font-weight: 500;
+            transition: color 0.5s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+        .subtitle a {
+            color: var(--text-color);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .subtitle a:hover {
+            color: var(--primary-color);
         }
 
-        body.poris-theme header h1 {
-            font-family: 'Orbitron', sans-serif; /* Font Cyberpunk */
+        body.theme-poris header h1 {
+            font-family: 'Orbitron', sans-serif;
+        }
+        body.theme-classic header h1 {
+             font-family: 'Luckiest Guy', cursive;
         }
 
-        .search-wrapper { position: relative; width: 100%; max-width: 600px; margin: 0 auto 40px; }
+        /* === FITUR BARU: STATS CONTAINER === */
+        #stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .stats-card {
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 5px 5px 0px var(--border-shadow-color);
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+        }
+        .stats-card-header {
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        .stats-card-header svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        .stats-card-value {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        .stats-card-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        /* Animasi delay untuk stats */
+        .stats-card:nth-child(1) { animation-delay: 0.1s; }
+        .stats-card:nth-child(2) { animation-delay: 0.2s; }
+        .stats-card:nth-child(3) { animation-delay: 0.3s; }
+        /* === AKHIR STATS CONTAINER === */
+
+
+        .search-wrapper { position: relative; width: 100%; max-width: 600px; margin: 0 auto; }
+        
+        .view-controls {
+            display: flex;
+            justify-content: flex-end;
+            margin: -30px 0 15px 0;
+            gap: 10px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .view-btn {
+            border: 2px solid var(--border-shadow-color);
+            color: var(--text-muted);
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .view-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--text-color);
+        }
+        .view-btn.active {
+            background-color: var(--primary-color);
+            color: #FFFFFF; /* Teks putih solid di tombol aktif */
+            border-color: var(--primary-color);
+        }
+        .view-btn svg { width: 20px; height: 20px; }
+
         #search-input { 
             width: 100%; 
             padding: 15px 20px 15px 50px; 
-            background-color: var(--card-bg); 
-            border: 2px solid var(--dark-wood);
+            border: 2px solid var(--border-shadow-color);
             border-radius: 10px; 
             color: var(--text-color); 
             font-size: 1rem; 
             outline: none; 
-            transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.7s ease, color 0.7s ease; 
+            margin-bottom: 40px;
         }
         #search-input:focus { 
-            border-color: var(--primary-gold); 
+            border-color: var(--primary-color); 
             box-shadow: 0 0 20px var(--glow-color); 
         }
-        .search-wrapper svg { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: var(--text-muted); }
+        .search-wrapper svg { position: absolute; left: 15px; top: 17.5px; transform: none; width: 20px; height: 20px; color: var(--text-muted); }
 
         .category-grid, .content-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
         
         .category-card, .quiz-card {
-            background-color: var(--card-bg);
-            border: 2px solid var(--dark-wood);
+            border: 2px solid var(--border-shadow-color);
             border-radius: 12px;
             text-decoration: none;
             color: var(--text-color);
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background-color 0.7s ease;
-            box-shadow: 5px 5px 0px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.5s ease, background-color 0.5s ease, min-height 0.3s ease;
+            box-shadow: 5px 5px 0px var(--border-shadow-color);
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
         }
         .category-card:hover, .quiz-card:hover {
             transform: translateY(-5px) scale(1.02);
-            box-shadow: 8px 8px 0px rgba(0,0,0,0.3);
-            border-color: var(--primary-gold);
+            box-shadow: 8px 8px 0px var(--border-shadow-color);
+            border-color: var(--primary-color);
         }
+        body.theme-classic .category-card,
+        body.theme-classic .quiz-card {
+             box-shadow: 5px 5px 0px var(--border-shadow-color);
+        }
+        body.theme-classic .category-card:hover,
+        body.theme-classic .quiz-card:hover {
+             box-shadow: 8px 8px 0px var(--border-shadow-color);
+        }
+        
         .category-card { padding: 25px; cursor: pointer; min-height: 160px; justify-content: space-between; }
         .quiz-card { padding: 20px; }
         
         .category-card.secret .category-card-header svg { color: var(--error-color); }
-        .category-card-header { display: flex; align-items: center; margin-bottom: 15px; }
-        .category-card-header svg { width: 32px; height: 32px; margin-right: 15px; color: var(--primary-gold); flex-shrink: 0; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3));}
+        .category-card-header { display: flex; align-items: center; margin-bottom: 15px; transition: margin-bottom 0.3s ease; }
+        .category-card-header svg { width: 32px; height: 32px; margin-right: 15px; color: var(--primary-color); flex-shrink: 0; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3));}
         .category-card-header h2 { font-size: 1.5rem; font-weight: 600; }
-        .category-card-footer { font-size: 0.9rem; color: var(--text-muted); text-align: right; font-weight: 500;}
+        .category-card-footer { font-size: 0.9rem; color: var(--text-muted); text-align: right; font-weight: 500; transition: text-align 0.3s ease; }
         
+        .category-grid.list-view {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        .category-grid.list-view .category-card {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 25px;
+            min-height: auto;
+        }
+        .category-grid.list-view .category-card-header {
+            margin-bottom: 0;
+            flex-grow: 1;
+        }
+        .category-grid.list-view .category-card-footer {
+            text-align: right;
+            flex-shrink: 0;
+            margin-left: 20px;
+        }
+
         .card-header { display: flex; align-items: center; margin-bottom: 15px; }
-        .card-header svg { width: 24px; height: 24px; margin-right: 12px; color: var(--primary-gold); flex-shrink: 0; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3)); }
+        .card-header svg { width: 24px; height: 24px; margin-right: 12px; color: var(--primary-color); flex-shrink: 0; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3)); }
         .card-header h3 { font-size: 1.25rem; font-weight: 600; flex-grow: 1; }
         .card-body p { font-size: 0.9rem; color: var(--text-muted); flex-grow: 1; }
         
         .quiz-view-header { display: flex; align-items: center; margin-bottom: 30px; }
         #back-to-categories-btn { 
-            background-color: var(--card-bg); 
-            border: 2px solid var(--dark-wood); 
+            border: 2px solid var(--border-shadow-color); 
             color: var(--text-color); 
             padding: 10px 20px; 
             border-radius: 8px; 
@@ -152,212 +350,251 @@
             align-items: center; 
             font-size: 1rem; 
             font-weight: 600; 
-            transition: all 0.2s ease, background-color 0.7s ease; 
-            box-shadow: 3px 3px 0px rgba(0,0,0,0.3);
+            box-shadow: 3px 3px 0px var(--border-shadow-color);
         }
         #back-to-categories-btn:hover { 
-            background-color: #f0e1c0;
-            border-color: var(--primary-gold); 
-            box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
+            border-color: var(--primary-color); 
+            box-shadow: 4px 4px 0px var(--border-shadow-color);
             transform: translateY(-2px);
+            background-color: var(--bg-color);
+        }
+        body.theme-classic #back-to-categories-btn:hover {
+             background-color: #f0e1c0;
         }
         #back-to-categories-btn svg { margin-right: 8px; }
-        .quiz-view-header .section-title { font-size: 2rem; margin-bottom: 0; margin-left: 20px; color: var(--dark-wood); text-shadow: 2px 2px 4px rgba(255,255,255,0.5);}
+        .quiz-view-header .section-title { font-size: 2rem; margin-bottom: 0; margin-left: 20px; color: var(--border-shadow-color); text-shadow: 1px 1px 2px var(--bg-color);}
 
-        .status-message { text-align: center; color: var(--dark-wood); font-size: 1rem; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-shadow: 1px 1px 2px rgba(255,255,255,0.7); }
-        .loader { width: 50px; height: 50px; border: 5px solid rgba(0,0,0, 0.2); border-top: 5px solid var(--primary-gold); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        .status-message { text-align: center; color: var(--text-color); font-size: 1rem; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .loader { width: 50px; height: 50px; border: 5px solid rgba(0,0,0, 0.2); border-top: 5px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        footer { text-align: center; padding: 40px 0; margin-top: 40px; border-top: 2px solid rgba(0,0,0,0.2); color: var(--text-color); }
+        /* === SKELETON LOADER BARU === */
+        .skeleton-loader {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        .skeleton-card {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            height: 160px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 5px 5px 0px var(--border-shadow-color);
+        }
+        .skeleton-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -150%;
+            width: 150%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+        body.theme-poris .skeleton-card::after {
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(100%); }
+        }
+        /* === AKHIR SKELETON LOADER === */
+
+
+        #update-log-container {
+            border: 2px solid var(--border-shadow-color);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 40px;
+            box-shadow: 5px 5px 0px var(--border-shadow-color);
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+            animation-delay: 0.5s; /* Muncul setelah stats dan card */
+        }
+        #update-log-container h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+        }
+        #update-log-container h2 svg {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            color: var(--primary-color);
+        }
+        #update-log-list { list-style: none; max-height: 300px; overflow-y: auto; padding-right: 10px; }
+        #update-log-list li { padding: 12px 0; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; }
+        #update-log-list li:last-child { border-bottom: none; }
+        #update-log-list .log-message { font-weight: 500; display: block; margin-bottom: 5px; }
+        #update-log-list .log-meta { font-size: 0.85rem; color: var(--text-muted); font-style: italic; }
+        #update-log-list::-webkit-scrollbar { width: 6px; }
+        #update-log-list::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 3px; }
+        #update-log-list::-webkit-scrollbar-thumb { background: var(--primary-color); border-radius: 3px; }
+        #update-log-list::-webkit-scrollbar-thumb:hover { background: #FFD700; }
+
+        footer { text-align: center; padding: 40px 0; margin-top: 40px; border-top: 2px solid var(--border-color); color: var(--text-color); }
         footer a { color: var(--text-color); text-decoration: none; font-weight: 500; transition: color 0.3s ease; }
-        footer a:hover { color: var(--primary-gold); }
+        footer a:hover { color: var(--primary-color); }
         .footer-credits { display: flex; flex-direction: column; gap: 8px; }
 
         .action-button { 
-            background-color: var(--primary-gold); 
-            color: var(--dark-wood); 
+            background-color: var(--primary-color); 
+            color: #FFFFFF; /* Teks putih solid */
             width: 50px; 
             height: 50px; 
             border-radius: 50%; 
-            border: 2px solid var(--dark-wood); 
+            border: 2px solid var(--border-shadow-color); 
             cursor: pointer; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             z-index: 1000; 
-            box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
-            transition: all 0.2s ease, background-color 0.7s ease;
+            box-shadow: 3px 3px 0 var(--border-shadow-color);
+            /* Terapkan efek kaca juga */
+            background-color: var(--primary-color);
+        }
+        body.theme-classic .action-button {
+             color: var(--text-color);
         }
         .action-button:hover {
             transform: scale(1.1) translateY(-2px);
-            box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+            box-shadow: 4px 4px 0 var(--border-shadow-color);
         }
+        
         #back-to-top { position: fixed; bottom: 20px; right: 20px; opacity: 0; visibility: hidden; }
         #back-to-top.visible { opacity: 1; visibility: visible; }
         
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 2000; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
-        .modal-overlay.visible { opacity: 1; visibility: visible; }
-        .modal-content { background-color: var(--card-bg); border: 2px solid var(--dark-wood); padding: 30px; border-radius: 10px; border-top: 4px solid var(--primary-gold); width: 90%; max-width: 400px; text-align: center; transform: scale(0.9); transition: transform 0.3s; box-shadow: 5px 5px 0 rgba(0,0,0,0.3); }
-        .modal-overlay.visible .modal-content { transform: scale(1); }
-        .modal-content h3 { margin-bottom: 15px; font-size: 1.5rem; }
-        .modal-content p { margin-bottom: 20px; color: var(--text-muted); }
-        #password-input { width: 100%; padding: 12px; background-color: #D2B48C; border: 2px solid var(--dark-wood); border-radius: 8px; color: var(--text-color); font-size: 1rem; margin-bottom: 10px; text-align: center; }
-        #password-error { color: var(--error-color); font-size: 0.9rem; height: 1.2em; margin-bottom: 10px; }
-        .modal-actions { display: flex; gap: 10px; }
-        .modal-btn { flex-grow: 1; padding: 12px; border: 2px solid var(--dark-wood); border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 3px 3px 0 rgba(0,0,0,0.3); }
-        .modal-btn.primary { background-color: var(--primary-gold); color: var(--dark-wood); }
-        .modal-btn.primary:hover { transform: translateY(-2px); box-shadow: 4px 4px 0 rgba(0,0,0,0.3); }
-        .modal-btn.secondary { background-color: var(--card-bg); color: var(--text-muted); }
-        .modal-btn.secondary:hover { background-color: #D2B48C; color: var(--text-color); transform: translateY(-2px); box-shadow: 4px 4px 0 rgba(0,0,0,0.3); }
-
         #music-player-toggle {
             position: fixed;
             bottom: 20px;
             right: 80px;
         }
+        #theme-toggle-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 140px;
+        }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 2000; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-content { border: 2px solid var(--border-shadow-color); padding: 30px; border-radius: 10px; border-top: 4px solid var(--primary-color); width: 90%; max-width: 400px; text-align: center; transform: scale(0.9); transition: transform 0.3s, background-color 0.5s ease; box-shadow: 5px 5px 0 var(--border-shadow-color); }
+        .modal-overlay.visible .modal-content { transform: scale(1); }
+        .modal-content h3 { margin-bottom: 15px; font-size: 1.5rem; }
+        .modal-content p { margin-bottom: 20px; color: var(--text-muted); }
+        #password-input { width: 100%; padding: 12px; background-color: var(--bg-color); border: 2px solid var(--border-shadow-color); border-radius: 8px; color: var(--text-color); font-size: 1rem; margin-bottom: 10px; text-align: center; transition: background-color 0.5s ease; }
+        #password-error { color: var(--error-color); font-size: 0.9rem; height: 1.2em; margin-bottom: 10px; }
+        .modal-actions { display: flex; gap: 10px; }
+        .modal-btn { flex-grow: 1; padding: 12px; border: 2px solid var(--border-shadow-color); border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 3px 3px 0 var(--border-shadow-color); }
+        .modal-btn.primary { background-color: var(--primary-color); color: #FFFFFF; }
+        .modal-btn.primary:hover { transform: translateY(-2px); box-shadow: 4px 4px 0 var(--border-shadow-color); }
+        .modal-btn.secondary { background-color: var(--card-bg); color: var(--text-muted); }
+        .modal-btn.secondary:hover { background-color: var(--bg-color); color: var(--text-color); transform: translateY(-2px); box-shadow: 4px 4px 0 var(--border-shadow-color); }
+
         #music-player-toggle.playing {
-             background-color: #FFD700;
+             background-color: var(--primary-color);
         }
-        body.poris-theme #music-player-toggle.playing {
-             background-color: var(--primary-gold);
-        }
+
         #music-player-modal {
             position: fixed;
             bottom: 80px;
             right: 20px;
             width: 300px;
-            background-color: var(--card-bg);
-            border: 2px solid var(--dark-wood);
-            box-shadow: 5px 5px 0 rgba(0,0,0,0.3);
+            border: 2px solid var(--border-shadow-color);
+            box-shadow: 5px 5px 0 var(--border-shadow-color);
             border-radius: 12px;
             z-index: 999;
             padding: 15px;
             opacity: 0;
             visibility: hidden;
             transform: translateY(20px);
-            transition: opacity 0.3s, visibility 0.3s, transform 0.3s, background-color 0.7s ease;
         }
         #music-player-modal.visible {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
         }
-        .music-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
+        .music-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .music-header-info { display: flex; align-items: center; gap: 8px; overflow: hidden; }
+        #now-playing { font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-muted); flex-grow: 1; }
+        .music-controls { display: flex; }
+        .music-controls button { background: none; border: none; color: var(--text-color); cursor: pointer; padding: 5px; transition: transform 0.2s, color 0.2s; }
+        .music-controls button:hover { color: var(--primary-color); transform: scale(1.1); }
+        .music-controls button.active { color: var(--primary-color); }
+        #track-list { list-style: none; max-height: 150px; overflow-y: auto; }
+        #track-list li { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-radius: 5px; transition: background-color 0.2s, color 0.2s; font-size: 0.9rem; }
+        #track-list li:hover { background-color: rgba(0, 123, 255, 0.1); }
+        body.theme-classic #track-list li:hover { background-color: rgba(255, 199, 0, 0.1); }
+        body.theme-poris #track-list li:hover { background-color: rgba(229, 62, 62, 0.1); }
+        .track-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; flex-grow: 1; }
+        #track-list li.playing .track-name { color: var(--primary-color); font-weight: 600; }
+        #track-list li.hidden { opacity: 0.5; }
+        #track-list li.hidden .track-name { text-decoration: line-through; }
+        .hide-track-btn { background: none; border: none; cursor: pointer; margin-left: 10px; color: var(--text-muted); flex-shrink: 0; }
+        .hide-track-btn:hover { color: var(--text-color); }
+
+        /* Animasi Fade-in */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .music-header-info {
-             display: flex;
-             align-items: center;
-             gap: 8px;
-             overflow: hidden;
-        }
-        #now-playing {
-            font-size: 0.8rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            color: var(--text-muted);
-            flex-grow: 1;
-        }
-        .music-controls {
-            display: flex;
-        }
-        .music-controls button {
-            background: none;
-            border: none;
-            color: var(--text-color);
-            cursor: pointer;
-            padding: 5px;
-            transition: transform 0.2s, color 0.2s;
-        }
-        .music-controls button:hover {
-            color: var(--primary-gold);
-            transform: scale(1.1);
-        }
-        .music-controls button.active {
-            color: var(--primary-gold);
-        }
-        #track-list {
-            list-style: none;
-            max-height: 150px;
-            overflow-y: auto;
-        }
-        #track-list li {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px;
-            border-radius: 5px;
-            transition: background-color 0.2s, color 0.2s;
-            font-size: 0.9rem;
-        }
-        #track-list li:hover {
-            background-color: rgba(255, 199, 0, 0.1);
-        }
-        body.poris-theme #track-list li:hover {
-            background-color: rgba(229, 62, 62, 0.1);
-        }
-        .track-name {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            cursor: pointer;
-            flex-grow: 1;
-        }
-        #track-list li.playing .track-name {
-            color: var(--primary-gold);
-            font-weight: 600;
-        }
-        #track-list li.hidden {
-            opacity: 0.5;
-        }
-        #track-list li.hidden .track-name {
-            text-decoration: line-through;
-        }
-        .hide-track-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            margin-left: 10px;
-            color: var(--text-muted);
-            flex-shrink: 0;
-        }
-        .hide-track-btn:hover {
-            color: var(--text-color);
-        }
+
     </style>
 </head>
 <body>
+    
+    <!-- Latar Belakang 3D akan di-mount di sini -->
+    <canvas id="bg-canvas"></canvas>
+    
     <div class="top-marquee-container">
-        <marquee behavior="scroll" direction="left" scrollamount="6">
+        <div class="marquee-content">
             <span>
                 Yo, for real, you think this magic just happens? Nah, the server's running on fumes and a prayer. You want to keep acing your exams? Then stop playing and slide some love to our <a href="https://saweria.co/beenspaceess" target="_blank">Saweria (yeah, click this shiny link)</a>. Don't be a ghost. Keep this joint alive. We ain't playin'. Your future self will thank you. Or not. Whatever. Just do it. This ain't a charity but it feels like one sometimes, you feel me? Keep the lights on, fam.
             </span>
-            <span style="margin-left: 100vw;">
+            <span>
                 Yo, for real, you think this magic just happens? Nah, the server's running on fumes and a prayer. You want to keep acing your exams? Then stop playing and slide some love to our <a href="https://saweria.co/beenspaceess" target="_blank">Saweria (yeah, click this shiny link)</a>. Don't be a ghost. Keep this joint alive. We ain't playin'. Your future self will thank you. Or not. Whatever. Just do it. This ain't a charity but it feels like one sometimes, you feel me? Keep the lights on, fam.
             </span>
-        </marquee>
+        </div>
     </div>
 
     <div class="dashboard-container">
         <header>
             <h1>Been On Exam</h1>
+            <p class="subtitle">
+                in collaboration w/ <a href="https://github.com/ghaffarsyafiq-arch" target="_blank">@ghaffarsyafiq-arch</a> (coming soon)
+            </p>
         </header>
+
+        <!-- Container Statistik Baru -->
+        <div id="stats-container">
+            <!-- Stats akan di-render oleh JS di sini -->
+        </div>
 
         <div class="search-wrapper">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input type="text" id="search-input" placeholder="Cari kategori...">
+            <input type="text" id="search-input" class="glass-effect" placeholder="Cari kategori...">
         </div>
         
         <main id="main-content">
-            <div class="status-message">
-                <div class="loader"></div>
-                <span>Memuat daftar kuis...</span>
-            </div>
+            <!-- Skeleton Loader akan di-render oleh JS di sini -->
         </main>
+
+        <div id="update-log-container" class="glass-effect">
+            <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6"></path><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                Log Pembaruan
+            </h2>
+            <ul id="update-log-list">
+                <li class="status-message" style="padding: 20px 0;">Memuat log pembaruan...</li>
+            </ul>
+        </div>
 
         <footer>
             <div class="footer-credits">
@@ -367,7 +604,7 @@
         </footer>
     </div>
     
-    <div id="music-player-modal">
+    <div id="music-player-modal" class="glass-effect">
         <div class="music-header">
             <div class="music-header-info">
                  <button id="show-all-btn" title="Tampilkan Semua Lagu">
@@ -392,24 +629,26 @@
         </ul>
     </div>
 
-    <button id="music-player-toggle" class="action-button" title="Buka Pemutar Musik">
+    <button id="theme-toggle-btn" class="action-button glass-effect" title="Ganti Tema">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0L12 2.69z"></path><path d="M12 22.31V12"></path></svg>
+    </button>
+    <button id="music-player-toggle" class="action-button glass-effect" title="Buka Pemutar Musik">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
     </button>
-    
-    <button id="back-to-top" class="action-button" title="Kembali ke atas">
+    <button id="back-to-top" class="action-button glass-effect" title="Kembali ke atas">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
     </button>
     
     <div id="password-modal" class="modal-overlay">
-        <div class="modal-content">
+        <div class="modal-content glass-effect">
             <h3>Akses Terbatas</h3>
             <p>Kategori ini memerlukan password untuk membukanya.</p>
             <form id="password-form">
                 <input type="password" id="password-input" placeholder="Masukkan password...">
                 <div id="password-error"></div>
                 <div class="modal-actions">
-                    <button type="button" id="close-modal-btn" class="modal-btn secondary">Batal</button>
-                    <button type="submit" class="modal-btn primary">Buka</button>
+                    <button type="button" id="close-modal-btn" class="modal-btn secondary glass-effect">Batal</button>
+                    <button type="submit" class="modal-btn primary glass-effect">Buka</button>
                 </div>
             </form>
         </div>
@@ -420,8 +659,10 @@
         const GITHUB_REPO = "beenonexam";
         const SECRET_PASSWORD = 'enakajaluanjing';
 
+        // ... (Semua elemen DOM lainnya) ...
         const mainContent = document.getElementById('main-content');
         const searchInput = document.getElementById('search-input');
+        const searchWrapper = document.querySelector('.search-wrapper');
         const backToTopButton = document.getElementById('back-to-top');
         const passwordModal = document.getElementById('password-modal');
         const passwordForm = document.getElementById('password-form');
@@ -429,7 +670,6 @@
         const passwordError = document.getElementById('password-error');
         const closeModalBtn = document.getElementById('close-modal-btn');
         
-        // Music Player Elements
         const musicPlayerToggle = document.getElementById('music-player-toggle');
         const musicPlayerModal = document.getElementById('music-player-modal');
         const nowPlayingEl = document.getElementById('now-playing');
@@ -438,8 +678,14 @@
         const stopBtn = document.getElementById('stop-btn');
         const shuffleBtn = document.getElementById('shuffle-btn');
         const showAllBtn = document.getElementById('show-all-btn');
+
+        const updateLogList = document.getElementById('update-log-list');
+        const statsContainer = document.getElementById('stats-container');
         
-        // Audio players untuk crossfade
+        const themeToggleBtn = document.getElementById('theme-toggle-btn');
+        const themes = ['theme-fresh', 'theme-poris', 'theme-classic'];
+        let currentThemeIndex = 0;
+
         let audioPlayer = new Audio();
         let nextAudioPlayer = new Audio();
         let fadeInterval = null;
@@ -448,21 +694,235 @@
         let currentTrackIndex = -1;
         let isShuffle = false;
         
-        const porisKeywords = ['poris', 'di bawah bulan'];
-        
         const fileIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>`;
         const folderIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`;
         const lockIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
 
         let groupedQuizzes = {};
+        let currentView = 'grid';
+        let gridViewBtn, listViewBtn, viewControls;
 
+        // === LOGIKA TIGA.JS (LATAR BELAKANG 3D) ===
+        let scene, camera, renderer, particles, clock;
+        let mouseX = 0, mouseY = 0;
+        let windowHalfX = window.innerWidth / 2;
+        let windowHalfY = window.innerHeight / 2;
+
+        function initThree() {
+            try {
+                scene = new THREE.Scene();
+                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                camera.position.z = 50; // Mundurkan kamera
+
+                renderer = new THREE.WebGLRenderer({
+                    canvas: document.getElementById('bg-canvas'),
+                    alpha: true // Latar belakang transparan
+                });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+
+                clock = new THREE.Clock();
+
+                // Buat Partikel
+                const particleCount = 5000;
+                const positions = new Float32Array(particleCount * 3);
+                for (let i = 0; i < particleCount * 3; i++) {
+                    positions[i] = (Math.random() - 0.5) * 200; // Sebar partikel lebih luas
+                }
+
+                const geometry = new THREE.BufferGeometry();
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+                const material = new THREE.PointsMaterial({
+                    size: 0.1,
+                    color: 0xffffff, // Warna akan di-set oleh tema
+                });
+
+                particles = new THREE.Points(geometry, material);
+                scene.add(particles);
+
+                document.addEventListener('mousemove', onDocumentMouseMove, false);
+                window.addEventListener('resize', onWindowResize, false);
+                
+                updateThreeTheme(); // Set warna awal
+                animateThree();
+            } catch (e) {
+                console.error("Three.js gagal diinisialisasi:", e);
+                // Sembunyikan canvas jika error
+                document.getElementById('bg-canvas').style.display = 'none';
+            }
+        }
+
+        function animateThree() {
+            requestAnimationFrame(animateThree);
+
+            const elapsedTime = clock.getElapsedTime();
+            
+            // Animasi partikel
+            particles.rotation.x = elapsedTime * 0.05;
+            particles.rotation.y = elapsedTime * 0.1;
+            
+            // Pergerakan kamera berdasarkan mouse
+            camera.position.x += (mouseX - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            windowHalfX = window.innerWidth / 2;
+            windowHalfY = window.innerHeight / 2;
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function onDocumentMouseMove(event) {
+            mouseX = (event.clientX - windowHalfX) / 50; // Kurangi intensitas gerakan
+            mouseY = (event.clientY - windowHalfY) / 50;
+        }
+
+        function updateThreeTheme() {
+            if (!renderer || !particles) return; // Pastikan three.js sudah siap
+
+            const style = getComputedStyle(document.body);
+            const particleColor = style.getPropertyValue('--primary-color').trim();
+            const bgColor = style.getPropertyValue('--bg-color').trim();
+            const speed = parseFloat(style.getPropertyValue('--particle-speed').trim() || 0.1);
+
+            // Set warna background renderer
+            renderer.setClearColor(new THREE.Color(bgColor), 1);
+            
+            // Set warna partikel
+            particles.material.color.set(new THREE.Color(particleColor));
+            
+            // Set kecepatan rotasi (simulasi)
+            if (particles.rotation) {
+                particles.rotation.x = clock.getElapsedTime() * (speed * 0.5); // Atur kecepatan rotasi
+                particles.rotation.y = clock.getElapsedTime() * speed;
+            }
+        }
+
+        // === AKHIR LOGIKA TIGA.JS ===
+
+        
+        // --- FUNGSI CACHING ---
+        function getCachedData(key, maxAgeMinutes = 10) {
+            const item = localStorage.getItem(key);
+            if (!item) return null;
+            try {
+                const data = JSON.parse(item);
+                const now = new Date().getTime();
+                if (now - data.timestamp > maxAgeMinutes * 60 * 1000) {
+                    localStorage.removeItem(key);
+                    return null;
+                }
+                return data.payload;
+            } catch (e) {
+                localStorage.removeItem(key);
+                return null;
+            }
+        }
+
+        function setCachedData(key, payload) {
+            const data = {
+                payload: payload,
+                timestamp: new Date().getTime()
+            };
+            try {
+                localStorage.setItem(key, JSON.stringify(data));
+            } catch (e) {
+                console.error("Gagal menyimpan cache:", e);
+            }
+        }
+        
+        // --- FUNGSI TEMA ---
+        function setTheme(themeName) {
+            document.body.classList.remove(...themes);
+            document.body.classList.add(themeName);
+            localStorage.setItem('theme', themeName);
+            currentThemeIndex = themes.indexOf(themeName);
+            
+            // PENTING: Update warna 3D setelah DOM/CSS di-update
+            setTimeout(updateThreeTheme, 0);
+        }
+
+        function cycleTheme() {
+            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+            const newTheme = themes[currentThemeIndex];
+            setTheme(newTheme);
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme && themes.includes(savedTheme)) {
+                setTheme(savedTheme);
+            } else {
+                setTheme(themes[0]);
+            }
+        }
+
+        // --- FUNGSI VIEW MODE ---
+        function injectViewControls() {
+            const viewControlsHTML = `
+                <div class="view-controls">
+                    <button id="grid-view-btn" class="view-btn glass-effect" title="Grid View">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    </button>
+                    <button id="list-view-btn" class="view-btn glass-effect" title="List View">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                    </button>
+                </div>
+            `;
+            searchWrapper.insertAdjacentHTML('afterend', viewControlsHTML);
+            
+            gridViewBtn = document.getElementById('grid-view-btn');
+            listViewBtn = document.getElementById('list-view-btn');
+            viewControls = document.querySelector('.view-controls');
+
+            gridViewBtn.addEventListener('click', () => setViewMode('grid'));
+            listViewBtn.addEventListener('click', () => setViewMode('list'));
+
+            loadViewMode();
+        }
+
+        function setViewMode(mode) {
+            currentView = mode;
+            localStorage.setItem('viewMode', mode);
+            const grid = mainContent.querySelector('.category-grid');
+            if (mode === 'list') {
+                if (grid) grid.classList.add('list-view');
+                gridViewBtn.classList.remove('active');
+                listViewBtn.classList.add('active');
+            } else {
+                if (grid) grid.classList.remove('list-view');
+                gridViewBtn.classList.add('active');
+                listViewBtn.classList.remove('active');
+            }
+        }
+
+        function loadViewMode() {
+            currentView = localStorage.getItem('viewMode') || 'grid';
+            if (currentView === 'list') {
+                listViewBtn.classList.add('active');
+            } else {
+                gridViewBtn.classList.add('active');
+            }
+        }
+        
+        // --- RENDER KONTEN ---
         function renderCategoryView(filter = '') {
-            mainContent.innerHTML = '';
+            mainContent.innerHTML = ''; // Hapus skeleton loader/konten lama
             document.querySelector('.search-wrapper').style.display = 'block';
+            if (viewControls) viewControls.style.display = 'flex';
             searchInput.placeholder = "Cari kategori...";
 
             const categoryGrid = document.createElement('div');
             categoryGrid.className = 'category-grid';
+            
+            if (currentView === 'list') {
+                categoryGrid.classList.add('list-view');
+            }
 
             let filteredCategories = Object.keys(groupedQuizzes).filter(category => 
                 category.toLowerCase().includes(filter.toLowerCase())
@@ -473,14 +933,18 @@
                 return;
             }
 
+            let animationDelay = 0; // Untuk animasi berurutan
             filteredCategories.sort().forEach(category => {
                 const quizCount = groupedQuizzes[category].length;
                 const isSecret = /secret/i.test(category);
                 const card = document.createElement('div');
-                card.className = 'category-card';
+                card.className = 'category-card glass-effect'; // Tambah glass-effect
                 if (isSecret) card.classList.add('secret');
                 card.setAttribute('role', 'button');
                 card.tabIndex = 0;
+                card.style.animationDelay = `${animationDelay}s`; // Terapkan delay
+                animationDelay += 0.05; // Tambah delay sedikit
+                
                 card.innerHTML = `
                     <div>
                         <div class="category-card-header">
@@ -504,12 +968,13 @@
         function renderQuizView(categoryName) {
             mainContent.innerHTML = '';
             document.querySelector('.search-wrapper').style.display = 'none';
+            if (viewControls) viewControls.style.display = 'none';
             searchInput.value = '';
 
             const header = document.createElement('div');
             header.className = 'quiz-view-header';
             header.innerHTML = `
-                <button id="back-to-categories-btn">
+                <button id="back-to-categories-btn" class="glass-effect">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                     Kembali
                 </button>
@@ -521,11 +986,15 @@
             const grid = document.createElement('div');
             grid.className = 'content-grid';
             
+            let animationDelay = 0;
             groupedQuizzes[categoryName].sort((a, b) => a.quizName.localeCompare(b.quizName)).forEach(item => {
                 const card = document.createElement('a');
                 card.href = `kuis/${item.filename}`;
                 card.target = '_blank';
-                card.className = 'quiz-card';
+                card.className = 'quiz-card glass-effect'; // Tambah glass-effect
+                card.style.animationDelay = `${animationDelay}s`;
+                animationDelay += 0.05;
+                
                 card.innerHTML = `
                     <div class="card-header">${fileIcon}<h3>${item.quizName}</h3></div>
                     <div class="card-body"><p>${item.description}</p></div>
@@ -536,8 +1005,94 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        // --- FETCH DATA ---
+
+        // 1. Logika Kuis & Statistik
+        function processQuizData(files) {
+            const allQuizData = files
+                .filter(file => file.type === 'file' && file.name.endsWith('.html'))
+                .map(file => {
+                    const quizName = file.name.split('_').slice(1).join(' ').replace('.html', '');
+                    return { filename: file.name, description: `Kumpulan soal & latihan untuk ${quizName}.` };
+                });
+            
+            groupedQuizzes = allQuizData.reduce((acc, item) => {
+                const parts = item.filename.split('_');
+                if (parts.length < 2) return acc;
+                const category = parts[0].trim();
+                const quizName = parts.slice(1).join(' ').replace('.html', '').trim();
+                if (!acc[category]) acc[category] = [];
+                acc[category].push({ ...item, quizName });
+                return acc;
+            }, {});
+            
+            // --- HITUNG DAN RENDER STATISTIK ---
+            try {
+                const totalCategories = Object.keys(groupedQuizzes).length;
+                const totalQuizzes = allQuizData.length;
+                
+                let largestCategoryName = "N/A";
+                let maxQuizzes = 0;
+                for (const category in groupedQuizzes) {
+                    if (groupedQuizzes[category].length > maxQuizzes) {
+                        maxQuizzes = groupedQuizzes[category].length;
+                        largestCategoryName = category.replace(/secret/i, '').trim();
+                    }
+                }
+                
+                statsContainer.innerHTML = `
+                    <div class="stats-card glass-effect">
+                        <div class="stats-card-header">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                            Total Kategori
+                        </div>
+                        <div class="stats-card-value">${totalCategories}</div>
+                    </div>
+                    <div class="stats-card glass-effect">
+                        <div class="stats-card-header">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+                            Total Kuis
+                        </div>
+                        <div class="stats-card-value">${totalQuizzes}</div>
+                    </div>
+                    <div class="stats-card glass-effect">
+                        <div class="stats-card-header">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            Kategori Terbesar
+                        </div>
+                        <div class="stats-card-value">${maxQuizzes} <span class="stats-card-label">Kuis</span></div>
+                        <div class="stats-card-label">${largestCategoryName}</div>
+                    </div>
+                `;
+            } catch (e) {
+                console.error("Gagal render statistik:", e);
+                statsContainer.innerHTML = `<p class="status-message">Gagal memuat statistik.</p>`;
+            }
+            // --- AKHIR STATISTIK ---
+            
+            renderCategoryView(); // Render kartu kuis setelah statistik
+        }
+
         async function fetchAndProcessQuizzes() {
-            mainContent.innerHTML = `<div class="status-message"><div class="loader"></div><span>Memuat Kategori...</span></div>`;
+            // Tampilkan Skeleton Loader
+            mainContent.innerHTML = `
+                <div class="skeleton-loader">
+                    ${Array(6).fill('<div class="skeleton-card"></div>').join('')}
+                </div>`;
+            statsContainer.innerHTML = `
+                <div class="stats-card glass-effect skeleton-card" style="height: 150px"></div>
+                <div class="stats-card glass-effect skeleton-card" style="height: 150px"></div>
+                <div class="stats-card glass-effect skeleton-card" style="height: 150px"></div>
+            `;
+
+            const cacheKey = 'cachedQuizzes';
+            const cachedData = getCachedData(cacheKey, 10);
+
+            if (cachedData) {
+                processQuizData(cachedData);
+                return;
+            }
+
             const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/kuis`;
             
             try {
@@ -546,28 +1101,13 @@
                 const files = await response.json();
                 if (!Array.isArray(files)) throw new Error("Folder 'kuis' tidak ditemukan atau repo privat.");
 
-                const allQuizData = files
-                    .filter(file => file.type === 'file' && file.name.endsWith('.html'))
-                    .map(file => {
-                        const quizName = file.name.split('_').slice(1).join(' ').replace('.html', '');
-                        return { filename: file.name, description: `Kumpulan soal & latihan untuk ${quizName}.` };
-                    });
-                
-                groupedQuizzes = allQuizData.reduce((acc, item) => {
-                    const parts = item.filename.split('_');
-                    if (parts.length < 2) return acc;
-                    const category = parts[0].trim();
-                    const quizName = parts.slice(1).join(' ').replace('.html', '').trim();
-                    if (!acc[category]) acc[category] = [];
-                    acc[category].push({ ...item, quizName });
-                    return acc;
-                }, {});
-                
-                renderCategoryView();
+                setCachedData(cacheKey, files);
+                processQuizData(files);
 
             } catch (error) {
                 console.error("Error:", error);
-                mainContent.innerHTML = `<div class="status-message error"><strong>Terjadi Kesalahan</strong><p>Gagal memuat daftar kuis. Pastikan USERNAME dan REPO benar, dan folder 'kuis' ada di repo Anda.</p><small>Detail: ${error.message}</small></div>`;
+                mainContent.innerHTML = `<div class="status-message error"><strong>Terjadi Kesalahan</strong><p>Gagal memuat daftar kuis. Ini bisa terjadi karena limit API GitHub. Coba lagi setelah beberapa saat.</p><small>Detail: ${error.message}</small></div>`;
+                statsContainer.innerHTML = ''; // Sembunyikan skeleton stats jika error
             }
         }
 
@@ -588,8 +1128,9 @@
             };
         }
         
-        // --- MUSIC PLAYER LOGIC ---
-
+        // --- MUSIC PLAYER ---
+        // ... (Fungsi getHiddenTracks, saveHiddenTracks, processMusicData, fetchAndProcessMusic, renderPlaylist, toggleHideTrack, playTrack, playNextTrack, updatePlayPauseIcon, startCrossfade, dan event listener tombol musik tetap sama seperti v1.4, HANYA SAJA setPorisTheme() DIHAPUS)
+        
         function getHiddenTracks() {
             try {
                 const hidden = localStorage.getItem('hiddenTracks');
@@ -603,7 +1144,37 @@
             localStorage.setItem('hiddenTracks', JSON.stringify(hidden));
         }
 
+        function processMusicData(files) {
+            if (!Array.isArray(files)) {
+                trackListEl.innerHTML = `<li class="no-music">Tidak ada musik.</li>`;
+                return;
+            }
+            const hiddenTracks = getHiddenTracks();
+            const musicFiles = files.filter(file => 
+                (file.name.endsWith('.mp3') || file.name.endsWith('.wav')) && !file.name.toUpperCase().startsWith('HIDE_')
+            );
+            if (musicFiles.length === 0) {
+                trackListEl.innerHTML = `<li class="no-music">Tidak ada musik di folder.</li>`;
+                return;
+            }
+            musicPlaylist = musicFiles.map(file => {
+                const src = file.download_url;
+                return {
+                    name: file.name.replace(/\.(mp3|wav)$/i, '').replace(/_/g, ' '),
+                    src: src,
+                    hidden: hiddenTracks.includes(src)
+                };
+            }).sort((a, b) => a.name.localeCompare(b.name));
+            renderPlaylist();
+        }
+
         async function fetchAndProcessMusic() {
+            const cacheKey = 'cachedMusic';
+            const cachedData = getCachedData(cacheKey, 30);
+            if (cachedData) {
+                processMusicData(cachedData);
+                return;
+            }
             const apiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/contents/music`;
             try {
                 const response = await fetch(apiUrl);
@@ -613,32 +1184,8 @@
                 }
                 if (!response.ok) throw new Error(`GitHub API Error (Status: ${response.status})`);
                 const files = await response.json();
-                if (!Array.isArray(files)) {
-                     trackListEl.innerHTML = `<li class="no-music">Tidak ada musik.</li>`;
-                     return;
-                }
-
-                const hiddenTracks = getHiddenTracks();
-                const musicFiles = files.filter(file => 
-                    (file.name.endsWith('.mp3') || file.name.endsWith('.wav')) && !file.name.toUpperCase().startsWith('HIDE_')
-                );
-
-                if (musicFiles.length === 0) {
-                    trackListEl.innerHTML = `<li class="no-music">Tidak ada musik di folder.</li>`;
-                    return;
-                }
-                
-                musicPlaylist = musicFiles.map(file => {
-                    const src = file.download_url;
-                    return {
-                        name: file.name.replace(/\.(mp3|wav)$/i, '').replace(/_/g, ' '),
-                        src: src,
-                        hidden: hiddenTracks.includes(src)
-                    };
-                }).sort((a, b) => a.name.localeCompare(b.name));
-                
-                renderPlaylist();
-
+                setCachedData(cacheKey, files);
+                processMusicData(files);
             } catch(error) {
                 console.error("Music Error:", error);
                 trackListEl.innerHTML = `<li class="no-music">Gagal memuat musik.</li>`;
@@ -652,14 +1199,12 @@
                 li.dataset.index = index;
                 if (track.hidden) li.classList.add('hidden');
                 if (index === currentTrackIndex) li.classList.add('playing');
-
                 const trackNameEl = document.createElement('span');
                 trackNameEl.className = 'track-name';
                 trackNameEl.textContent = track.name;
                 trackNameEl.addEventListener('click', () => {
                     if(!track.hidden) playTrack(index);
                 });
-
                 const hideBtn = document.createElement('button');
                 hideBtn.className = 'hide-track-btn';
                 hideBtn.title = track.hidden ? 'Tampilkan lagu' : 'Sembunyikan lagu';
@@ -667,7 +1212,6 @@
                     `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>` :
                     `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
                 hideBtn.addEventListener('click', () => toggleHideTrack(index));
-
                 li.appendChild(trackNameEl);
                 li.appendChild(hideBtn);
                 trackListEl.appendChild(li);
@@ -677,39 +1221,22 @@
         function toggleHideTrack(index) {
             const track = musicPlaylist[index];
             track.hidden = !track.hidden;
-
             const hiddenTracks = musicPlaylist.filter(t => t.hidden).map(t => t.src);
             saveHiddenTracks(hiddenTracks);
-            
             if (track.hidden && index === currentTrackIndex) {
                 stopBtn.click();
             }
-
             renderPlaylist();
-        }
-
-        function setPorisTheme(trackName) {
-            const isPoris = porisKeywords.some(keyword => trackName.toLowerCase().includes(keyword));
-            if (isPoris) {
-                document.body.classList.add('poris-theme');
-            } else {
-                document.body.classList.remove('poris-theme');
-            }
         }
 
         function playTrack(index) {
             if (index < 0 || index >= musicPlaylist.length || musicPlaylist[index].hidden) {
                 return;
             }
-            
             clearInterval(fadeInterval);
             nextAudioPlayer.pause();
-            
             currentTrackIndex = index;
             const track = musicPlaylist[index];
-
-            setPorisTheme(track.name);
-
             nowPlayingEl.textContent = track.name;
             audioPlayer.src = track.src;
             audioPlayer.volume = 1;
@@ -719,13 +1246,10 @@
         
         function playNextTrack() {
             if (musicPlaylist.every(t => t.hidden)) return;
-
             let nextIndex = currentTrackIndex;
-            // Loop untuk mencari lagu berikutnya yang tidak di-hide
             do {
                 nextIndex = (nextIndex + 1) % musicPlaylist.length;
             } while (musicPlaylist[nextIndex].hidden);
-            
             playTrack(nextIndex);
         }
 
@@ -737,44 +1261,33 @@
         }
 
         function startCrossfade() {
-            clearInterval(fadeInterval); // Hentikan fade sebelumnya jika ada
-
+            clearInterval(fadeInterval);
             let nextIndex = currentTrackIndex;
             do {
                 nextIndex = (nextIndex + 1) % musicPlaylist.length;
             } while (musicPlaylist[nextIndex].hidden);
-
             const nextTrack = musicPlaylist[nextIndex];
             nextAudioPlayer.src = nextTrack.src;
             nextAudioPlayer.volume = 0;
             nextAudioPlayer.play();
-
-            const fadeDuration = 3000; // 3 detik
+            const fadeDuration = 3000;
             const fadeSteps = 50;
             const stepDuration = fadeDuration / fadeSteps;
             let currentStep = 0;
-
             fadeInterval = setInterval(() => {
                 currentStep++;
                 const progress = currentStep / fadeSteps;
                 audioPlayer.volume = 1 - progress;
                 nextAudioPlayer.volume = progress;
-
                 if (currentStep >= fadeSteps) {
                     clearInterval(fadeInterval);
                     audioPlayer.pause();
-                    
-                    // Tukar player
                     let tempPlayer = audioPlayer;
                     audioPlayer = nextAudioPlayer;
                     nextAudioPlayer = tempPlayer;
-
-                    // Add the event listener back to the new audioPlayer
                     audioPlayer.addEventListener('timeupdate', timeUpdateForCrossfade);
-
                     currentTrackIndex = nextIndex;
                     nowPlayingEl.textContent = nextTrack.name;
-                    setPorisTheme(nextTrack.name);
                     renderPlaylist();
                 }
             }, stepDuration);
@@ -800,16 +1313,13 @@
             nextAudioPlayer.currentTime = 0;
             nowPlayingEl.textContent = "Pilih lagu...";
             currentTrackIndex = -1;
-            document.body.classList.remove('poris-theme');
             renderPlaylist();
         });
 
         shuffleBtn.addEventListener('click', () => {
             isShuffle = !isShuffle;
             shuffleBtn.classList.toggle('active', isShuffle);
-
             const currentSrc = audioPlayer.src;
-
             if (isShuffle) {
                 for (let i = musicPlaylist.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
@@ -818,7 +1328,6 @@
             } else {
                 musicPlaylist.sort((a, b) => a.name.localeCompare(b.name));
             }
-            
             currentTrackIndex = musicPlaylist.findIndex(track => track.src === currentSrc);
             renderPlaylist();
         });
@@ -831,27 +1340,23 @@
         
         audioPlayer.onplay = () => updatePlayPauseIcon(true);
         audioPlayer.onpause = () => {
-            if (audioPlayer.volume > 0.1) { // Hanya update ikon jika bukan karena fadeout
+            if (audioPlayer.volume > 0.1) {
                  updatePlayPauseIcon(false);
             }
         };
         
-        // Listener untuk Automix (Crossfade)
         const timeUpdateForCrossfade = () => {
-            const crossfadePoint = 3; // Mulai crossfade 3 detik sebelum lagu habis
+            const crossfadePoint = 3;
             if (audioPlayer.duration && (audioPlayer.duration - audioPlayer.currentTime) <= crossfadePoint) {
-                // Hapus listener untuk mencegah trigger berulang
                 audioPlayer.removeEventListener('timeupdate', timeUpdateForCrossfade);
                 startCrossfade();
             }
         };
 
         audioPlayer.addEventListener('timeupdate', timeUpdateForCrossfade);
-
-        // Event listener harus ditambahkan kembali setelah player ditukar
         audioPlayer.addEventListener('ended', playNextTrack);
 
-
+        // --- EVENT LISTENERS LAIN ---
         closeModalBtn.addEventListener('click', () => {
             passwordModal.classList.remove('visible');
             passwordInput.value = '';
@@ -859,23 +1364,70 @@
         });
 
         searchInput.addEventListener('input', () => renderCategoryView(searchInput.value));
-        
         window.addEventListener('scroll', () => backToTopButton.classList.toggle('visible', window.scrollY > 300));
         backToTopButton.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-        
         musicPlayerToggle.addEventListener('click', () => {
             musicPlayerModal.classList.toggle('visible');
         });
+        themeToggleBtn.addEventListener('click', cycleTheme);
 
+        // --- LOG PEMBARUAN ---
+        function formatCommitDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            return new Date(dateString).toLocaleString('id-ID', options).replace('.', ':');
+        }
+
+        function processLogData(commits) {
+             if (commits.length === 0) {
+                updateLogList.innerHTML = '<li>Tidak ada log pembaruan yang ditemukan.</li>';
+                return;
+            }
+            updateLogList.innerHTML = '';
+            commits.forEach(commitData => {
+                const commit = commitData.commit;
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span class="log-message">${commit.message}</span>
+                    <span class="log-meta">
+                        ${commit.author.name} - ${formatCommitDate(commit.author.date)}
+                    </span>
+                `;
+                updateLogList.appendChild(li);
+            });
+        }
+
+        async function fetchUpdateLog() {
+            const cacheKey = 'cachedCommits';
+            const cachedData = getCachedData(cacheKey, 5);
+            if (cachedData) {
+                processLogData(cachedData);
+                return;
+            }
+            const commitsApiUrl = `https://api.github.com/repos/${GITHUB_USERNAME}/${GITHUB_REPO}/commits?per_page=5`;
+            try {
+                const response = await fetch(commitsApiUrl);
+                if (!response.ok) throw new Error(`GitHub API Error (Status: ${response.status})`);
+                const commits = await response.json();
+                setCachedData(cacheKey, commits);
+                processLogData(commits);
+            } catch(error) {
+                console.error("Update Log Error:", error);
+                updateLogList.innerHTML = `<li class="status-message error" style="padding: 10px 0;">Gagal memuat log pembaruan.</li>`;
+            }
+        }
+        
+        // --- INISIALISASI ---
         document.addEventListener('DOMContentLoaded', () => {
-            fetchAndProcessQuizzes();
+            loadTheme(); // Muat tema (harus sebelum initThree)
+            initThree(); // Inisialisasi latar belakang 3D
+            injectViewControls();
+            fetchAndProcessQuizzes(); // Ini akan memanggil renderStats dan renderCategory
             fetchAndProcessMusic();
+            fetchUpdateLog();
         });
     </script>
     
     <!-- Vercel Web Analytics -->
-    <script defer src="/_vercel/insights/script.js"></script>
+    <script src="/_vercel/insights/script.js"></script>
 </body>
 </html>
-
-
