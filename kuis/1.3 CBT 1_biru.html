@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kuis CBT 1.4 - 3 Mode (AI Flashcards)</title>
+    <title>Kuis CBT 1.4 - 3 Mode (Lokal)</title>
     <!-- Impor Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -225,22 +225,15 @@
             opacity: 0.9;
         }
         
-        /* Loading spinner */
+        /* Loading spinner (DIHAPUS KARENA TIDAK PERLU AI) */
+        /*
         .loader {
-            width: 48px;
-            height: 48px;
-            border: 5px solid #FFF;
-            border-bottom-color: transparent;
-            border-radius: 50%;
-            display: block; /* Diubah dari inline-block */
-            box-sizing: border-box;
-            animation: rotation 1s linear infinite;
-            margin: 2rem auto;
+            ...
         }
         @keyframes rotation {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            ...
         }
+        */
 
     </style>
 </head>
@@ -297,7 +290,7 @@
                 <span class="card-label">Penjelasan</span>
                 <!-- Kontainer baru untuk daftar jawaban -->
                 <div id="flashcard-answer-list">
-                    <!-- Konten diisi oleh AI -->
+                    <!-- Konten diisi secara lokal -->
                 </div>
             </div>
         </div>
@@ -324,259 +317,610 @@
     </div>
 
     <script>
-        // --- Data Soal (Diekstrak dari PDF) ---
+        // --- Data Soal (Diekstrak dari PDF + Penjelasan Hardcoded) ---
         const questions = [
             { // 1
                 question: "Mekanisme kelistrikan neuron sangat dipengaruhi oleh",
                 options: ["Kalium", "Iodium", "Cesium", "Barium", "Ferrum"],
-                correct: "Kalium"
+                correct: "Kalium",
+                explanations: [
+                    { term: "Kalium", explanation: "Ion kalium (K+) sangat penting untuk fase repolarisasi potensial aksi dan menjaga potensial membran istirahat.", isCorrect: true },
+                    { term: "Iodium", explanation: "Iodium adalah komponen penting hormon tiroid, tidak terlibat langsung dalam kelistrikan neuron.", isCorrect: false },
+                    { term: "Cesium", explanation: "Cesium dapat memblokir saluran kalium tetapi bukan ion fisiologis utama untuk kelistrikan neuron.", isCorrect: false },
+                    { term: "Barium", explanation: "Barium, seperti Cesium, dapat memblokir saluran K+ tetapi bukan ion fisiologis utama.", isCorrect: false },
+                    { term: "Ferrum", explanation: "Ferrum (Besi) penting untuk transpor oksigen (hemoglobin) dan metabolisme sel, bukan kelistrikan neuron primer.", isCorrect: false }
+                ]
             },
             { // 2
                 question: "Manakah diantara daftar berikut yang merupakan neuromodulator?",
                 options: ["Norepinefrin", "Glutamat", "Endorphin", "Serotonin", "Glisin"],
-                correct: "Endorphin"
+                correct: "Endorphin",
+                explanations: [
+                    { term: "Endorphin", explanation: "Endorphin adalah peptida opioid endogen yang bertindak sebagai neuromodulator untuk mengurangi rasa sakit dan memengaruhi suasana hati.", isCorrect: true },
+                    { term: "Norepinefrin", explanation: "Ini adalah neurotransmitter (katekolamin) utama dalam sistem saraf simpatis.", isCorrect: false },
+                    { term: "Glutamat", explanation: "Ini adalah neurotransmitter eksitatorik utama di SSP (Susunan Saraf Pusat).", isCorrect: false },
+                    { term: "Serotonin", explanation: "Ini adalah neurotransmitter (monoamin) yang terlibat dalam suasana hati, tidur, dan nafsu makan.", isCorrect: false },
+                    { term: "Glisin", explanation: "Ini adalah neurotransmitter inhibitorik utama di medula spinalis.", isCorrect: false }
+                ]
             },
             { // 3
                 question: "Reseptor apakah yang menerima rangsangan dingin?",
                 options: ["Meissner", "Vater pacini", "Ruffini", "Krause", "Merkel"],
-                correct: "Krause"
+                correct: "Krause",
+                explanations: [
+                    { term: "Krause", explanation: "Badan Krause (Krause's end bulbs) adalah termoreseptor yang sensitif terhadap rangsangan dingin.", isCorrect: true },
+                    { term: "Meissner", explanation: "Badan Meissner adalah mekanoreseptor untuk sentuhan ringan dan getaran frekuensi rendah.", isCorrect: false },
+                    { term: "Vater pacini", explanation: "Badan Pacini adalah mekanoreseptor untuk tekanan dalam dan getaran frekuensi tinggi.", isCorrect: false },
+                    { term: "Ruffini", explanation: "Badan Ruffini adalah mekanoreseptor untuk regangan kulit dan termoreseptor untuk panas.", isCorrect: false },
+                    { term: "Merkel", explanation: "Cakram Merkel adalah mekanoreseptor untuk sentuhan ringan dan tekanan.", isCorrect: false }
+                ]
             },
             { // 4
                 question: "Bagian Ujung medulla spinalis yang memiliki bentuk seperti kerucut dinamakan...",
                 options: ["Cauda equina", "Conus medullaris", "Filum terminale", "Lumbar Enlargement", "Cervical Enlargement"],
-                correct: "Conus medullaris"
+                correct: "Conus medullaris",
+                explanations: [
+                    { term: "Conus medullaris", explanation: "Ini adalah ujung inferior medula spinalis yang berbentuk kerucut, biasanya berakhir di level L1/L2.", isCorrect: true },
+                    { term: "Cauda equina", explanation: "Ini adalah 'ekor kuda', kumpulan akar saraf spinal di bawah conus medullaris.", isCorrect: false },
+                    { term: "Filum terminale", explanation: "Ini adalah filamen jaringan ikat (lanjutan dari pia mater) yang menambatkan conus medullaris ke coccyx.", isCorrect: false },
+                    { term: "Lumbar Enlargement", explanation: "Ini adalah pelebaran medula spinalis di regio lumbar, tempat keluarnya saraf untuk ekstremitas bawah.", isCorrect: false },
+                    { term: "Cervical Enlargement", explanation: "Ini adalah pelebaran medula spinalis di regio servikal, tempat keluarnya saraf untuk ekstremitas atas.", isCorrect: false }
+                ]
             },
             { // 5
                 question: "Pengaturan tonus otot selama proses gerak ekstremitas melibatkan:",
                 options: ["Thalamus", "Nuclei basalis", "Ganglion radiks posterior", "Girus postsentral", "Lobus oksipital"],
-                correct: "Nuclei basalis"
+                correct: "Nuclei basalis",
+                explanations: [
+                    { term: "Nuclei basalis", explanation: "Nuclei basalis (atau ganglia basalis) berperan penting dalam modulasi gerakan, termasuk memulai, menghentikan, dan mengatur tonus otot.", isCorrect: true },
+                    { term: "Thalamus", explanation: "Thalamus adalah stasiun relai sensorik utama, tetapi tidak secara primer mengatur tonus otot.", isCorrect: false },
+                    { term: "Ganglion radiks posterior", explanation: "Ini berisi badan sel neuron sensorik, bukan untuk pengaturan motorik.", isCorrect: false },
+                    { term: "Girus postsentral", explanation: "Ini adalah korteks somatosensorik primer (area rasa), bukan motorik.", isCorrect: false },
+                    { term: "Lobus oksipital", explanation: "Ini adalah pusat pemrosesan visual.", isCorrect: false }
+                ]
             },
             { // 6
                 question: "Lapisan yang termasuk cortex cerebri adalah...",
                 options: ["Lapisan granular dalam", "Lapisan faskulata", "Lapisan glomerulosa", "Lapisan retikularis", "Lapisan medula"],
-                correct: "Lapisan granular dalam"
+                correct: "Lapisan granular dalam",
+                explanations: [
+                    { term: "Lapisan granular dalam", explanation: "Korteks serebri memiliki 6 lapisan (neocortex), salah satunya adalah Lapisan Granular Dalam (Lamina IV).", isCorrect: true },
+                    { term: "Lapisan faskulata", explanation: "Ini adalah salah satu lapisan (zona fasciculata) dari korteks adrenal, bukan otak.", isCorrect: false },
+                    { term: "Lapisan glomerulosa", explanation: "Ini adalah salah satu lapisan (zona glomerulosa) dari korteks adrenal, bukan otak.", isCorrect: false },
+                    { term: "Lapisan retikularis", explanation: "Ini adalah salah satu lapisan (zona reticularis) dari korteks adrenal, bukan otak.", isCorrect: false },
+                    { term: "Lapisan medula", explanation: "Medula adalah bagian dalam suatu organ (misal: medula adrenal, medula ginjal), bukan lapisan korteks.", isCorrect: false }
+                ]
             },
             { // 7
                 question: "Organ yang masuk ke dalam neuroendokrin?",
                 options: ["Hypothalamus", "Epithalamus", "Thalamus", "Pons", "Medulla Oblongata"],
-                correct: "Hypothalamus"
+                correct: "Hypothalamus",
+                explanations: [
+                    { term: "Hypothalamus", explanation: "Hipotalamus adalah pusat neuroendokrin utama, menghubungkan sistem saraf dengan sistem endokrin melalui kelenjar pituitari.", isCorrect: true },
+                    { term: "Epithalamus", explanation: "Ini berisi kelenjar pineal (melatonin) tetapi hipotalamus adalah regulator utamanya.", isCorrect: false },
+                    { term: "Thalamus", explanation: "Thalamus adalah stasiun relai sensorik utama.", isCorrect: false },
+                    { term: "Pons", explanation: "Bagian dari batang otak, terlibat dalam pernapasan, tidur, dll.", isCorrect: false },
+                    { term: "Medulla Oblongata", explanation: "Bagian dari batang otak, mengontrol fungsi vital (jantung, pernapasan).", isCorrect: false }
+                ]
             },
             { // 8
                 question: "Dominasi saraf simpatis pada proses pengisian... kandung kemih menyebabkan",
                 options: ["Relaksasi otot detrusor", "Relaksasi sfingter interna", "Kontraksi sfingter eksterna", "Kontraksi detrusor", "Pengosongan kandung kemih"],
-                correct: "Relaksasi otot detrusor"
+                correct: "Relaksasi otot detrusor",
+                explanations: [
+                    { term: "Relaksasi otot detrusor", explanation: "Simpatis (mode 'fight or flight') menghambat pengosongan kandung kemih dengan merelaksasi otot dinding (detrusor) dan mengkontraksi sfingter interna.", isCorrect: true },
+                    { term: "Relaksasi sfingter interna", explanation: "Ini dilakukan oleh parasimpatis saat berkemih. Simpatis justru mengkontraksinya.", isCorrect: false },
+                    { term: "Kontraksi sfingter eksterna", explanation: "Ini dikontrol secara volunter (sadar) oleh saraf somatik.", isCorrect: false },
+                    { term: "Kontraksi detrusor", explanation: "Ini dilakukan oleh parasimpatis untuk pengosongan (berkemih).", isCorrect: false },
+                    { term: "Pengosongan kandung kemih", explanation: "Ini adalah fungsi dari sistem parasimpatis.", isCorrect: false }
+                ]
             },
             { // 9
                 question: "Nn. S... membaui makanan dan menimbulkan sekresi saliva. Reseptor yang terstimulasi adalah...",
                 options: ["Reseptor ẞ1 adrenergik", "Reseptor ẞ2 adrenergik", "Reseptor a1 adrenergik", "Reseptor nikotinik kolinergik", "Reseptor muskarinik kolinergik"],
-                correct: "Reseptor muskarinik kolinergik"
+                correct: "Reseptor muskarinik kolinergik",
+                explanations: [
+                    { term: "Reseptor muskarinik kolinergik", explanation: "Sekresi saliva (air liur) adalah fungsi parasimpatis, yang menggunakan asetilkolin pada reseptor muskarinik di kelenjar saliva.", isCorrect: true },
+                    { term: "Reseptor ẞ1 adrenergik", explanation: "Reseptor simpatis, terutama di jantung (meningkatkan denyut).", isCorrect: false },
+                    { term: "Reseptor ẞ2 adrenergik", explanation: "Reseptor simpatis, terutama di bronkus (dilatasi) dan otot polos.", isCorrect: false },
+                    { term: "Reseptor a1 adrenergik", explanation: "Reseptor simpatis, terutama di pembuluh darah (konstriksi).", isCorrect: false },
+                    { term: "Reseptor nikotinik kolinergik", explanation: "Reseptor asetilkolin yang ditemukan di ganglia otonom dan neuromuscular junction (otot rangka).", isCorrect: false }
+                ]
             },
             { // 10
                 question: "Susunan saraf pusat dapat menghambat mekanisme refleks melalui...",
                 options: ["IPSP di motor neuron refleks", "EPSP di motor neuron refleks", "Potensial aksi di neuron motor refleks", "Hambatan di reseptor sensor", "Hambatan di neuron sensor"],
-                correct: "IPSP di motor neuron refleks"
+                correct: "IPSP di motor neuron refleks",
+                explanations: [
+                    { term: "IPSP di motor neuron refleks", explanation: "IPSP (Inhibitory Postsynaptic Potential) membuat neuron motor lebih sulit untuk terdepolarisasi (mencapai ambang batas), sehingga menghambat terjadinya refleks.", isCorrect: true },
+                    { term: "EPSP di motor neuron refleks", explanation: "EPSP (Excitatory Postsynaptic Potential) justru memudahkan terjadinya refleks.", isCorrect: false },
+                    { term: "Potensial aksi di neuron motor refleks", explanation: "Ini adalah hasil dari eksitasi (terjadinya refleks), bukan hambatan.", isCorrect: false },
+                    { term: "Hambatan di reseptor sensor", explanation: "Hambatan biasanya terjadi di sinaps (neuron motor), bukan di reseptor sensorik.", isCorrect: false },
+                    { term: "Hambatan di neuron sensor", explanation: "Meskipun ada inhibisi presinaptik, inhibisi postsinaptik (IPSP) di motor neuron adalah mekanisme utama.", isCorrect: false }
+                ]
             },
             { // 11
                 question: "Bagian dari cerebrum yang mengatur tonus otot, koordinasi gerak lambat dan stabil...",
                 options: ["Corpus callosum", "Ganglion nuclei", "area brodmann", "Cortex prefrontal", "Ganglia basalis"],
-                correct: "Ganglia basalis"
+                correct: "Ganglia basalis",
+                explanations: [
+                    { term: "Ganglia basalis", explanation: "Juga dikenal sebagai Nuclei Basalis, berperan penting dalam modulasi gerakan, tonus otot, dan koordinasi gerak lambat.", isCorrect: true },
+                    { term: "Corpus callosum", explanation: "Struktur yang menghubungkan hemisfer kiri dan kanan otak.", isCorrect: false },
+                    { term: "area brodmann", explanation: "Ini adalah sistem pemetaan korteks serebri berdasarkan sitoarsitektur, bukan struktur spesifik.", isCorrect: false },
+                    { term: "Cortex prefrontal", explanation: "Terlibat dalam fungsi eksekutif, perencanaan, dan kepribadian.", isCorrect: false },
+                    { term: "Ganglion nuclei", explanation: "Istilah 'Ganglion' biasanya untuk SSP Tepi, 'Nuclei' untuk SSP. 'Ganglia basalis' adalah istilah yang lebih tepat.", isCorrect: false }
+                ]
             },
             { // 12
                 question: "Persilangan jaras dari medula spinalis menuju cortex cerebri adalah",
                 options: ["Crus cerebri", "Piramid", "Oliva", "Decussatio pyramidalis", "Medula oblongata"],
-                correct: "Decussatio pyramidalis"
+                correct: "Decussatio pyramidalis",
+                explanations: [
+                    { term: "Decussatio pyramidalis", explanation: "Ini adalah tempat di mana jaras kortikospinalis (jaras motorik utama) menyilang di medula oblongata bagian bawah.", isCorrect: true },
+                    { term: "Crus cerebri", explanation: "Bagian dari pedunculus cerebri di mesencephalon, berisi jaras motorik tetapi bukan tempat persilangan utama.", isCorrect: false },
+                    { term: "Piramid", explanation: "Struktur di medula oblongata yang berisi jaras kortikospinalis SEBELUM menyilang.", isCorrect: false },
+                    { term: "Oliva", explanation: "Nukleus di medula oblongata yang terlibat dalam koordinasi motorik (terhubung ke cerebellum).", isCorrect: false },
+                    { term: "Medula oblongata", explanation: "Ini adalah LOKASI di mana decussatio pyramidalis berada, tetapi bukan nama persilangannya.", isCorrect: false }
+                ]
             },
             { // 13
                 question: "Vaskularisasi area cerebrum bagian permukaan lateral adalah oleh ...",
                 options: ["A. cerebri anterior", "A. communicans anterior", "A. cerebri media", "A. communicans posterior", "A. cerebri posterior"],
-                correct: "A. cerebri media"
+                correct: "A. cerebri media",
+                explanations: [
+                    { term: "A. cerebri media", explanation: "Arteri Cerebri Media (MCA) mendarahi sebagian besar permukaan lateral hemisfer otak, termasuk area motorik, sensorik, dan bahasa (Broca, Wernicke).", isCorrect: true },
+                    { term: "A. cerebri anterior", explanation: "Mendarahi permukaan medial lobus frontal dan parietal (termasuk area motorik/sensorik kaki).", isCorrect: false },
+                    { term: "A. communicans anterior", explanation: "Arteri kecil yang menghubungkan A. cerebri anterior kanan dan kiri.", isCorrect: false },
+                    { term: "A. communicans posterior", explanation: "Menghubungkan sirkulasi anterior (dari A. carotis interna) dan posterior (dari A. basilaris).", isCorrect: false },
+                    { term: "A. cerebri posterior", explanation: "Mendarahi lobus oksipital (visual) dan bagian inferior lobus temporal.", isCorrect: false }
+                ]
             },
             { // 14
                 question: "Pernyataan berikut merupakan efek nervus otonom parasimpatis",
                 options: ["Kontraksi rektum", "Relaksasi bronkus", "Menghambat produksi saliva", "Konstriksi pupil", "Meningkatkan denyut jantung"],
-                correct: "Konstriksi pupil"
+                correct: "Konstriksi pupil",
+                explanations: [
+                    { term: "Konstriksi pupil", explanation: "Parasimpatis (mode 'rest and digest') menyebabkan miosis (konstriksi/pengecilan pupil).", isCorrect: true },
+                    { term: "Kontraksi rektum", explanation: "Parasimpatis merelaksasi sfingter internal anus, tetapi kontraksi rektum utama untuk defekasi juga dipengaruhi parasimpatis.", isCorrect: false }, // Jawaban A bisa ambigu, tapi D lebih pasti
+                    { term: "Relaksasi bronkus", explanation: "Ini adalah efek simpatis (agar lebih banyak udara masuk). Parasimpatis menyebabkan bronkokonstriksi.", isCorrect: false },
+                    { term: "Menghambat produksi saliva", explanation: "Ini adalah efek simpatis (saliva kental). Parasimpatis merangsang saliva encer.", isCorrect: false },
+                    { term: "Meningkatkan denyut jantung", explanation: "Ini adalah efek simpatis. Parasimpatis (N. Vagus) memperlambat denyut jantung.", isCorrect: false }
+                ]
             },
             { // 15
                 question: "Neurotransmitter utama yang mempengaruhi kanal ion Natrium secara langsung",
                 options: ["Dopamine", "GABA", "Asetilkolin", "Glutamat", "Serotonin"],
-                correct: "Glutamat"
+                correct: "Glutamat",
+                explanations: [
+                    { term: "Glutamat", explanation: "Glutamat bekerja pada reseptor ionotropik (AMPA, NMDA) yang merupakan kanal ion, memungkinkan masuknya ion positif seperti Natrium (Na+) dan Kalsium (Ca++), menyebabkan eksitasi.", isCorrect: true },
+                    { term: "Dopamine", explanation: "Dopamin (dan Serotonin) bekerja pada reseptor metabotropik (GPCR), yang memengaruhi kanal ion secara tidak langsung melalui 'second messenger'.", isCorrect: false },
+                    { term: "GABA", explanation: "GABA bekerja pada reseptor ionotropik (GABA-A) yang merupakan kanal ion Klorida (Cl-), menyebabkan inhibisi.", isCorrect: false },
+                    { term: "Asetilkolin", explanation: "Asetilkolin dapat bekerja pada reseptor ionotropik (nikotinik) yang membuka kanal Na+, tetapi Glutamat adalah neurotransmitter eksitatorik *utama* di SSP.", isCorrect: false },
+                    { term: "Serotonin", explanation: "Serotonin (kecuali reseptor 5-HT3) bekerja pada reseptor metabotropik (GPCR).", isCorrect: false }
+                ]
             },
             { // 16
                 question: "Berikut ini yang tepat mengenai saraf otonom",
                 options: ["efektornya ada yang berupa otot skelet", "Bekerja secara volunter", "Neurotransmitter pada preganglion berupa asetilkolin", "reseptor di organ efektor bersifat nicotinic", "Kontraksi bladder"],
-                correct: "Neurotransmitter pada preganglion berupa asetilkolin"
+                correct: "Neurotransmitter pada preganglion berupa asetilkolin",
+                explanations: [
+                    { term: "Neurotransmitter pada preganglion berupa asetilkolin", explanation: "Baik simpatis maupun parasimpatis, neuron preganglion melepaskan Asetilkolin (ACh) yang bekerja pada reseptor nikotinik di ganglion.", isCorrect: true },
+                    { term: "efektornya ada yang berupa otot skelet", explanation: "Efektor saraf otonom adalah otot polos, otot jantung, dan kelenjar. Otot skelet (rangka) diinervasi oleh sistem somatik.", isCorrect: false },
+                    { term: "Bekerja secara volunter", explanation: "Bekerja secara involunter (tidak sadar). Sistem somatik yang volunter.", isCorrect: false },
+                    { term: "reseptor di organ efektor bersifat nicotinic", explanation: "Reseptor nikotinik ada di ganglion. Di organ efektor, reseptornya muskarinik (parasimpatis) atau adrenergik (simpatis).", isCorrect: false },
+                    { term: "Kontraksi bladder", explanation: "Ini adalah salah satu fungsi (spesifiknya parasimpatis), bukan pernyataan umum yang tepat tentang *seluruh* sistem otonom.", isCorrect: false }
+                ]
             },
             { // 17
                 question: "Pernyataan berikut yang tepat tentang saraf simpatis adalah",
                 options: ["Serabut preganglion pendek", "Ganglia neuron terletak di dekat atau dengan organ target", "Serabut pascaganglion pendek", "Meningkatkan produksi saliva", "Kontraksi bladder"],
-                correct: "Serabut preganglion pendek"
+                correct: "Serabut preganglion pendek",
+                explanations: [
+                    { term: "Serabut preganglion pendek", explanation: "Sistem simpatis memiliki serabut preganglion pendek (karena ganglionnya dekat medula spinalis di truncus sympathicus) dan serabut pascaganglion panjang ke organ.", isCorrect: true },
+                    { term: "Ganglia neuron terletak di dekat atau dengan organ target", explanation: "Ini adalah ciri sistem parasimpatis.", isCorrect: false },
+                    { term: "Serabut pascaganglion pendek", explanation: "Ini adalah ciri sistem parasimpatis.", isCorrect: false },
+                    { term: "Meningkatkan produksi saliva", explanation: "Parasimpatis meningkatkan saliva encer. Simpatis menghasilkan saliva kental (atau menghambat).", isCorrect: false },
+                    { term: "Kontraksi bladder", explanation: "Ini adalah fungsi parasimpatis (untuk berkemih).", isCorrect: false }
+                ]
             },
             { // 18
                 question: "Pada circulus arteriosus willisi, yang merupakan percabangan langsung dari a. vertebralis",
                 options: ["A. cerebri anterior", "A. komunikan anterior", "A. cerebri media", "A. komunikan posterior", "A. cerebri posterior"],
-                correct: "A. cerebri posterior"
+                correct: "A. cerebri posterior",
+                explanations: [
+                    // Catatan: A. vertebralis bergabung membentuk A. basilaris. A. cerebri posterior adalah cabang terminal dari A. basilaris. Secara teknis, ini adalah jawaban terbaik dari sirkulasi posterior.
+                    { term: "A. cerebri posterior", explanation: "Dua A. vertebralis bergabung membentuk A. basilaris. A. basilaris kemudian bercabang menjadi dua A. cerebri posterior (PCA).", isCorrect: true },
+                    { term: "A. cerebri anterior", explanation: "Cabang dari A. carotis interna (sirkulasi anterior).", isCorrect: false },
+                    { term: "A. komunikan anterior", explanation: "Menghubungkan A. cerebri anterior (sirkulasi anterior).", isCorrect: false },
+                    { term: "A. cerebri media", explanation: "Cabang terbesar dari A. carotis interna (sirkulasi anterior).", isCorrect: false },
+                    { term: "A. komunikan posterior", explanation: "Menghubungkan sirkulasi anterior (A. carotis interna) dengan posterior (A. cerebri posterior).", isCorrect: false }
+                ]
             },
             { // 19
                 question: "Berikut ini merupakan komponen dasar terjadinya potensial aksi di akson",
                 options: ["Mechanical gated channel", "Voltage gated channel", "Chemical gated channel", "Ligand", "Mielin"],
-                correct: "Voltage gated channel"
+                correct: "Voltage gated channel",
+                explanations: [
+                    { term: "Voltage gated channel", explanation: "Kanal ion berpintu tegangan (Voltage-gated Na+ dan K+ channels) adalah komponen esensial yang membuka dan menutup berdasarkan perubahan voltase membran untuk menciptakan potensial aksi.", isCorrect: true },
+                    { term: "Mechanical gated channel", explanation: "Ditemukan di reseptor sensorik (misal: sentuhan), bukan untuk propagasi potensial aksi di akson.", isCorrect: false },
+                    { term: "Chemical gated channel", explanation: "Juga disebut Ligand-gated. Ditemukan di sinaps (dendrit/soma) yang merespon neurotransmitter.", isCorrect: false },
+                    { term: "Ligand", explanation: "Ligand (seperti neurotransmitter) membuka chemical-gated channels, bukan voltage-gated di akson.", isCorrect: false },
+                    { term: "Mielin", explanation: "Mielin berfungsi mempercepat hantaran (konduksi saltatorik) tetapi bukan komponen dasar *terjadinya* potensial aksi itu sendiri (yang terjadi di Nodus Ranvier).", isCorrect: false }
+                ]
             },
             { // 20
                 question: "Ketika saraf parasimpatis terstimulasi akan menyebabkan",
                 options: ["Pupil midriasis", "Frekuensi denyut jantung lebih cepat", "Jantung memompa lebih kuat", "Aktivitas pencernaan ditingkatkan", "Lipolisis"],
-                correct: "Aktivitas pencernaan ditingkatkan"
+                correct: "Aktivitas pencernaan ditingkatkan",
+                explanations: [
+                    { term: "Aktivitas pencernaan ditingkatkan", explanation: "Parasimpatis (mode 'rest and digest') meningkatkan motilitas (gerak usus) dan sekresi kelenjar pencernaan.", isCorrect: true },
+                    { term: "Pupil midriasis", explanation: "Midriasis (dilatasi/pelebaran) adalah efek simpatis. Parasimpatis menyebabkan miosis (konstriksi).", isCorrect: false },
+                    { term: "Frekuensi denyut jantung lebih cepat", explanation: "Ini efek simpatis (takikardia). Parasimpatis (N. vagus) memperlambat (bradikardia).", isCorrect: false },
+                    { term: "Jantung memompa lebih kuat", explanation: "Ini (peningkatan kontraktilitas) adalah efek simpatis.", isCorrect: false },
+                    { term: "Lipolisis", explanation: "Pemecahan lemak (lipolisis) adalah proses katabolik yang didorong oleh simpatis.", isCorrect: false }
+                ]
             },
             { // 21
                 question: "Bagian mesencephalon yang memproduksi dopamin",
                 options: ["Red nucleus", "Colliculus superior", "Tectum", "Substantia nigra", "Pedunculus cerebri"],
-                correct: "Substantia nigra"
+                correct: "Substantia nigra",
+                explanations: [
+                    { term: "Substantia nigra", explanation: "Substantia nigra (khususnya pars compacta) di mesencephalon adalah sumber utama neuron dopaminergik, yang penting untuk jaras motorik (nigrostriatal).", isCorrect: true },
+                    { term: "Red nucleus", explanation: "Nukleus di mesencephalon yang terlibat dalam koordinasi motorik (jaras rubrospinal).", isCorrect: false },
+                    { term: "Colliculus superior", explanation: "Bagian dari tectum, terlibat dalam refleks visual dan gerakan mata.", isCorrect: false },
+                    { term: "Tectum", explanation: "Bagian 'atap' mesencephalon, terdiri dari colliculus superior dan inferior.", isCorrect: false },
+                    { term: "Pedunculus cerebri", explanation: "Bagian 'dasar' mesencephalon, berisi jaras motorik (kortikospinalis).", isCorrect: false }
+                ]
             },
             { // 22
                 question: "Seorang kakek-kakek... paham apa yg orang lain katakan, namun tidak bisa berbicara... area manakah yang terkena lesi?",
                 options: ["Area Brocha", "Area Brodmann 1,2,3", "Lobus parietal", "Area Wernicke", "Lobus Oksipital"],
-                correct: "Area Brocha"
+                correct: "Area Brocha",
+                explanations: [
+                    { term: "Area Brocha", explanation: "Ini adalah afasia Broca (afasia motorik/ekspresif). Pasien paham bahasa (area Wernicke utuh) tetapi kesulitan memproduksi bahasa (bicara).", isCorrect: true },
+                    { term: "Area Brodmann 1,2,3", explanation: "Ini adalah korteks somatosensorik primer (girus postsentral), untuk sensasi tubuh.", isCorrect: false },
+                    { term: "Lobus parietal", explanation: "Terlibat dalam sensasi, persepsi ruang. Area Wernicke ada di perbatasan temporal-parietal.", isCorrect: false },
+                    { term: "Area Wernicke", explanation: "Lesi di sini menyebabkan afasia Wernicke (afasia sensorik/reseptif), di mana pasien tidak paham bahasa tetapi bicaranya lancar (namun tidak bermakna).", isCorrect: false },
+                    { term: "Lobus Oksipital", explanation: "Pusat pemrosesan visual.", isCorrect: false }
+                ]
             },
             { // 23
                 question: "Vena yang menghubungkan sistem vena ekstrakranial dan intrakranial adalah",
                 options: ["Vena Emissaria", "Pleksus pterygoid", "Vena meningea media", "Vena jugularis eksterna", "Vena jugularis interna"],
-                correct: "Vena Emissaria"
+                correct: "Vena Emissaria",
+                explanations: [
+                    { term: "Vena Emissaria", explanation: "Vena emisaria adalah vena tanpa katup yang menembus tulang tengkorak, menghubungkan sinus duramater (intrakranial) dengan vena di kulit kepala (ekstrakranial).", isCorrect: true },
+                    { term: "Pleksus pterygoid", explanation: "Pleksus vena di fosa infratemporal (ekstrakranial), terhubung ke sinus kavernosus (intrakranial) tetapi V. Emisaria adalah istilah umumnya.", isCorrect: false },
+                    { term: "Vena meningea media", explanation: "Vena yang berjalan bersama arteri meningea media, berada di dalam kranium tetapi mendarahi dura.", isCorrect: false },
+                    { term: "Vena jugularis eksterna", explanation: "Vena superfisial di leher (ekstrakranial).", isCorrect: false },
+                    { term: "Vena jugularis interna", explanation: "Vena utama yang mengalirkan darah dari sinus duramater (intrakranial) ke luar.", isCorrect: false }
+                ]
             },
             { // 24
                 question: "Pada homunculus, yang paling besar bagian sistem saraf motorik pada otak adalah...",
                 options: ["Mulut", "Mata", "Toraks dan abdomen", "Tangan", "Kaki"],
-                correct: "Tangan"
+                correct: "Tangan",
+                explanations: [
+                    { term: "Tangan", explanation: "Korteks motorik primer memiliki representasi somatotopik (homunculus) di mana area dengan gerakan halus dan kompleks (tangan, jari, wajah, bibir) memiliki area korteks yang jauh lebih besar.", isCorrect: true },
+                    { term: "Mulut", explanation: "Mulut (termasuk bibir dan lidah) juga besar, tetapi tangan (terutama jari) sering dianggap yang terbesar karena keterampilan motorik halusnya.", isCorrect: true }, // Tangan dan Mulut keduanya besar. Tangan seringkali digambar paling dominan.
+                    { term: "Mata", explanation: "Gerakan mata dikontrol oleh area lain (frontal eye fields), bukan primernya di homunculus motorik girus presentral.", isCorrect: false },
+                    { term: "Toraks dan abdomen", explanation: "Memiliki representasi yang sangat kecil karena gerakannya tidak kompleks.", isCorrect: false },
+                    { term: "Kaki", explanation: "Memiliki representasi di permukaan medial, ukurannya lebih kecil dibanding tangan.", isCorrect: false }
+                ]
             },
             { // 25
                 question: "Organ berikut divaskularisasi oleh A. superior cerebellum adalah...",
                 options: ["Thalamus", "Cerebellum lobus inferior", "Medula oblongata", "Pons", "Mesencephalon"],
-                correct: "Pons"
+                correct: "Pons",
+                explanations: [
+                    // A. Superior Cerebellar Artery (SCA) mendarahi bagian superior cerebellum, dan juga bagian dari pons dan mesencephalon.
+                    { term: "Pons", explanation: "Arteri Serebelar Superior (SCA) mendarahi bagian atas (superior) serebelum dan juga bagian lateral dari pons dan mesencephalon.", isCorrect: true },
+                    { term: "Thalamus", explanation: "Divaskularisasi oleh cabang A. cerebri posterior (PCA).", isCorrect: false },
+                    { term: "Cerebellum lobus inferior", explanation: "Divaskularisasi oleh AICA (Anterior Inferior) dan PICA (Posterior Inferior Cerebellar Artery).", isCorrect: false },
+                    { term: "Medula oblongata", explanation: "Divaskularisasi oleh A. vertebralis dan PICA.", isCorrect: false },
+                    { term: "Mesencephalon", explanation: "Mesencephalon juga mendapat suplai dari SCA, tetapi Pons adalah jawaban yang lebih umum terkait.", isCorrect: true } // Kedua jawaban D dan E bisa benar, tapi D lebih sering terkait.
+                ]
             },
             { // 26
                 question: "Cabang terakhir arteri carotis externa yang nantinya akan bercabang menjadi A. meningens media adalah...",
                 options: ["a. superficial temporal", "a. maksilaris", "a. occipitalis", "a. superficial temporal", "a. facial"],
-                correct: "a. maksilaris"
+                correct: "a. maksilaris",
+                explanations: [
+                    { term: "a. maksilaris", explanation: "A. carotis externa bercabang menjadi dua cabang terminal: A. temporalis superficialis dan A. maksilaris. A. meningea media adalah cabang dari A. maksilaris.", isCorrect: true },
+                    { term: "a. superficial temporal", explanation: "Ini adalah cabang terminal lain dari A. carotis externa, tetapi tidak mempercabangkan A. meningea media.", isCorrect: false },
+                    { term: "a. occipitalis", explanation: "Cabang posterior dari A. carotis externa.", isCorrect: false },
+                    { term: "a. facial", explanation: "Cabang anterior dari A. carotis externa.", isCorrect: false }
+                    // Opsi "a. superficial temporal" duplikat
+                ]
             },
             { // 27
                 question: "Yang menjadi salah satu penyusun Blood Brain Barrier adalah..",
                 options: ["Sel ependim", "Sel astrosit", "Sel piramidal", "Sel purkinje", "Sel schwann"],
-                correct: "Sel astrosit"
+                correct: "Sel astrosit",
+                explanations: [
+                    { term: "Sel astrosit", explanation: "Astrosit (sel glia) memiliki 'kaki perivaskular' (perivascular feet) yang membungkus kapiler otak, berkontribusi pada pembentukan dan pemeliharaan Blood-Brain Barrier (BBB).", isCorrect: true },
+                    { term: "Sel ependim", explanation: "Sel yang melapisi ventrikel otak dan membentuk 'blood-CSF barrier', tetapi bukan BBB utama.", isCorrect: false },
+                    { term: "Sel piramidal", explanation: "Jenis neuron utama di korteks serebri.", isCorrect: false },
+                    { term: "Sel purkinje", explanation: "Jenis neuron utama di korteks serebelum.", isCorrect: false },
+                    { term: "Sel schwann", explanation: "Membentuk mielin di Susunan Saraf Tepi (SST), bukan di otak (SSP).", isCorrect: false }
+                ]
             },
             { // 28
                 question: "Apa nama struktur yang menjadi pusat sensorik primer",
                 options: ["Gyrus precentral", "Gyrus postcentral", "Lobus parietal", "Lobus temporal", "Lobus oksipital"],
-                correct: "Gyrus postcentral"
+                correct: "Gyrus postcentral",
+                explanations: [
+                    { term: "Gyrus postcentral", explanation: "Girus postsentralis di lobus parietal adalah lokasi korteks somatosensorik primer (Area Brodmann 1, 2, 3), yang menerima sensasi tubuh.", isCorrect: true },
+                    { term: "Gyrus precentral", explanation: "Ini adalah korteks motorik primer (Area Brodmann 4), untuk gerakan volunter.", isCorrect: false },
+                    { term: "Lobus parietal", explanation: "Ini adalah LOKASI girus postsentral, tetapi girus adalah struktur spesifiknya.", isCorrect: false },
+                    { term: "Lobus temporal", explanation: "Pusat pendengaran (auditori) dan pemahaman bahasa (Wernicke).", isCorrect: false },
+                    { term: "Lobus oksipital", explanation: "Pusat penglihatan (visual).", isCorrect: false }
+                ]
             },
             { // 29
                 question: "Jaringan ikat pembungkus saraf tepi terluar adalah",
                 options: ["Perimisium", "Perineurium", "Endomisium", "Endometrium", "Epineurium"],
-                correct: "Epineurium"
+                correct: "Epineurium",
+                explanations: [
+                    { term: "Epineurium", explanation: "Lapisan jaringan ikat padat terluar yang membungkus seluruh saraf tepi (kumpulan fasikulus).", isCorrect: true },
+                    { term: "Perineurium", explanation: "Lapisan yang membungkus satu fasikulus (kumpulan akson) di dalam saraf.", isCorrect: false },
+                    { term: "Endoneurium", explanation: "Lapisan halus yang membungkus satu akson (serabut saraf) individual. (Endomisium tidak ada).", isCorrect: false },
+                    { term: "Perimisium", explanation: "Istilah untuk pembungkus fasikulus pada OTOT, bukan saraf.", isCorrect: false },
+                    { term: "Endometrium", explanation: "Lapisan dalam rahim (uterus).", isCorrect: false }
+                ]
             },
             { // 30
                 question: "Struktur yang termasuk prosencephalon?",
                 options: ["Cerebrum", "Cerebellum", "Thalamus", "Medulla oblongata", "Pons"],
-                correct: "Cerebrum"
+                correct: "Cerebrum",
+                explanations: [
+                    { term: "Cerebrum", explanation: "Prosencephalon (otak depan) berkembang menjadi Telencephalon (yang menjadi Cerebrum) dan Diencephalon (Thalamus, Hypothalamus).", isCorrect: true },
+                    { term: "Cerebellum", explanation: "Berkembang dari Rhombencephalon (otak belakang), spesifiknya Metencephalon.", isCorrect: false },
+                    { term: "Thalamus", explanation: "Berkembang dari Diencephalon, yang merupakan bagian dari Prosencephalon. Namun, Cerebrum adalah turunan Telencephalon, juga dari Prosencephalon dan merupakan jawaban yang lebih besar/umum.", isCorrect: true },
+                    { term: "Medulla oblongata", explanation: "Berkembang dari Rhombencephalon (otak belakang), spesifiknya Myelencephalon.", isCorrect: false },
+                    { term: "Pons", explanation: "Berkembang dari Rhombencephalon (otak belakang), spesifiknya Metencephalon.", isCorrect: false }
+                ]
             },
             { // 31
                 question: "Nn. N mengalami stress berat... respon saraf fight or flight... Neurotransmitter apakah yang dimaksud?",
                 options: ["Acetylcholin", "Serotonin", "Endorphine", "GABA", "Dopamine"],
-                correct: "Dopamine"
+                correct: "Dopamine",
+                explanations: [
+                    // Catatan: 'Fight or flight' primer adalah Norepinefrin/Epinefrin (Adrenalin). Namun, Dopamin adalah prekursornya dan terlibat dalam respons stres dan 'reward'. Di antara opsi, Dopamin adalah yang paling terkait.
+                    { term: "Dopamine", explanation: "Dopamin terlibat dalam sistem 'reward' dan motivasi, serta merupakan prekursor untuk norepinefrin. Stres akut dapat melepaskan dopamin. (Meskipun Norepinefrin adalah jawaban yang lebih primer untuk 'fight or flight').", isCorrect: true },
+                    { term: "Acetylcholin", explanation: "Neurotransmitter utama sistem parasimpatis ('rest and digest').", isCorrect: false },
+                    { term: "Serotonin", explanation: "Terlibat dalam regulasi suasana hati, tidur. Stres kronis memengaruhinya, tetapi bukan neurotransmitter 'fight or flight' akut.", isCorrect: false },
+                    { term: "Endorphine", explanation: "Neuromodulator untuk mengurangi rasa sakit, sering dilepaskan saat stres atau olahraga.", isCorrect: false },
+                    { term: "GABA", explanation: "Neurotransmitter inhibitorik utama, berfungsi menenangkan sistem saraf.", isCorrect: false }
+                ]
             },
             { // 32
                 question: "Seorang mahasiswa... menemukan bahwa terdapat neuron yang menerima impuls dari berbagai neuron. Pusat integrasi tersebut terjadi di?",
                 options: ["Soma", "Dendrit", "Akson", "Nodus Ranvier", "Ujung akson"],
-                correct: "Soma"
+                correct: "Soma",
+                explanations: [
+                    { term: "Soma", explanation: "Soma (badan sel) adalah pusat metabolisme dan integrasi neuron. Di sinilah sinyal-sinyal (IPSP dan EPSP) dari dendrit dijumlahkan di 'axon hillock' untuk menentukan apakah potensial aksi akan ditembakkan.", isCorrect: true },
+                    { term: "Dendrit", explanation: "Dendrit adalah struktur yang Menerima impuls dari neuron lain, tetapi integrasi utamanya terjadi di soma/axon hillock.", isCorrect: false },
+                    { term: "Akson", explanation: "Struktur yang Menghantarkan potensial aksi menjauhi soma.", isCorrect: false },
+                    { term: "Nodus Ranvier", explanation: "Celah di selubung mielin tempat potensial aksi 'melompat' (konduksi saltatorik).", isCorrect: false },
+                    { term: "Ujung akson", explanation: "Terminal akson tempat pelepasan neurotransmitter ke sinaps berikutnya.", isCorrect: false }
+                ]
             },
             { // 33
                 question: "Aktifitas berikut ini akan menimbulkan gelombang alfa di EEG",
                 options: ["Duduk santai dengan mata terpejam", "belajar", "Olahraga", "Rem", "Deep sleep"],
-                correct: "Duduk santai dengan mata terpejam"
+                correct: "Duduk santai dengan mata terpejam",
+                explanations: [
+                    { term: "Duduk santai dengan mata terpejam", explanation: "Gelombang Alfa (8-13 Hz) dominan pada saat kondisi rileks, terjaga, tetapi mata tertutup (tidak ada input visual).", isCorrect: true },
+                    { term: "belajar", explanation: "Aktivitas mental yang waspada (seperti belajar atau mata terbuka) didominasi gelombang Beta (>13 Hz).", isCorrect: false },
+                    { term: "Olahraga", explanation: "Aktivitas fisik dan mental waspada, didominasi gelombang Beta.", isCorrect: false },
+                    { term: "Rem", explanation: "REM (Rapid Eye Movement) sleep memiliki pola EEG yang mirip dengan kondisi terjaga (Beta), sering disebut tidur paradoksal.", isCorrect: false },
+                    { term: "Deep sleep", explanation: "Tidur dalam (NREM stage 3) didominasi oleh gelombang Delta (<4 Hz) yang lambat.", isCorrect: false }
+                ]
             },
             { // 34
                 question: "Pada phineas cage tertusuk tongkat... perubahan kepribadian. Bagian apa yang mengalami kelainan",
                 options: ["Lobus temporal", "Lobus occipital", "Lobus frontalis", "Gyrus precentral", "Lobus parietalis"],
-                correct: "Lobus frontalis"
+                correct: "Lobus frontalis",
+                explanations: [
+                    { term: "Lobus frontalis", explanation: "Kasus Phineas Gage terkenal karena kerusakan parah pada lobus frontalis (khususnya korteks prefrontal), yang menyebabkan perubahan drastis pada kepribadian, emosi, dan fungsi eksekutif.", isCorrect: true },
+                    { term: "Lobus temporal", explanation: "Terlibat dalam pendengaran, memori, dan pemahaman bahasa.", isCorrect: false },
+                    { term: "Lobus occipital", explanation: "Terlibat dalam penglihatan.", isCorrect: false },
+                    { term: "Gyrus precentral", explanation: "Ini adalah korteks motorik primer, bagian dari lobus frontalis, tetapi kerusakan Gage lebih spesifik di area prefrontal.", isCorrect: false },
+                    { term: "Lobus parietalis", explanation: "Terlibat dalam sensasi dan persepsi spasial.", isCorrect: false }
+                ]
             },
             { // 35
                 question: "Cerebrum potongan coronal, struktur apa yang dapat... diidentifikasi",
                 options: ["substantia grisea paling superficial", "substansia alba paling superficial", "substansia alba dan substansia grisea tidak bisa dibedakan", "sulcus centralis terlihat jelas", "Ventrikel terlihat di inferior"],
-                correct: "substantia grisea paling superficial"
+                correct: "substantia grisea paling superficial",
+                explanations: [
+                    { term: "substantia grisea paling superficial", explanation: "Pada cerebrum, substantia grisea (grey matter, berisi badan sel neuron) membentuk lapisan luar yang disebut korteks serebri. Substantia alba (white matter, berisi akson bermielin) berada di bagian dalam.", isCorrect: true },
+                    { term: "substansia alba paling superficial", explanation: "Ini kebalikan dari cerebrum (tapi benar untuk medula spinalis).", isCorrect: false },
+                    { term: "substansia alba dan substansia grisea tidak bisa dibedakan", explanation: "Keduanya sangat jelas terlihat perbedaannya pada potongan makroskopik.", isCorrect: false },
+                    { term: "sulcus centralis terlihat jelas", explanation: "Sulcus centralis memisahkan lobus frontal dan parietal (potongan sagital lebih baik), mungkin tidak selalu jelas di setiap potongan koronal.", isCorrect: false },
+                    { term: "Ventrikel terlihat di inferior", explanation: "Ventrikel (lateral dan ketiga) terlihat di bagian dalam (deep) otak, bukan inferior.", isCorrect: false }
+                ]
             },
             { // 36
                 question: "Area cerebrum sebagai cortex sensoris primer",
                 options: ["gyrus postcentralis", "gyrus precentralis", "lobus temporalis", "lobus occipitale", "lobus parietal"],
-                correct: "gyrus postcentralis"
+                correct: "gyrus postcentralis",
+                explanations: [
+                    { term: "gyrus postcentralis", explanation: "Girus postsentralis adalah nama anatomis untuk korteks somatosensorik primer (sensasi tubuh).", isCorrect: true },
+                    { term: "gyrus precentralis", explanation: "Ini adalah korteks motorik primer.", isCorrect: false },
+                    { term: "lobus temporalis", explanation: "Korteks auditori (pendengaran) primer ada di sini.", isCorrect: false },
+                    { term: "lobus occipitale", explanation: "Korteks visual (penglihatan) primer ada di sini.", isCorrect: false },
+                    { term: "lobus parietal", explanation: "Ini adalah LOKASI girus postsentral, tetapi girus adalah struktur spesifiknya.", isCorrect: false }
+                ]
             },
             { // 37
                 question: "Ketika impuls sudah mencapai ujung akson, maka akan terjadi...",
                 options: ["hiperpolarisasi", "depolarisasi", "pelepasan neurotransmitter", "reuptake neurotransmitter", "terjadi potensial aksi"],
-                correct: "pelepasan neurotransmitter"
+                correct: "pelepasan neurotransmitter",
+                explanations: [
+                    { term: "pelepasan neurotransmitter", explanation: "Potensial aksi yang tiba di terminal akson memicu pembukaan kanal Ca++ (kalsium) berpintu tegangan. Masuknya Ca++ memicu eksositosis vesikel sinaptik, melepaskan neurotransmitter ke celah sinaps.", isCorrect: true },
+                    { term: "hiperpolarisasi", explanation: "Ini adalah fase setelah potensial aksi (fase repolarisasi berlebih), bukan kejadian di terminal.", isCorrect: false },
+                    { term: "depolarisasi", explanation: "Depolarisasi (potensial aksi) adalah yang *menyebabkan* pelepasan, bukan hasil akhirnya.", isCorrect: false },
+                    { term: "reuptake neurotransmitter", explanation: "Ini terjadi *setelah* pelepasan, untuk membersihkan neurotransmitter dari celah sinaps.", isCorrect: false },
+                    { term: "terjadi potensial aksi", explanation: "Potensial aksi *tiba* di ujung akson, itu bukan *hasil* dari kedatangannya.", isCorrect: false }
+                ]
             },
             { // 38
                 question: "Struktur otak yang aktivitasnya rendah pada orang dengan empati rendah dan enggan menolong",
                 options: ["Lobus temporal", "Lobus occipital", "Korteks sensorik primer", "Korteks somatosensori", "Korteks prefrontal"],
-                correct: "Korteks prefrontal"
+                correct: "Korteks prefrontal",
+                explanations: [
+                    { term: "Korteks prefrontal", explanation: "Korteks prefrontal (bagian dari lobus frontalis) sangat terlibat dalam fungsi eksekutif, pengambilan keputusan, regulasi emosi, dan perilaku sosial kompleks seperti empati.", isCorrect: true },
+                    { term: "Lobus temporal", explanation: "Terlibat dalam pendengaran dan memori.", isCorrect: false },
+                    { term: "Lobus occipital", explanation: "Terlibat dalam penglihatan.", isCorrect: false },
+                    { term: "Korteks sensorik primer", explanation: "Menerima sensasi fisik.", isCorrect: false },
+                    { term: "Korteks somatosensori", explanation: "Nama lain untuk korteks sensorik primer.", isCorrect: false }
+                ]
             },
             { // 39
                 question: "Sel yang mengelilingi mielin di susunan saraf pusat?",
                 options: ["sel ependim", "sel astrosit", "sel schwann", "sel oligodendrosit"],
-                correct: "sel oligodendrosit"
+                correct: "sel oligodendrosit",
+                explanations: [
+                    { term: "sel oligodendrosit", explanation: "Oligodendrosit adalah sel glia di Susunan Saraf Pusat (SSP: otak dan medula spinalis) yang membentuk selubung mielin. Satu oligodendrosit dapat memielinasi beberapa akson.", isCorrect: true },
+                    { term: "sel ependim", explanation: "Melapisi ventrikel.", isCorrect: false },
+                    { term: "sel astrosit", explanation: "Sel pendukung, bagian dari BBB.", isCorrect: false },
+                    { term: "sel schwann", explanation: "Membentuk mielin di Susunan Saraf Tepi (SST: saraf kranial dan spinal). Satu sel Schwann hanya memielinasi satu segmen akson.", isCorrect: false }
+                ]
             },
             { // 40
                 question: "Bagian otak berikut merupakan salah satu bagian diencephalon, yaitu",
                 options: ["Korteks cerebri", "Ganglia basalis", "Hipotalamus", "Hipokampus", "Amigdala"],
-                correct: "Hipotalamus"
+                correct: "Hipotalamus",
+                explanations: [
+                    { term: "Hipotalamus", explanation: "Diencephalon adalah bagian dari otak depan (Prosencephalon) yang terdiri dari Thalamus, Hypothalamus, Epithalamus, dan Subthalamus.", isCorrect: true },
+                    { term: "Korteks cerebri", explanation: "Bagian dari Telencephalon.", isCorrect: false },
+                    { term: "Ganglia basalis", explanation: "Nukleus di dalam Telencephalon.", isCorrect: false },
+                    { term: "Hipokampus", explanation: "Bagian dari sistem limbik, terletak di lobus temporal (Telencephalon).", isCorrect: false },
+                    { term: "Amigdala", explanation: "Bagian dari sistem limbik, terletak di lobus temporal (Telencephalon).", isCorrect: false }
+                ]
             },
             { // 41
                 question: "Beberapa refleks primitif menghilang selama proses tumbuh kembang. Hal ini terjadi melalui...",
                 options: ["Pembentukan sinaps fasilitasi", "Pembentukan sinaps inhibisi", "Mielinisasi", "Modulasi sensorik", "Synaptic delay"],
-                correct: "Pembentukan sinaps inhibisi"
+                correct: "Pembentukan sinaps inhibisi",
+                explanations: [
+                    { term: "Pembentukan sinaps inhibisi", explanation: "Refleks primitif (misal: Babinski, rooting) berasal dari batang otak/spinal. Seiring matangnya korteks motorik, korteks mengembangkan jaras inhibisi (penghambat) yang menekan refleks-refleks ini.", isCorrect: true },
+                    { term: "Pembentukan sinaps fasilitasi", explanation: "Ini akan memperkuat refleks, bukan menghilangkannya.", isCorrect: false },
+                    { term: "Mielinisasi", explanation: "Mielinisasi mempercepat hantaran, yang penting untuk perkembangan motorik, tetapi inhibisi adalah mekanisme *penekanan* refleksnya.", isCorrect: false },
+                    { term: "Modulasi sensorik", explanation: "Proses pengolahan input sensorik, terkait tetapi bukan mekanisme utama.", isCorrect: false },
+                    { term: "Synaptic delay", explanation: "Waktu yang dibutuhkan untuk transmisi sinaptik, bukan mekanisme perkembangan.", isCorrect: false }
+                ]
             },
             { // 42
                 question: "Motor neuron di kornu anterior medula spinalis yang berperan mengatur tonus otot adalah..",
                 options: ["Alpha", "Beta", "Delta", "Gamma", "Tetha"],
-                correct: "Gamma"
+                correct: "Gamma",
+                explanations: [
+                    { term: "Gamma", explanation: "Gamma motor neuron menginervasi serabut intrafusal di dalam 'muscle spindle'. Aktivitasnya mengatur sensitivitas 'muscle spindle' terhadap regangan, yang sangat penting untuk menjaga tonus otot.", isCorrect: true },
+                    { term: "Alpha", explanation: "Alpha motor neuron menginervasi serabut ekstrafusal, yaitu serabut otot utama yang menghasilkan kekuatan kontraksi.", isCorrect: false },
+                    { term: "Beta", explanation: "Neuron Beta menginervasi kedua jenis serabut (ekstra- dan intrafusal).", isCorrect: false },
+                    { term: "Delta", explanation: "Istilah untuk serabut saraf (nyeri/suhu), atau gelombang EEG, bukan tipe motor neuron.", isCorrect: false },
+                    { term: "Tetha", explanation: "Istilah untuk gelombang EEG, bukan tipe motor neuron.", isCorrect: false }
+                ]
             },
             { // 43
                 question: "Apa fungsi sistem limbik",
                 options: ["Pusat pencernaan", "Pusat kesadaran", "Koordinasi pergerakan", "Pusat ide", "Pusat emosi, afeksi, dan motivasi"],
-                correct: "Pusat emosi, afeksi, dan motivasi"
+                correct: "Pusat emosi, afeksi, dan motivasi",
+                explanations: [
+                    { term: "Pusat emosi, afeksi, dan motivasi", explanation: "Sistem limbik (termasuk amigdala, hipokampus, girus singulata) adalah 'otak emosional' yang mengatur emosi (takut, marah), memori, dan motivasi.", isCorrect: true },
+                    { term: "Pusat pencernaan", explanation: "Dikontrol oleh batang otak dan sistem otonom.", isCorrect: false },
+                    { term: "Pusat kesadaran", explanation: "Terutama melibatkan Formatio Retikularis (ARAS) di batang otak dan korteks serebri.", isCorrect: false },
+                    { term: "Koordinasi pergerakan", explanation: "Fungsi utama Cerebellum dan Ganglia Basalis.", isCorrect: false },
+                    { term: "Pusat ide", explanation: "Fungsi kognitif tinggi yang melibatkan korteks serebri, terutama lobus frontalis.", isCorrect: false }
+                ]
             },
             { // 44
                 question: "Pengaturan atau kontrol fungsi Vegetatif diperankan oleh...",
                 options: ["diencephalon, mesencephalon", "hypothalamus, thalamus, epitalamus", "pons, medula oblongata, mesencephalon", "cerebrum, cerebellum", "sistem limbik"],
-                correct: "pons, medula oblongata, mesencephalon"
+                correct: "pons, medula oblongata, mesencephalon",
+                explanations: [
+                    { term: "pons, medula oblongata, mesencephalon", explanation: "Ketiga struktur ini membentuk Batang Otak, yang merupakan pusat kontrol vital (vegetatif) seperti denyut jantung, tekanan darah (medula), dan pernapasan (pons, medula).", isCorrect: true },
+                    { term: "diencephalon, mesencephalon", explanation: "Diencephalon (terutama Hipotalamus) adalah pengatur otonom TERTINGGI, tetapi batang otak adalah pusat kontrol langsungnya.", isCorrect: false },
+                    { term: "hypothalamus, thalamus, epitalamus", explanation: "Ini adalah Diencephalon. Hipotalamus penting, tetapi Thalamus (sensorik) dan Epithalamus (pineal) tidak secara primer.", isCorrect: false },
+                    { term: "cerebrum, cerebellum", explanation: "Cerebrum (kesadaran) dan Cerebellum (koordinasi) bukan pusat vegetatif primer.", isCorrect: false },
+                    { term: "sistem limbik", explanation: "Pusat emosi, yang dapat *mempengaruhi* fungsi vegetatif, tetapi bukan pusat kontrolnya.", isCorrect: false }
+                ]
             },
             { // 45
                 question: "Tempat Keluarnya Nervus Kranial IX, X, XI, XII adalah",
                 options: ["Mesencephalon", "Pons", "Medula oblongata", "Cerebellum", "Medula spinalis"],
-                correct: "Medula oblongata"
+                correct: "Medula oblongata",
+                explanations: [
+                    { term: "Medula oblongata", explanation: "Medula oblongata adalah tempat keluarnya N. IX (Glossopharyngeus), X (Vagus), XI (Accessorius), dan XII (Hypoglossus).", isCorrect: true },
+                    { term: "Mesencephalon", explanation: "Tempat keluar N. III (Oculomotorius) dan IV (Trochlearis).", isCorrect: false },
+                    { term: "Pons", explanation: "Tempat keluar N. V (Trigeminus), VI (Abducens), VII (Facialis), dan VIII (Vestibulocochlearis).", isCorrect: false },
+                    { term: "Cerebellum", explanation: "Tidak ada nervus kranial yang keluar dari cerebellum.", isCorrect: false },
+                    { term: "Medula spinalis", explanation: "Tempat keluar saraf spinal (N. Accessorius [XI] memiliki akar spinal, tetapi intinya di medula).", isCorrect: false }
+                ]
             },
             { // 46
                 question: "Faktor pemicu terjadinya mengantuk dan tidur",
                 options: ["Peningkatan ATP otak", "Pelepasan neurotransmitter NE", "Tekanan darah meningkat", "Kelelahan neuron", "Peningkatan aktivitas formation retikularis"],
-                correct: "Kelelahan neuron"
+                correct: "Kelelahan neuron",
+                explanations: [
+                    { term: "Kelelahan neuron", explanation: "Aktivitas otak yang berkepanjangan menyebabkan penumpukan adenosin (hasil pemecahan ATP). Adenosin ini menghambat neuron di 'pusat bangun' (termasuk formatio retikularis), menyebabkan kelelahan dan kantuk.", isCorrect: true },
+                    { term: "Peningkatan ATP otak", explanation: "Justru pemecahan ATP menjadi ADP dan Adenosin yang memicu kantuk.", isCorrect: false },
+                    { term: "Pelepasan neurotransmitter NE", explanation: "Norepinefrin (NE) adalah neurotransmitter yang membuat 'terjaga' (wakefulness) dari Locus Coeruleus.", isCorrect: false },
+                    { term: "Tekanan darah meningkat", explanation: "Tekanan darah biasanya menurun saat tidur (NREM).", isCorrect: false },
+                    { term: "Peningkatan aktivitas formation retikularis", explanation: "Peningkatan aktivitas ARAS (Ascending Reticular Activating System) menyebabkan kondisi terjaga (bangun), bukan tidur.", isCorrect: false }
+                ]
             },
             { // 47
                 question: "Fungsi formatio retikularis, kecuali",
                 options: ["Somatic motor control", "Cardiovascular control", "Pain modulator", "Sleep and consciousness", "Perception"],
-                correct: "Perception"
+                correct: "Perception",
+                explanations: [
+                    { term: "Perception", explanation: "Persepsi (interpretasi sadar) adalah fungsi korteks serebri. Formatio Retikularis (ARAS) penting untuk *kesadaran* (consciousness) agar persepsi bisa terjadi, tetapi ARAS sendiri tidak melakukan persepsi.", isCorrect: true },
+                    { term: "Somatic motor control", explanation: "Jaras retikulospinalis memengaruhi tonus otot dan postur.", isCorrect: false },
+                    { term: "Cardiovascular control", explanation: "Pusat vasomotor di medula adalah bagian dari formatio retikularis.", isCorrect: false },
+                    { term: "Pain modulator", explanation: "Jaras desenden (misal: dari PAG) memodulasi sinyal nyeri di medula spinalis.", isCorrect: false },
+                    { term: "Sleep and consciousness", explanation: "Ini adalah fungsi utama ARAS (Ascending Reticular Activating System).", isCorrect: false }
+                ]
             },
             { // 48
                 question: "Hemisphere dextra dan sinistra dihubungkan melalui....",
                 options: ["Corpus callosum", "Ventrikel lateral", "Aqueductus Sylvii", "Lobus temporal", "Gyrus precentral"],
-                correct: "Corpus callosum" // Perbaikan dari "calloSUM"
+                correct: "Corpus callosum",
+                explanations: [
+                    { term: "Corpus callosum", explanation: "Ini adalah 'jembatan' besar dari serabut substantia alba (komisura) yang menghubungkan hemisfer serebri kiri dan kanan, memungkinkan komunikasi antar keduanya.", isCorrect: true },
+                    { term: "Ventrikel lateral", explanation: "Ruang berisi cairan (CSF) di dalam masing-masing hemisfer.", isCorrect: false },
+                    { term: "Aqueductus Sylvii", explanation: "Saluran sempit di mesencephalon yang menghubungkan ventrikel ketiga dan keempat.", isCorrect: false },
+                    { term: "Lobus temporal", explanation: "Bagian dari hemisfer, bukan penghubung.", isCorrect: false },
+                    { term: "Gyrus precentral", explanation: "Bagian dari hemisfer (korteks motorik), bukan penghubung.", isCorrect: false }
+                ]
             },
             { // 49
                 question: "Petani terpapar pestisida organofosfat (inhibitor asetilkolinesterase). Hal tersebut menyebabkan... (kadar asetilkolin)",
                 options: ["Penurunan secara signifikan", "Peningkatan Secara signifikan", "Tidak ada Perubahan"],
-                correct: "Peningkatan Secara signifikan"
+                correct: "Peningkatan Secara signifikan",
+                explanations: [
+                    { term: "Peningkatan Secara signifikan", explanation: "Asetilkolinesterase adalah enzim yang memecah Asetilkolin (ACh) di celah sinaps. Jika enzim ini dihambat (oleh organofosfat), ACh tidak dipecah dan menumpuk, menyebabkan stimulasi berlebihan pada reseptor kolinergik.", isCorrect: true },
+                    { term: "Penurunan secara signifikan", explanation: "Ini adalah efek sebaliknya. Obat yang memblokir pelepasan ACh akan menyebabkan penurunan.", isCorrect: false },
+                    { term: "Tidak ada Perubahan", explanation: "Inhibitor enzim pasti akan menyebabkan perubahan kadar substratnya.", isCorrect: false }
+                ]
             },
             { // 50
                 question: "Nervus cabang pleksus brachialis yang menginervasi m. deltoid adalah",
                 options: ["Musculocutaneus", "Axilaris", "Radialis", "Medianus", "Axillaris"],
-                correct: "Axilaris" // "Axilaris" dan "Axillaris" sama, ambil opsi pertama
+                correct: "Axilaris",
+                explanations: [
+                    { term: "Axilaris", explanation: "Nervus Axillaris (dari fasciculus posterior) menginervasi m. deltoideus (untuk abduksi lengan) dan m. teres minor.", isCorrect: true },
+                    { term: "Musculocutaneus", explanation: "Menginervasi otot kompartemen anterior lengan atas (biceps brachii, brachialis) untuk fleksi siku.", isCorrect: false },
+                    { term: "Radialis", explanation: "Menginervasi kompartemen posterior lengan atas dan lengan bawah (ekstensor).", isCorrect: false },
+                    { term: "Medianus", explanation: "Menginervasi sebagian besar fleksor lengan bawah dan otot tenar di tangan.", isCorrect: false },
+                    { term: "Axillaris", explanation: "Ejaan alternatif dari Axilaris, jawaban yang sama.", isCorrect: true }
+                ]
             }
         ];
+
 
 
         // --- Variabel Status Kuis ---
@@ -621,14 +965,9 @@
         // Tombol Kembali ke Menu
         const backToMenuButtons = document.querySelectorAll('.back-to-menu-btn');
         
-        /**
-         * Inisialisasi data soal, tambahkan properti cache
+        /* * FUNGSI initializeQuestions() DIHAPUS 
+         * (Tidak perlu cache, data sudah hardcoded)
          */
-        function initializeQuestions() {
-            questions.forEach(q => {
-                q.explanations = null; // Cache untuk penjelasan AI
-            });
-        }
 
         // --- Fungsi Navigasi Utama ---
 
@@ -678,7 +1017,7 @@
             // Isi teks kartu depan
             flashcardFront.querySelector('p').innerText = question.question;
             
-            // Kosongkan bagian belakang. Ini akan diisi oleh API call saat di-flip
+            // Kosongkan bagian belakang. Ini akan diisi saat di-flip
             flashcardAnswerList.innerHTML = ''; 
             
             // Reset tampilan kartu (tampilkan depan)
@@ -702,12 +1041,13 @@
             
             if (isFlippingToBack) {
                 const q = questions[currentFlashcardIndex];
-                // Hanya fetch jika data belum ada di cache
-                if (!q.explanations) {
-                     fetchFlashcardExplanations(q); // Panggil fungsi AI
-                } else {
-                    // Jika sudah ada, render dari cache
+                
+                // DATA SUDAH ADA (HARDCODED), LANGSUNG RENDER
+                if (q.explanations) {
                     renderExplanations(q.explanations);
+                } else {
+                    // Fallback jika data penjelasan tidak ada
+                    flashcardAnswerList.innerHTML = '<p class="text-center">Penjelasan tidak ditemukan.</p>';
                 }
             }
             
@@ -725,8 +1065,11 @@
                 flashcardAnswerList.innerHTML = '<p class="text-center">Gagal memuat penjelasan.</p>';
                 return;
             }
+            
+            // Urutkan agar jawaban benar selalu di atas
+            const sortedExplanations = [...explanationsArray].sort((a, b) => (a.isCorrect === b.isCorrect) ? 0 : a.isCorrect ? -1 : 1);
 
-            explanationsArray.forEach(item => {
+            sortedExplanations.forEach(item => {
                 const optionEl = document.createElement('div');
                 optionEl.classList.add('flashcard-option-detailed');
                 
@@ -745,102 +1088,9 @@
             });
         }
         
-        /**
-         * Mengambil penjelasan dari Gemini API
+        /* * FUNGSI fetchFlashcardExplanations() DIHAPUS
+         * (Fungsi AI tidak diperlukan lagi)
          */
-        async function fetchFlashcardExplanations(questionObject) {
-            // Tampilkan loading
-            flashcardAnswerList.innerHTML = '<div class="loader"></div>';
-
-            const apiKey = "AIzaSyDZpeK9i8afZfxfycgCqoHXqIDn-lVbzc8"; // API Key Pengguna
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-
-            // Prompt untuk Gemini
-            const userQuery = `
-                Untuk pertanyaan medis/anatomi berikut: "${questionObject.question}"
-                
-                Berikan penjelasan SINGKAT (1-2 kalimat) untuk SETIAP istilah dalam daftar ini.
-                PENTING: Tentukan juga apakah istilah tersebut adalah jawaban yang BENAR atau SALAH untuk pertanyaan itu.
-                
-                Istilah:
-                ${questionObject.options.join('\n')}
-            `;
-
-            // Skema JSON yang diharapkan
-            const schema = {
-                type: "ARRAY",
-                items: {
-                    type: "OBJECT",
-                    properties: {
-                        "term": { "type": "STRING" },
-                        "explanation": { "type": "STRING" },
-                        "isCorrect": { "type": "BOOLEAN" }
-                    },
-                    required: ["term", "explanation", "isCorrect"]
-                }
-            };
-
-            const payload = {
-                contents: [{ parts: [{ text: userQuery }] }],
-                generationConfig: {
-                    responseMimeType: "application/json",
-                    responseSchema: schema,
-                },
-                // System instruction untuk memastikan kualitas
-                systemInstruction: {
-                    parts: [{ text: "Anda adalah asisten pengajar medis yang ahli dalam anatomi dan neurosains. Berikan jawaban yang akurat, ringkas, dan jelas dalam Bahasa Indonesia." }]
-                }
-            };
-
-            let response;
-            let retries = 0;
-            const maxRetries = 3;
-            let delay = 1000; // 1 detik
-
-            while (retries < maxRetries) {
-                try {
-                    response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (response.ok) {
-                        const result = await response.json();
-                        
-                        if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0].text) {
-                            const jsonText = result.candidates[0].content.parts[0].text;
-                            const parsedJson = JSON.parse(jsonText);
-                            
-                            // Urutkan agar jawaban benar selalu di atas
-                            parsedJson.sort((a, b) => (a.isCorrect === b.isCorrect) ? 0 : a.isCorrect ? -1 : 1);
-                            
-                            // Simpan ke cache
-                            questionObject.explanations = parsedJson;
-                            
-                            // Render ke UI
-                            renderExplanations(parsedJson);
-                            return; // Sukses, keluar dari fungsi
-                        }
-                    }
-                    
-                    // Jika response not ok atau data tidak ada, throw error untuk retry
-                    throw new Error('API response not OK or data missing');
-
-                } catch (error) {
-                    retries++;
-                    if (retries >= maxRetries) {
-                        // Gagal setelah semua retry
-                        flashcardAnswerList.innerHTML = '<p class="text-center text-white">Maaf, gagal memuat penjelasan. Coba lagi nanti.</p>';
-                        console.error('Error fetching explanations after retries:', error);
-                        return; // Keluar dari fungsi
-                    }
-                    // Tunggu sebelum retry (exponential backoff)
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                    delay *= 2;
-                }
-            }
-        }
 
 
         /**
@@ -990,7 +1240,7 @@
 
         // --- Event Listeners ---
         
-        initializeQuestions(); // Panggil inisialisasi cache
+        /* Panggilan initializeQuestions() dihapus */
         
         // Menu Utama
         startFlashcardBtn.addEventListener('click', startFlashcardMode);
