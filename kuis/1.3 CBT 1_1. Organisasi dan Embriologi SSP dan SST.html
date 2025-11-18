@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kuis Embriologi SSP/SST - 20 Soal</title>
+    <title>Kuis Embriologi SSP/SST - 35 Soal</title>
     <!-- Impor Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -264,7 +264,7 @@
     <!-- 1. Layar Mulai (Pilih Mode) -->
     <div id="start-screen" class="quiz-container text-center">
         <h1 class="text-3xl md:text-4xl mb-6">KUIS EMBRIOLOGI</h1>
-        <p class="mb-10 text-lg">SSP & SST - 20 SOAL</p>
+        <p class="mb-10 text-lg">SSP & SST - 35 SOAL</p>
         <div class="flex flex-col">
             <button id="start-flashcard-btn" class="action-btn">Mode Flashcard</button>
             <button id="start-practice-btn" class="action-btn">Mode Latihan</button>
@@ -276,7 +276,7 @@
     <div id="quiz-screen" class="quiz-container hidden w-full max-w-4xl">
         <!-- Info Progress & Skor -->
         <div class="flex justify-between items-center mb-6">
-            <span id="progress-text">Soal 1 / 20</span>
+            <span id="progress-text">Soal 1 / 35</span>
             <span id="score-text">Skor: 0</span>
         </div>
         
@@ -307,7 +307,7 @@
     <!-- 3. Layar Flashcard (Tersembunyi) -->
     <div id="flashcard-screen" class="quiz-container hidden w-full max-w-2xl">
         <!-- Progress Flashcard -->
-        <span id="flashcard-progress" class="block text-center mb-6">1 / 20</span>
+        <span id="flashcard-progress" class="block text-center mb-6">1 / 35</span>
         
         <!-- Flashcard -->
         <div id="flashcard">
@@ -339,7 +339,7 @@
     <!-- 4. Layar Hasil (Tersembunyi) -->
     <div id="result-screen" class="quiz-container text-center hidden">
         <h1 class="text-3xl mb-6">KUIS SELESAI!</h1>
-        <p id="final-score-text" class="text-4xl my-10">SKOR ANDA: 0 / 20</p>
+        <p id="final-score-text" class="text-4xl my-10">SKOR ANDA: 0 / 35</p>
         <!-- Tombol Review BARU -->
         <div class="flex flex-col md:flex-row justify-center gap-4">
             <button id="review-button" class="action-btn text-xl hidden">Review Kuis</button>
@@ -605,6 +605,189 @@
                     "Sistem Saraf Embriologis": "SALAH. Ini merujuk pada pembagian vesikula (misal: Prosencephalon).",
                     "Vesikula Otak": "SALAH. Ini adalah pembagian embriologis dari SSP.",
                     "Hanya Otak": "SALAH. Pembagian ini melibatkan saraf di seluruh tubuh."
+                }
+            },
+            
+            // --- SOAL TAMBAHAN (21-35) ---
+            
+            { // 21
+                question: "Manakah dari sel glia berikut yang berfungsi membentuk sawar darah otak (blood-brain barrier) di SSP?",
+                options: ["Oligodendrosit", "Mikroglia", "Sel Ependim", "Astrosit", "Sel Schwann"],
+                correct: "Astrosit",
+                explanations: {
+                    "Oligodendrosit": "SALAH. Oligodendrosit berfungsi membentuk mielin di SSP.",
+                    "Mikroglia": "SALAH. Mikroglia berfungsi sebagai sel imun (fagosit) di SSP.",
+                    "Sel Ependim": "SALAH. Sel Ependim melapisi ventrikel dan memproduksi cairan serebrospinal.",
+                    "Astrosit": "BENAR. Astrosit memiliki 'kaki perivaskular' yang menyelimuti kapiler dan berkontribusi besar dalam pembentukan sawar darah otak.",
+                    "Sel Schwann": "SALAH. Sel Schwann berada di SST, bukan SSP, dan berfungsi membentuk mielin di SST."
+                }
+            },
+            { // 22
+                question: "Sel glia yang berfungsi membentuk selubung mielin di Susunan Saraf Tepi (SST) adalah...",
+                options: ["Astrosit", "Oligodendrosit", "Sel Satelit", "Mikroglia", "Sel Schwann"],
+                correct: "Sel Schwann",
+                explanations: {
+                    "Astrosit": "SALAH. Astrosit adalah sel pendukung di SSP yang membentuk sawar darah otak.",
+                    "Oligodendrosit": "SALAH. Oligodendrosit membentuk mielin di SSP, bukan SST. Satu oligodendrosit bisa memielinasi beberapa akson.",
+                    "Sel Satelit": "SALAH. Sel satelit adalah sel pendukung di SST, tetapi fungsinya menyokong badan sel di ganglion.",
+                    "Mikroglia": "SALAH. Mikroglia adalah sel imun di SSP.",
+                    "Sel Schwann": "BENAR. Sel Schwann membungkus akson di SST untuk membentuk selubung mielin. Satu sel Schwann hanya memielinasi satu segmen akson."
+                }
+            },
+            { // 23
+                question: "Struktur di ektoderm yang menjadi penanda dimulainya proses Gastrulasi pada minggu ke-3 adalah...",
+                options: ["Notokord", "Primitive Streak (Garis Primitif)", "Neural Plate (Lempeng Saraf)", "Blastodisc", "Morula"],
+                correct: "Primitive Streak (Garis Primitif)",
+                explanations: {
+                    "Notokord": "SALAH. Notokord terbentuk dari mesoderm setelah gastrulasi dimulai.",
+                    "Primitive Streak (Garis Primitif)": "BENAR. Gastrulasi, proses pembentukan 3 lapisan germinal, dimulai dengan terbentuknya primitive streak, tempat sel ektoderm bermigrasi ke dalam.",
+                    "Neural Plate (Lempeng Saraf)": "SALAH. Neural plate terbentuk setelah gastrulasi, sebagai hasil induksi dari notokord.",
+                    "Blastodisc": "SALAH. Blastodisc adalah struktur 2 lapis (ektoderm & endoderm) sebelum gastrulasi.",
+                    "Morula": "SALAH. Morula adalah tahap bola sel padat sebelum blastulasi."
+                }
+            },
+            { // 24
+                question: "Struktur dari mesoderm yang berperan PENTING menginduksi ektoderm di atasnya untuk menebal menjadi lempeng saraf (neural plate) adalah...",
+                options: ["Krista Neuralis", "Tabung Neural", "Notokord", "Primitive Streak", "Endoderm"],
+                correct: "Notokord",
+                explanations: {
+                    "Krista Neuralis": "SALAH. Krista neuralis adalah turunan dari ektoderm, bukan penginduksi.",
+                    "Tabung Neural": "SALAH. Tabung neural adalah hasil dari induksi, bukan penginduksinya.",
+                    "Notokord": "BENAR. Notokord adalah batang dari sel-sel mesoderm di garis tengah yang melepaskan sinyal kimia (menginduksi) ektoderm di atasnya untuk memulai proses neurulasi.",
+                    "Primitive Streak": "SALAH. Primitive streak adalah tempat gastrulasi terjadi, sebelum induksi neurulasi.",
+                    "Endoderm": "SALAH. Endoderm adalah lapisan germinal bawah."
+                }
+            },
+            { // 25
+                question: "Pada perkembangan medulla spinalis, struktur apakah yang memisahkan Plat Alar (sensorik) dari Plat Basal (motorik)?",
+                options: ["Kanalis Sentralis", "Zona Marginal", "Sulcus Limitans", "Neuroporus Kaudalis", "Rhombic Lips"],
+                correct: "Sulcus Limitans",
+                explanations: {
+                    "Kanalis Sentralis": "SALAH. Ini adalah rongga di tengah medulla spinalis.",
+                    "Zona Marginal": "SALAH. Ini adalah lapisan terluar (substansia alba).",
+                    "Sulcus Limitans": "BENAR. Ini adalah alur longitudinal di dinding lateral tabung saraf yang memisahkan area dorsal (Alar/sensorik) dari area ventral (Basal/motorik).",
+                    "Neuroporus Kaudalis": "SALAH. Ini adalah lubang di ujung tabung saraf.",
+                    "Rhombic Lips": "SALAH. Ini adalah struktur di otak belakang yang membentuk serebelum."
+                }
+            },
+            { // 26
+                question: "Plat Alar (bagian dorsal) dari tabung saraf akan berkembang menjadi struktur yang memiliki fungsi utama...",
+                options: ["Motorik Somatik", "Motorik Viseral (Otonom)", "Sensorik", "Menghubungkan hemisfer", "Memproduksi mielin"],
+                correct: "Sensorik",
+                explanations: {
+                    "Motorik Somatik": "SALAH. Ini adalah fungsi dari Plat Basal (kornu ventralis).",
+                    "Motorik Viseral (Otonom)": "SALAH. Ini juga fungsi dari Plat Basal (kornu lateralis).",
+                    "Sensorik": "BENAR. Plat Alar menerima input sensorik dan berkembang menjadi kornu dorsalis (tanduk abu-abu belakang) di medulla spinalis dan nukleus sensorik di batang otak.",
+                    "Menghubungkan hemisfer": "SALAH. Ini adalah fungsi corpus callosum.",
+                    "Memproduksi mielin": "SALAH. Ini adalah fungsi oligodendrosit."
+                }
+            },
+            { // 27
+                question: "Plat Basal (bagian ventral) dari tabung saraf akan berkembang menjadi kornu (tanduk) di medulla spinalis yang berfungsi sebagai...",
+                options: ["Pusat relay sensorik", "Pusat motorik", "Jalur substansia alba", "Sawar darah otak", "Pusat refleks visual"],
+                correct: "Pusat motorik",
+                explanations: {
+                    "Pusat relay sensorik": "SALAH. Ini adalah fungsi dari Plat Alar (kornu dorsalis).",
+                    "Pusat motorik": "BENAR. Plat Basal berkembang menjadi kornu ventralis (motorik somatik) dan kornu lateralis (motorik otonom), tempat badan sel neuron motorik berada.",
+                    "Jalur substansia alba": "SALAH. Ini adalah Zona Marginal, bukan Plat Basal (yang menjadi substansia grisea).",
+                    "Sawar darah otak": "SALAH. Ini adalah fungsi astrosit.",
+                    "Pusat refleks visual": "SALAH. Ini adalah fungsi colliculus superior (turunan Mesencephalon)."
+                }
+            },
+            { // 28
+                question: "Selama perkembangan medulla spinalis, badan sel neuron (neuroblas) bermigrasi dari Zona Ventrikular untuk membentuk...",
+                options: ["Zona Marginal (Substansia Alba)", "Zona Intermediet (Substansia Grisea)", "Sel Ependim", "Kanalis Sentralis", "Notokord"],
+                correct: "Zona Intermediet (Substansia Grisea)",
+                explanations: {
+                    "Zona Marginal (Substansia Alba)": "SALAH. Zona marginal adalah lapisan terluar yang berisi akson, bukan badan sel.",
+                    "Zona Intermediet (Substansia Grisea)": "BENAR. Sel-sel dari Zona Ventrikular (lapisan terdalam) bermigrasi ke luar untuk membentuk Zona Intermediet (Lapisan Mantel), yang menjadi substansia grisea (badan sel).",
+                    "Sel Ependim": "SALAH. Sel ependim adalah sisa dari Zona Ventrikular yang tidak bermigrasi.",
+                    "Kanalis Sentralis": "SALAH. Ini adalah rongga, bukan lapisan sel.",
+                    "Notokord": "SALAH. Notokord adalah struktur mesodermal yang terpisah."
+                }
+            },
+            { // 29
+                question: "Serebelum (otak kecil) berkembang dari penebalan bagian dorsal Plat Alar yang disebut...",
+                options: ["Tectum", "Tegmentum", "Corpus Striatum", "Rhombic Lips (Bibir Rombik)", "Infundibulum"],
+                correct: "Rhombic Lips (Bibir Rombik)",
+                explanations: {
+                    "Tectum": "SALAH. Tectum (colliculi) adalah turunan Plat Alar dari Mesencephalon.",
+                    "Tegmentum": "SALAH. Tegmentum adalah turunan Plat Basal dari Mesencephalon.",
+                    "Corpus Striatum": "SALAH. Ini adalah struktur di dalam Telencephalon.",
+                    "Rhombic Lips (Bibir Rombik)": "BENAR. Ini adalah penebalan di bagian dorsal-lateral dari Plat Alar Metencephalon, yang tumbuh dan menyatu untuk membentuk serebelum.",
+                    "Infundibulum": "SALAH. Ini adalah turunan Diencephalon yang membentuk hipofisis posterior."
+                }
+            },
+            { // 30
+                question: "Kelenjar Hipofisis (Pituitari) memiliki dua asal embriologi. Lobus anterior (Adenohipofisis) berasal dari...",
+                options: ["Ektoderm atap mulut (Kantung Rathke)", "Neuroektoderm Diencephalon (Infundibulum)", "Sel Krista Neuralis", "Mesoderm", "Plat Alar Myelencephalon"],
+                correct: "Ektoderm atap mulut (Kantung Rathke)",
+                explanations: {
+                    "Ektoderm atap mulut (Kantung Rathke)": "BENAR. Adenohipofisis berasal dari ektoderm permukaan (atap mulut primitif) yang tumbuh ke atas.",
+                    "Neuroektoderm Diencephalon (Infundibulum)": "SALAH. Ini adalah asal dari lobus posterior (Neurohipofisis).",
+                    "Sel Krista Neuralis": "SALAH. Krista neuralis tidak membentuk hipofisis.",
+                    "Mesoderm": "SALAH. Hipofisis berasal dari ektoderm.",
+                    "Plat Alar Myelencephalon": "SALAH. Ini membentuk nukleus sensorik di medula oblongata."
+                }
+            },
+            { // 31
+                question: "Pada Telencephalon, berkas akson masif (Kapsula Interna) tumbuh dan membagi Corpus Striatum menjadi...",
+                options: ["Talamus dan Hipotalamus", "Pons dan Serebelum", "Nukleus Kaudatus dan Nukleus Lentiformis", "Colliculus Superior dan Inferior", "Nukleus Grasilis dan Kuneatus"],
+                correct: "Nukleus Kaudatus dan Nukleus Lentiformis",
+                explanations: {
+                    "Talamus dan Hipotalamus": "SALAH. Ini adalah struktur Diencephalon.",
+                    "Pons dan Serebelum": "SALAH. Ini adalah struktur Metencephalon.",
+                    "Nukleus Kaudatus dan Nukleus Lentiformis": "BENAR. Corpus Striatum adalah massa substansia grisea di dasar Telencephalon yang dibagi oleh Kapsula Interna menjadi dua nukleus tersebut (bagian dari ganglia basalis).",
+                    "Colliculus Superior dan Inferior": "SALAH. Ini adalah Tectum di Mesencephalon.",
+                    "Nukleus Grasilis dan Kuneatus": "SALAH. Ini adalah nukleus sensorik di Myelencephalon (medula oblongata)."
+                }
+            },
+            { // 32
+                question: "Pada orang dewasa, ujung kaudal dari Medulla Spinalis (Conus Medullaris) umumnya berada di level vertebra...",
+                options: ["Koksigeal (Tulang Ekor)", "Sakral 2 (S2)", "Lumbal 5 (L5)", "Lumbal 1-2 (L1-L2)", "Torakal 12 (T12)"],
+                correct: "Lumbal 1-2 (L1-L2)",
+                explanations: {
+                    "Koksigeal (Tulang Ekor)": "SALAH. Ini adalah posisi pada embrio bulan ke-3, sebelum pertumbuhan diferensial.",
+                    "Sakral 2 (S2)": "SALAH. Ini mungkin level ujung kantung dural, tapi bukan medulla spinalis.",
+                    "Lumbal 5 (L5)": "SALAH. Ini terlalu rendah. Posisi ini ada pada bayi baru lahir (sekitar L3).",
+                    "Lumbal 1-2 (L1-L2)": "BENAR. Karena kolumna vertebralis tumbuh lebih cepat daripada tabung saraf, ujung medulla spinalis 'tertarik' ke atas dan berakhir di L1-L2 pada orang dewasa.",
+                    "Torakal 12 (T12)": "SALAH. Ini sedikit terlalu tinggi, L1-L2 adalah level yang paling umum diterima."
+                }
+            },
+            { // 33
+                question: "Manakah dari berikut ini yang BUKAN merupakan turunan dari Sel Krista Neuralis (Neural Crest Cells)?",
+                options: ["Melanosit (Sel Pigmen Kulit)", "Medula Adrenal (Sel Kromafin)", "Ganglion Radiks Dorsalis", "Sel Schwann", "Neuron Motorik (di Kornu Ventralis)"],
+                correct: "Neuron Motorik (di Kornu Ventralis)",
+                explanations: {
+                    "Melanosit (Sel Pigmen Kulit)": "SALAH. Ini adalah turunan krista neuralis yang bermigrasi jauh.",
+                    "Medula Adrenal (Sel Kromafin)": "SALAH. Ini adalah turunan krista neuralis (dianggap sebagai ganglion simpatik termodifikasi).",
+                    "Ganglion Radiks Dorsalis": "SALAH. Neuron sensorik di ganglion ini adalah turunan klasik krista neuralis.",
+                    "Sel Schwann": "SALAH. Sel glia di SST ini berasal dari krista neuralis.",
+                    "Neuron Motorik (di Kornu Ventralis)": "BENAR. Neuron motorik berasal dari Plat Basal di dalam Tabung Neural (SSP), bukan dari Krista Neuralis (SST)."
+                }
+            },
+            { // 34
+                question: "Sistem Saraf Simpatik berasal dari neuron preganglion di level...",
+                options: ["Kraniosakral (Otak dan Sakrum S2-S4)", "Torakolumbal (T1 - L3)", "Hanya Saraf Kranial", "Hanya Medulla Spinalis bagian Servikal", "Seluruh Medulla Spinalis"],
+                correct: "Torakolumbal (T1 - L3)",
+                explanations: {
+                    "Kraniosakral (Otak dan Sakrum S2-S4)": "SALAH. Ini adalah asal dari Sistem Saraf Parasimpatik.",
+                    "Torakolumbal (T1 - L3)": "BENAR. Sistem simpatik disebut juga sistem torakolumbal karena badan sel preganglionnya berada di kornu lateralis medulla spinalis dari T1 hingga L2/L3.",
+                    "Hanya Saraf Kranial": "SALAH. Ini hanya bagian dari sistem parasimpatik.",
+                    "Hanya Medulla Spinalis bagian Servikal": "SALAH. Bagian servikal tidak memiliki output otonom primer.",
+                    "Seluruh Medulla Spinalis": "SALAH. Outputnya terbatas pada T1-L3 (simpatik) dan S2-S4 (parasimpatik)."
+                }
+            },
+            { // 35
+                question: "Manakah ciri khas dari Sistem Saraf Parasimpatik?",
+                options: ["Serabut preganglion pendek, postganglion panjang", "Berasal dari level Torakolumbal", "Ganglion terletak dekat dengan organ target", "Ganglion terletak dekat dengan medulla spinalis (Rantai Paravertebral)", "Menggunakan Norepinefrin di organ target"],
+                correct: "Ganglion terletak dekat dengan organ target",
+                explanations: {
+                    "Serabut preganglion pendek, postganglion panjang": "SALAH. Ini adalah ciri khas sistem Simpatik.",
+                    "Berasal dari level Torakolumbal": "SALAH. Ini adalah ciri khas sistem Simpatik.",
+                    "Ganglion terletak dekat dengan organ target": "BENAR. Sistem parasimpatik memiliki serabut preganglion yang panjang (dari otak/sakrum) dan ganglion terminal yang terletak di dalam atau sangat dekat dengan organ target.",
+                    "Ganglion terletak dekat dengan medulla spinalis (Rantai Paravertebral)": "SALAH. Ini adalah ciri khas sistem Simpatik.",
+                    "Menggunakan Norepinefrin di organ target": "SALAH. Sistem parasimpatik utamanya menggunakan Asetilkolin (ACh) di organ target."
                 }
             }
         ];
