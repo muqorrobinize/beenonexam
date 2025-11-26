@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deadmatch 1.3: Evolution - FK Unsoed 25</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #05010a; /* Deepest Void */
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(88, 28, 135, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(217, 70, 239, 0.1) 0px, transparent 50%);
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            border-color: rgba(168, 85, 247, 0.5);
+            box-shadow: 0 10px 40px -10px rgba(168, 85, 247, 0.3);
+        }
+
+        .text-glow {
+            text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f0518; }
+        ::-webkit-scrollbar-thumb { background: #4c1d95; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6d28d9; }
+
+        /* Animations */
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .animate-pulse-slow {
+            animation: pulse-glow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+<body class="text-gray-200 min-h-screen antialiased selection:bg-purple-500 selection:text-white">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        
+        <!-- Header -->
+        <header class="text-center mb-12 relative">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-purple-600/20 rounded-full blur-[100px] -z-10"></div>
+            <h1 class="text-5xl md:text-7xl font-bold tracking-tight mb-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-fuchsia-300 to-indigo-400 text-glow">
+                EVOLUTION
+            </h1>
+            <p class="text-gray-400 text-lg md:text-xl font-light tracking-wide uppercase">Blok 1.2 <span class="text-purple-500 mx-2">➔</span> Blok 1.3 Comparison</p>
+        </header>
+
+        <!-- Search & Filter -->
+        <div class="sticky top-4 z-40 mb-10">
+            <div class="max-w-3xl mx-auto relative group">
+                <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+                <input type="text" id="searchInput" 
+                    class="relative w-full bg-[#0f0518]/90 backdrop-blur-xl border border-white/10 rounded-full py-4 px-8 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all shadow-2xl" 
+                    placeholder="Cari Nama, NIM, atau Gelar (e.g., 'Comeback King')...">
+                <div class="absolute right-6 top-1/2 -translate-y-1/2 text-purple-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Quick Stats -->
+            <div class="flex justify-center gap-4 mt-4 text-xs md:text-sm text-gray-400 font-mono">
+                <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Improved</div>
+                <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-400"></span> Declined</div>
+                <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-yellow-400"></span> Top 10</div>
+            </div>
+        </div>
+
+        <!-- Grid -->
+        <div id="student-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <!-- Cards Injected via JS -->
+        </div>
+        
+        <div id="loading" class="text-center py-20 text-purple-400 animate-pulse">
+            Memproses Data Evolusi...
+        </div>
+
+        <div id="not-found" class="text-center py-20 hidden">
+            <h2 class="text-2xl font-bold text-gray-600">Data tidak ditemukan.</h2>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" id="modal-backdrop"></div>
+        <div class="relative bg-[#0f0518] border border-purple-500/20 w-full max-w-5xl rounded-3xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]" id="modal-content">
+            
+            <!-- Modal Header -->
+            <div class="p-6 md:p-8 border-b border-white/5 bg-gradient-to-r from-purple-900/20 to-transparent flex justify-between items-start">
+                <div>
+                    <h2 id="modal-name" class="text-2xl md:text-3xl font-bold text-white mb-1">Nama Mahasiswa</h2>
+                    <div class="flex items-center gap-3 text-sm">
+                        <span id="modal-nim" class="font-mono text-purple-300">NIM</span>
+                        <span id="modal-status" class="px-2 py-0.5 rounded text-xs font-bold bg-gray-800">STATUS</span>
+                    </div>
+                </div>
+                <button id="close-modal" class="text-gray-400 hover:text-white transition-colors">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Modal Body (Scrollable) -->
+            <div class="p-6 md:p-8 overflow-y-auto custom-scrollbar">
+                
+                <!-- Rank Evolution Banner -->
+                <div class="glass-card rounded-2xl p-6 mb-8 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-50"></div>
+                    
+                    <!-- Old Rank -->
+                    <div class="text-center opacity-60">
+                        <p class="text-xs uppercase tracking-widest text-gray-400 mb-1">Blok 1.2 Rank</p>
+                        <p id="modal-rank-old" class="text-4xl font-bold text-gray-300">#0</p>
+                    </div>
+
+                    <!-- Evolution Arrow -->
+                    <div class="flex flex-col items-center">
+                        <div id="modal-arrow-container" class="p-3 rounded-full bg-gray-800 mb-2">
+                            <!-- Icon injected js -->
+                        </div>
+                        <p id="modal-rank-diff" class="text-sm font-bold font-mono">--</p>
+                    </div>
+
+                    <!-- New Rank -->
+                    <div class="text-center relative">
+                        <div class="absolute -inset-4 bg-purple-500/20 blur-xl rounded-full"></div>
+                        <p class="text-xs uppercase tracking-widest text-purple-300 mb-1 relative">Blok 1.3 Rank</p>
+                        <p id="modal-rank-new" class="text-5xl font-black text-white relative">#0</p>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <!-- Stats Details -->
+                    <div class="space-y-6">
+                        <h3 class="text-xl font-bold text-white border-l-4 border-purple-500 pl-3">Komponen Nilai 1.3</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- Components injected via JS -->
+                            <div class="glass-card p-4 rounded-xl">
+                                <p class="text-xs text-gray-400 uppercase">SOCA</p>
+                                <p id="modal-soca" class="text-2xl font-bold text-white">0</p>
+                            </div>
+                            <div class="glass-card p-4 rounded-xl">
+                                <p class="text-xs text-gray-400 uppercase">Fisiologi</p>
+                                <p id="modal-fisio" class="text-2xl font-bold text-white">0</p>
+                            </div>
+                            <div class="glass-card p-4 rounded-xl">
+                                <p class="text-xs text-gray-400 uppercase">Histo (Ident)</p>
+                                <p id="modal-histo" class="text-2xl font-bold text-white">0</p>
+                            </div>
+                            <div class="glass-card p-4 rounded-xl">
+                                <p class="text-xs text-gray-400 uppercase">Anatomi</p>
+                                <p id="modal-anat" class="text-2xl font-bold text-white">0</p>
+                            </div>
+                            <div class="glass-card p-4 rounded-xl col-span-2 bg-gradient-to-r from-purple-900/30 to-blue-900/30">
+                                <div class="flex justify-between items-end">
+                                    <div>
+                                        <p class="text-xs text-gray-300 uppercase">Rata-rata CBT</p>
+                                        <p id="modal-cbt-avg" class="text-3xl font-bold text-white">0</p>
+                                    </div>
+                                    <div class="text-right text-xs text-gray-400">
+                                        <p>CBT 1: <span id="modal-cbt1" class="text-white">0</span></p>
+                                        <p>CBT 2: <span id="modal-cbt2" class="text-white">0</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chart -->
+                    <div class="glass-card p-4 rounded-2xl flex flex-col">
+                        <h3 class="text-sm font-bold text-gray-400 mb-4 uppercase text-center">Blok 1.2 vs Blok 1.3 Comparison</h3>
+                        <div class="relative flex-grow min-h-[250px]">
+                            <canvas id="comparisonChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA BLOK 1.2 (OLD) ---
+        // Extracted & Ranked from 'Deadmatch 1.2 Ranked.html'
+        const oldDataMap = {
+            "G1A025001": { "rank": 98, "nilai": 53.55, "anat": 72.78, "histo": 70, "cbt": 49.55 },
+            "G1A025002": { "rank": 54, "nilai": 66.06, "anat": 70, "histo": 82.91, "cbt": 67.75 },
+            "G1A025003": { "rank": 110, "nilai": 51.89, "anat": 43.33, "histo": 46.25, "cbt": 60.75 },
+            "G1A025004": { "rank": 82, "nilai": 59.29, "anat": 66.5, "histo": 86.67, "cbt": 65.85 },
+            "G1A025005": { "rank": 147, "nilai": 46.29, "anat": 55, "histo": 57.91, "cbt": 57.45 },
+            "G1A025006": { "rank": 17, "nilai": 78.08, "anat": 89.17, "histo": 42, "cbt": 67.3 },
+            "G1A025007": { "rank": 149, "nilai": 46.03, "anat": 75.5, "histo": 29.58, "cbt": 68.85 },
+            "G1A025008": { "rank": 113, "nilai": 51.23, "anat": 87.91, "histo": 43, "cbt": 56 },
+            "G1A025009": { "rank": 67, "nilai": 62.83, "anat": 81.67, "histo": 65.41, "cbt": 59.95 },
+            "G1A025010": { "rank": 42, "nilai": 69.56, "anat": 76.67, "histo": 89.58, "cbt": 67.25 },
+            "G1A025011": { "rank": 172, "nilai": 39.75, "anat": 43, "histo": 23.33, "cbt": 46.15 },
+            "G1A025012": { "rank": 21, "nilai": 75, "anat": 89.83, "histo": 77.91, "cbt": 80.25 },
+            "G1A025013": { "rank": 18, "nilai": 77.78, "anat": 80.5, "histo": 81.25, "cbt": 84.2 },
+            "G1A025014": { "rank": 22, "nilai": 74.53, "anat": 70.16, "histo": 77, "cbt": 80.25 },
+            "G1A025015": { "rank": 74, "nilai": 60.94, "anat": 51.6, "histo": 53.75, "cbt": 71.55 },
+            "G1A025016": { "rank": 32, "nilai": 70.98, "anat": 75.83, "histo": 85, "cbt": 82.25 },
+            "G1A025017": { "rank": 8, "nilai": 81.38, "anat": 84.16, "histo": 80.41, "cbt": 83.65 },
+            "G1A025018": { "rank": 36, "nilai": 70.2, "anat": 85.16, "histo": 77.1, "cbt": 68.55 },
+            "G1A025019": { "rank": 187, "nilai": 21.92, "anat": 11.33, "histo": 1.67, "cbt": 23.6 },
+            "G1A025020": { "rank": 90, "nilai": 56.89, "anat": 45.83, "histo": 67.75, "cbt": 57.25 },
+            "G1A025021": { "rank": 87, "nilai": 57.68, "anat": 40.83, "histo": 80.83, "cbt": 57.35 },
+            "G1A025022": { "rank": 93, "nilai": 55.54, "anat": 57.17, "histo": 60.83, "cbt": 56.15 },
+            "G1A025023": { "rank": 66, "nilai": 62.83, "anat": 44.5, "histo": 71.25, "cbt": 58.15 },
+            "G1A025024": { "rank": 176, "nilai": 35.33, "anat": 29, "histo": 22.08, "cbt": 43.65 },
+            "G1A025025": { "rank": 2, "nilai": 86.19, "anat": 93.33, "histo": 95.83, "cbt": 91.15 },
+            "G1A025026": { "rank": 70, "nilai": 62.06, "anat": 59.5, "histo": 65.41, "cbt": 69.55 },
+            "G1A025027": { "rank": 53, "nilai": 66.09, "anat": 82.66, "histo": 82.92, "cbt": 74.05 },
+            "G1A025028": { "rank": 48, "nilai": 67.56, "anat": 85.25, "histo": 85, "cbt": 75.85 },
+            "G1A025029": { "rank": 14, "nilai": 79.39, "anat": 79.33, "histo": 89.58, "cbt": 79 },
+            "G1A025030": { "rank": 86, "nilai": 58.12, "anat": 65.67, "histo": 62.08, "cbt": 64.55 },
+            "G1A025031": { "rank": 10, "nilai": 79.82, "anat": 79.67, "histo": 91.67, "cbt": 81.6 },
+            "G1A025032": { "rank": 69, "nilai": 62.21, "anat": 47.16, "histo": 86.66, "cbt": 60.05 },
+            "G1A025033": { "rank": 44, "nilai": 68.99, "anat": 73, "histo": 81.25, "cbt": 67.45 },
+            "G1A025034": { "rank": 182, "nilai": 33.27, "anat": 19.58, "histo": 10, "cbt": 51.9 },
+            "G1A025035": { "rank": 88, "nilai": 57.75, "anat": 86.3, "histo": 29.58, "cbt": 83.45 },
+            "G1A025036": { "rank": 178, "nilai": 34.88, "anat": 22.5, "histo": 12.92, "cbt": 43.7 },
+            "G1A025037": { "rank": 80, "nilai": 59.85, "anat": 62.17, "histo": 63.75, "cbt": 67.1 },
+            "G1A025038": { "rank": 156, "nilai": 44.46, "anat": 33, "histo": 63, "cbt": 57.45 },
+            "G1A025039": { "rank": 81, "nilai": 59.83, "anat": 65.17, "histo": 54.17, "cbt": 59.25 },
+            "G1A025040": { "rank": 111, "nilai": 51.66, "anat": 66.17, "histo": 47.5, "cbt": 54.1 },
+            "G1A025041": { "rank": 73, "nilai": 61.3, "anat": 78.88, "histo": 66.25, "cbt": 65.2 },
+            "G1A025042": { "rank": 64, "nilai": 63.62, "anat": 91.93, "histo": 75.83, "cbt": 59.4 },
+            "G1A025043": { "rank": 154, "nilai": 44.98, "anat": 31.67, "histo": 48.3, "cbt": 50.35 },
+            "G1A025044": { "rank": 76, "nilai": 60.54, "anat": 45.33, "histo": 76.67, "cbt": 74.6 },
+            "G1A025045": { "rank": 9, "nilai": 80.11, "anat": 82.93, "histo": 94.58, "cbt": 83.6 },
+            "G1A025046": { "rank": 184, "nilai": 30.28, "anat": 39.5, "histo": 35, "cbt": 28.55 },
+            "G1A025047": { "rank": 141, "nilai": 47.13, "anat": 54.88, "histo": 45, "cbt": 51.55 },
+            "G1A025048": { "rank": 97, "nilai": 54.14, "anat": 67.9, "histo": 42.5, "cbt": 54.85 },
+            "G1A025049": { "rank": 65, "nilai": 63.13, "anat": 56.17, "histo": 81, "cbt": 67.75 },
+            "G1A025050": { "rank": 186, "nilai": 22.87, "anat": 13.72, "histo": 7.25, "cbt": 24.15 },
+            "G1A025051": { "rank": 46, "nilai": 68.3, "anat": 49.5, "histo": 64.2, "cbt": 69.1 },
+            "G1A025052": { "rank": 79, "nilai": 60.14, "anat": 72.08, "histo": 65.5, "cbt": 60 },
+            "G1A025053": { "rank": 165, "nilai": 41.9, "anat": 79.17, "histo": 58.5, "cbt": 44.45 },
+            "G1A025054": { "rank": 29, "nilai": 71.69, "anat": 76.67, "histo": 79.58, "cbt": 85.95 },
+            "G1A025055": { "rank": 28, "nilai": 72.36, "anat": 71.5, "histo": 83.75, "cbt": 83.55 },
+            "G1A025056": { "rank": 37, "nilai": 70.2, "anat": 61.5, "histo": 74.42, "cbt": 69.2 },
+            "G1A025057": { "rank": 114, "nilai": 51.09, "anat": 78.3, "histo": 51.67, "cbt": 57 },
+            "G1A025059": { "rank": 95, "nilai": 55.08, "anat": 40, "histo": 43.5, "cbt": 53.8 },
+            "G1A025060": { "rank": 62, "nilai": 63.52, "anat": 71.5, "histo": 90, "cbt": 63.25 },
+            "G1A025061": { "rank": 68, "nilai": 62.46, "anat": 70.33, "histo": 66.67, "cbt": 66.55 },
+            "G1A025062": { "rank": 59, "nilai": 64.45, "anat": 68.6, "histo": 79.58, "cbt": 73.4 },
+            "G1A025063": { "rank": 92, "nilai": 55.62, "anat": 43.67, "histo": 37.08, "cbt": 69.7 },
+            "G1A025064": { "rank": 78, "nilai": 59.89, "anat": 74, "histo": 66.67, "cbt": 69.1 },
+            "G1A025065": { "rank": 30, "nilai": 71.59, "anat": 89.93, "histo": 75.83, "cbt": 75.3 },
+            "G1A025066": { "rank": 163, "nilai": 42.04, "anat": 35.83, "histo": 62, "cbt": 53.8 },
+            "G1A025067": { "rank": 112, "nilai": 51.36, "anat": 53.67, "histo": 44, "cbt": 70.2 },
+            "G1A025068": { "rank": 19, "nilai": 76.69, "anat": 81.83, "histo": 98.75, "cbt": 84.8 },
+            "G1A025069": { "rank": 140, "nilai": 47.54, "anat": 76, "histo": 40.41, "cbt": 63.25 },
+            "G1A025070": { "rank": 128, "nilai": 50, "anat": 72.43, "histo": 25.83, "cbt": 57 },
+            "G1A025071": { "rank": 72, "nilai": 61.57, "anat": 73, "histo": 62.91, "cbt": 52.2 },
+            "G1A025072": { "rank": 43, "nilai": 69.04, "anat": 68, "histo": 71, "cbt": 84.15 },
+            "G1A025073": { "rank": 50, "nilai": 67.12, "anat": 88.83, "histo": 76.25, "cbt": 76.45 },
+            "G1A025074": { "rank": 99, "nilai": 53.36, "anat": 57.08, "histo": 71.5, "cbt": 65.15 },
+            "G1A025075": { "rank": 107, "nilai": 52.07, "anat": 51.25, "histo": 48.17, "cbt": 62 },
+            "G1A025076": { "rank": 180, "nilai": 34.26, "anat": 33.83, "histo": 19.58, "cbt": 29.75 },
+            "G1A025077": { "rank": 164, "nilai": 41.93, "anat": 11.33, "histo": 21.67, "cbt": 66.4 },
+            "G1A025078": { "rank": 7, "nilai": 80.46, "anat": 74, "histo": 76.67, "cbt": 89.85 },
+            "G1A025079": { "rank": 61, "nilai": 64.25, "anat": 86.25, "histo": 78.67, "cbt": 75.95 },
+            "G1A025080": { "rank": 51, "nilai": 67.04, "anat": 73.83, "histo": 77.91, "cbt": 84.75 },
+            "G1A025081": { "rank": 85, "nilai": 58.15, "anat": 66.83, "histo": 66, "cbt": 72.7 },
+            "G1A025082": { "rank": 47, "nilai": 68.07, "anat": 87.08, "histo": 54, "cbt": 68.45 },
+            "G1A025083": { "rank": 63, "nilai": 62.55, "anat": 62, "histo": 72, "cbt": 62.7 },
+            "G1A025084": { "rank": 34, "nilai": 70.73, "anat": 67.83, "histo": 73.3, "cbt": 81.6 },
+            "G1A025086": { "rank": 57, "nilai": 64.88, "anat": 71.25, "histo": 54.17, "cbt": 79.75 },
+            "G1A025087": { "rank": 153, "nilai": 45.02, "anat": 50, "histo": 42.91, "cbt": 47.65 },
+            "G1A025088": { "rank": 56, "nilai": 64.95, "anat": 83, "histo": 50, "cbt": 57.05 },
+            "G1A025089": { "rank": 55, "nilai": 65.47, "anat": 78.3, "histo": 75, "cbt": 79.7 },
+            "G1A025091": { "rank": 71, "nilai": 61.38, "anat": 76.83, "histo": 87.91, "cbt": 61.35 },
+            "G1A025092": { "rank": 23, "nilai": 74.33, "anat": 92.91, "histo": 89, "cbt": 79.1 },
+            "G1A025093": { "rank": 66, "nilai": 62.86, "anat": 47.88, "histo": 85, "cbt": 81.55 },
+            "G1A025094": { "rank": 75, "nilai": 60.65, "anat": 35, "histo": 72.5, "cbt": 64.7 },
+            "G1A025095": { "rank": 15, "nilai": 78.57, "anat": 86.6, "histo": 76, "cbt": 80.5 },
+            "G1A025096": { "rank": 60, "nilai": 64.39, "anat": 72.16, "histo": 60, "cbt": 73.35 },
+            "G1A025097": { "rank": 52, "nilai": 65.76, "anat": 85.41, "histo": 83.33, "cbt": 68.4 },
+            "G1A025098": { "rank": 78, "nilai": 60.21, "anat": 42.5, "histo": 45.8, "cbt": 56.4 },
+            "G1A025099": { "rank": 63, "nilai": 63.62, "anat": 73.17, "histo": 92.9, "cbt": 73.35 },
+            "G1A025100": { "rank": 20, "nilai": 74.81, "anat": 68, "histo": 85.41, "cbt": 76.05 },
+            "G1A025101": { "rank": 137, "nilai": 47.97, "anat": 45.5, "histo": 45, "cbt": 49.55 },
+            "G1A025102": { "rank": 49, "nilai": 67.44, "anat": 55.41, "histo": 77.5, "cbt": 77.25 },
+            "G1A025103": { "rank": 55, "nilai": 64.98, "anat": 80, "histo": 60.83, "cbt": 65.85 },
+            "G1A025104": { "rank": 31, "nilai": 71.44, "anat": 86.97, "histo": 82.08, "cbt": 74.7 },
+            "G1A025105": { "rank": 16, "nilai": 78.08, "anat": 92.8, "histo": 89.58, "cbt": 83.6 },
+            "G1A025106": { "rank": 24, "nilai": 77.1, "anat": 87.08, "histo": 55, "cbt": 83.45 },
+            "G1A025107": { "rank": 152, "nilai": 45.16, "anat": 59.16, "histo": 61.5, "cbt": 41.85 },
+            "G1A025108": { "rank": 45, "nilai": 68.95, "anat": 76.5, "histo": 69.16, "cbt": 73.1 },
+            "G1A025109": { "rank": 27, "nilai": 72.45, "anat": 84.33, "histo": 68.33, "cbt": 77.25 },
+            "G1A025110": { "rank": 41, "nilai": 69.04, "anat": 75.17, "histo": 59.58, "cbt": 77.45 },
+            "G1A025111": { "rank": 127, "nilai": 50.12, "anat": 50, "histo": 54.16, "cbt": 59.5 },
+            "G1A025112": { "rank": 52, "nilai": 66.13, "anat": 85, "histo": 81.67, "cbt": 72.1 },
+            "G1A025113": { "rank": 38, "nilai": 69.95, "anat": 70.2, "histo": 85.41, "cbt": 79.7 },
+            "G1A025114": { "rank": 44, "nilai": 68.65, "anat": 88.67, "histo": 77.08, "cbt": 77.8 },
+            "G1A025115": { "rank": 58, "nilai": 64.09, "anat": 68.17, "histo": 63.75, "cbt": 72.2 },
+            "G1A025116": { "rank": 133, "nilai": 48.67, "anat": 39.67, "histo": 47.08, "cbt": 62.05 },
+            "G1A025117": { "rank": 183, "nilai": 31.15, "anat": 23.5, "histo": 33.08, "cbt": 49.3 },
+            "G1A025118": { "rank": 77, "nilai": 60.42, "anat": 56.67, "histo": 62.91, "cbt": 70.9 },
+            "G1A025119": { "rank": 185, "nilai": 29.54, "anat": 23.5, "histo": 30, "cbt": 43.2 },
+            "G1A025120": { "rank": 132, "nilai": 48.78, "anat": 38.04, "histo": 53.17, "cbt": 59.35 },
+            "G1A025121": { "rank": 142, "nilai": 47.01, "anat": 52.5, "histo": 35.38, "cbt": 60.15 },
+            "G1A025122": { "rank": 186, "nilai": 23.1, "anat": 20, "histo": 5, "cbt": 19.88 },
+            "G1A025123": { "rank": 135, "nilai": 48.32, "anat": 31.25, "histo": 40.33, "cbt": 50.35 },
+            "G1A025124": { "rank": 159, "nilai": 43.75, "anat": 25.67, "histo": 47, "cbt": 49.35 },
+            "G1A025125": { "rank": 51, "nilai": 66.66, "anat": 67.67, "histo": 67.64, "cbt": 78.45 },
+            "G1A025126": { "rank": 134, "nilai": 48.63, "anat": 48.17, "histo": 54.73, "cbt": 54.5 },
+            "G1A025127": { "rank": 103, "nilai": 52.94, "anat": 56.17, "histo": 71.25, "cbt": 60.65 },
+            "G1A025128": { "rank": 87, "nilai": 57.76, "anat": 60.22, "histo": 91.25, "cbt": 62 },
+            "G1A025129": { "rank": 89, "nilai": 57.53, "anat": 49.83, "histo": 62, "cbt": 77.1 },
+            "G1A025130": { "rank": 167, "nilai": 41.38, "anat": 51.67, "histo": 47, "cbt": 46.9 },
+            "G1A025131": { "rank": 125, "nilai": 50.61, "anat": 72.17, "histo": 53.89, "cbt": 58.85 },
+            "G1A025132": { "rank": 173, "nilai": 39.28, "anat": 18.83, "histo": 28.75, "cbt": 47.65 },
+            "G1A025133": { "rank": 96, "nilai": 54.33, "anat": 53.16, "histo": 54.5, "cbt": 67.55 },
+            "G1A025134": { "rank": 104, "nilai": 52.83, "anat": 54.33, "histo": 48.75, "cbt": 54.55 },
+            "G1A025135": { "rank": 33, "nilai": 70.89, "anat": 60.17, "histo": 90.4, "cbt": 69.7 },
+            "G1A025136": { "rank": 102, "nilai": 52.85, "anat": 37.42, "histo": 48.33, "cbt": 60.85 },
+            "G1A025138": { "rank": 129, "nilai": 49.91, "anat": 29.83, "histo": 45.41, "cbt": 52.6 },
+            "G1A025139": { "rank": 92, "nilai": 55.55, "anat": 44.67, "histo": 75, "cbt": 69.7 },
+            "G1A025140": { "rank": 181, "nilai": 33.91, "anat": 16.5, "histo": 31.88, "cbt": 39.95 },
+            "G1A025141": { "rank": 131, "nilai": 48.86, "anat": 38.16, "histo": 33, "cbt": 48.15 },
+            "G1A025142": { "rank": 101, "nilai": 52.87, "anat": 42.67, "histo": 48.75, "cbt": 65.2 },
+            "G1A025143": { "rank": 75, "nilai": 60.73, "anat": 63.83, "histo": 65.41, "cbt": 58.95 },
+            "G1A025144": { "rank": 185, "nilai": 29.05, "anat": 26, "histo": 24.17, "cbt": 32.25 },
+            "G1A025145": { "rank": 26, "nilai": 77.29, "anat": 69.33, "histo": 87.91, "cbt": 79.8 },
+            "G1A025146": { "rank": 91, "nilai": 55.76, "anat": 67.5, "histo": 52, "cbt": 59.5 },
+            "G1A025147": { "rank": 83, "nilai": 59.15, "anat": 61, "histo": 42, "cbt": 60.2 },
+            "G1A025148": { "rank": 47, "nilai": 67.57, "anat": 73.75, "histo": 65.41, "cbt": 82.75 },
+            "G1A025149": { "rank": 62, "nilai": 63.87, "anat": 42.3, "histo": 75, "cbt": 62.65 },
+            "G1A025150": { "rank": 155, "nilai": 44.58, "anat": 62.33, "histo": 77.5, "cbt": 54.1 },
+            "G1A025151": { "rank": 40, "nilai": 69.21, "anat": 67.83, "histo": 73.75, "cbt": 68.95 },
+            "G1A025152": { "rank": 109, "nilai": 51.9, "anat": 51.67, "histo": 52, "cbt": 60.1 },
+            "G1A025153": { "rank": 113, "nilai": 51.24, "anat": 23, "histo": 52.5, "cbt": 58.2 },
+            "G1A025154": { "rank": 85, "nilai": 57.88, "anat": 54.67, "histo": 28, "cbt": 77.7 },
+            "G1A025155": { "rank": 66, "nilai": 62.9, "anat": 57.17, "histo": 81, "cbt": 67.75 },
+            "G1A025156": { "rank": 130, "nilai": 49.3, "anat": 71.71, "histo": 53.75, "cbt": 46.8 },
+            "G1A025157": { "rank": 170, "nilai": 40.57, "anat": 23.67, "histo": 27.5, "cbt": 40.5 },
+            "G1A025159": { "rank": 171, "nilai": 40.25, "anat": 32.16, "histo": 71.5, "cbt": 44.95 },
+            "G1A025160": { "rank": 90, "nilai": 56.29, "anat": 61.05, "histo": 73.3, "cbt": 67.7 },
+            "G1A025161": { "rank": 188, "nilai": 27.13, "anat": 4.16, "histo": 71.5, "cbt": 31.65 },
+            "G1A025163": { "rank": 76, "nilai": 60.48, "anat": 65, "histo": 52.5, "cbt": 62.8 },
+            "G1A025164": { "rank": 189, "nilai": 26.95, "anat": 8, "histo": 10.83, "cbt": 38.6 },
+            "G1A025165": { "rank": 68, "nilai": 62.47, "anat": 73.26, "histo": 61.5, "cbt": 72.05 },
+            "G1A025166": { "rank": 150, "nilai": 45.31, "anat": 35.17, "histo": 25, "cbt": 52.6 },
+            "G1A025167": { "rank": 190, "nilai": 25.42, "anat": 20, "histo": 9.58, "cbt": 39.8 },
+            "G1A025168": { "rank": 96, "nilai": 54.4, "anat": 50.5, "histo": 56.67, "cbt": 50.25 },
+            "G1A025169": { "rank": 166, "nilai": 41.54, "anat": 54.67, "histo": 70, "cbt": 36.2 },
+            "G1A025170": { "rank": 179, "nilai": 32.4, "anat": 37.17, "histo": 25.83, "cbt": 46.15 },
+            "G1A025171": { "rank": 161, "nilai": 42.02, "anat": 39.5, "histo": 39.58, "cbt": 40.5 },
+            "G1A025172": { "rank": 110, "nilai": 51.6, "anat": 17.5, "histo": 61.5, "cbt": 58.85 },
+            "G1A025174": { "rank": 130, "nilai": 48.84, "anat": 33.33, "histo": 35.83, "cbt": 56.45 },
+            "G1A025175": { "rank": 153, "nilai": 45.45, "anat": 47.41, "histo": 66, "cbt": 58.8 },
+            "G1A025176": { "rank": 168, "nilai": 40.41, "anat": 50, "histo": 38, "cbt": 38.7 }
+        };
+
+        // --- DATA 1.3 (NEW) ---
+        // Extracted from PDF using User's Mapping Logic
+        const rawData13 = [
+            { "nim": "G1A025001", "nama": "MUSTIKA ZHAFARINA", "soca": 73.75, "fisio": 63, "histo": 14.75, "anat": 42, "cbt1": 72, "cbt2": 65.14, "nilai": 69.4, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025002", "nama": "ANINDITA RAHMAZYANTI", "soca": 81.25, "fisio": 70, "histo": 16.25, "anat": 49, "cbt1": 79, "cbt2": 73.14, "nilai": 73.28, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025003", "nama": "RONALD JASON NOVIANTO", "soca": 50, "fisio": 80, "histo": 10, "anat": 35, "cbt1": 65, "cbt2": 57.14, "nilai": 54.67, "grade": "D", "ket": "WAJIB REMED" },
+            { "nim": "G1A025004", "nama": "WANDA WIDYASWARA", "soca": 70, "fisio": 85, "histo": 14, "anat": 37, "cbt1": 70, "cbt2": 61.14, "nilai": 66, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025005", "nama": "NATASYA PUTRI AZALIA", "soca": 50, "fisio": 53.5, "histo": 10, "anat": 27, "cbt1": 58, "cbt2": 48.57, "nilai": 49.72, "grade": "D", "ket": "WAJIB REMED" },
+            { "nim": "G1A025006", "nama": "ALIF MUHAMMAD SATRIAS", "soca": 60, "fisio": 95, "histo": 12, "anat": 53, "cbt1": 93, "cbt2": 83.43, "nilai": 79.47, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025007", "nama": "ANGGUN SEKAR AMALIA", "soca": 57.5, "fisio": 75, "histo": 11.5, "anat": 35, "cbt1": 53, "cbt2": 50.29, "nilai": 53.16, "grade": "D", "ket": "WAJIB REMED" },
+            { "nim": "G1A025008", "nama": "MUHAMMAD RIZKI MAULANA", "soca": 31.25, "fisio": 80, "histo": 6.25, "anat": 42, "cbt1": 75, "cbt2": 66.86, "nilai": 56.8, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025009", "nama": "IVANA WIDYA PARAMITA", "soca": 87.5, "fisio": 78, "histo": 17.5, "anat": 43, "cbt1": 71, "cbt2": 65.14, "nilai": 69.81, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025010", "nama": "MIFTAKHUL RIZKY ALWI ZAKARIA", "soca": 82.5, "fisio": 84.5, "histo": 16.5, "anat": 50, "cbt1": 79, "cbt2": 73.71, "nilai": 76.03, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025011", "nama": "RIFA AFRIANTI PRIMANTO", "soca": 42.5, "fisio": 51, "histo": 8.5, "anat": 25, "cbt1": 57, "cbt2": 46.86, "nilai": 44.41, "grade": "E", "ket": "WAJIB REMED" },
+            { "nim": "G1A025012", "nama": "ARZETA HAFIFATUZZAHROH", "soca": 82.5, "fisio": 82.5, "histo": 16.5, "anat": 38, "cbt1": 87, "cbt2": 71.43, "nilai": 73.44, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025013", "nama": "ALYSA ILMI AULIA", "soca": 91.25, "fisio": 100, "histo": 18.25, "anat": 54, "cbt1": 93, "cbt2": 84, "nilai": 87.55, "grade": "A", "ket": "LULUS" },
+            { "nim": "G1A025014", "nama": "NURUL UZMA ARIFINIANTI", "soca": 90, "fisio": 97.5, "histo": 18, "anat": 48, "cbt1": 89, "cbt2": 78.29, "nilai": 79.29, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025015", "nama": "NASHWA RIHADATUL 'AISY", "soca": 88.75, "fisio": 70, "histo": 17.75, "anat": 38, "cbt1": 66, "cbt2": 59.43, "nilai": 66.58, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025016", "nama": "HAIBA ZAHWA ADNINDYA ZIEN", "soca": 80, "fisio": 98, "histo": 16, "anat": 44, "cbt1": 92, "cbt2": 77.71, "nilai": 79.56, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025017", "nama": "ARKAAN ARRASYID S", "soca": 67.5, "fisio": 85.5, "histo": 13.5, "anat": 48, "cbt1": 89, "cbt2": 78.29, "nilai": 77.18, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025018", "nama": "ANDHIKA NUR HAKIM", "soca": 51.25, "fisio": 90, "histo": 10.25, "anat": 46, "cbt1": 86, "cbt2": 75.43, "nilai": 70.91, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025019", "nama": "ILHAM RAMADHAN TAUFIQ", "soca": 51.25, "fisio": 25, "histo": 10.25, "anat": 18, "cbt1": 41, "cbt2": 33.71, "nilai": 30.77, "grade": "E", "ket": "WAJIB REMED" },
+            { "nim": "G1A025020", "nama": "SYIFA AULIA WIDIANA", "soca": 88, "fisio": 83, "histo": 17.6, "anat": 36, "cbt1": 65, "cbt2": 57.71, "nilai": 64.94, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025021", "nama": "NAYRAH BARIZKY RITONGA", "soca": 67.5, "fisio": 85, "histo": 13.5, "anat": 33, "cbt1": 64, "cbt2": 55.43, "nilai": 60.91, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025022", "nama": "NATASYA AURA PUTRI AHMAD", "soca": 78.7, "fisio": 82.5, "histo": 15.74, "anat": 38, "cbt1": 70, "cbt2": 61.71, "nilai": 66, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025023", "nama": "LUTHFI FADHILAH FATURAHMAN", "soca": 57.5, "fisio": 90, "histo": 11.5, "anat": 36, "cbt1": 77, "cbt2": 64.57, "nilai": 64.51, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025024", "nama": "NABILA QURROTA A'INI", "soca": 81.25, "fisio": 62.5, "histo": 16.25, "anat": 31, "cbt1": 57, "cbt2": 50.29, "nilai": 52.3, "grade": "D", "ket": "WAJIB REMED" },
+            { "nim": "G1A025025", "nama": "LOVINA DINA KAMILA", "soca": 96.25, "fisio": 100, "histo": 19.25, "anat": 59, "cbt1": 97, "cbt2": 89.14, "nilai": 90.64, "grade": "A", "ket": "LULUS" },
+            { "nim": "G1A025026", "nama": "AVELIKA LADYSA SHANETIN", "soca": 87.5, "fisio": 75, "histo": 17.5, "anat": 41, "cbt1": 66, "cbt2": 61.14, "nilai": 64.55, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025027", "nama": "SHARFINA AURIZMA TITANIA WARDANI", "soca": 95, "fisio": 87.5, "histo": 19, "anat": 45, "cbt1": 87, "cbt2": 75.43, "nilai": 81.44, "grade": "A", "ket": "LULUS" },
+            { "nim": "G1A025028", "nama": "RAFI HAZZA SAPUTRA", "soca": 77.5, "fisio": 85, "histo": 15.5, "anat": 49, "cbt1": 90, "cbt2": 79.43, "nilai": 79.54, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025029", "nama": "FATWA DINATA", "soca": 82.5, "fisio": 95, "histo": 16.5, "anat": 45, "cbt1": 90, "cbt2": 77.14, "nilai": 78.35, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025030", "nama": "REZA HARUN", "soca": 82.5, "fisio": 90, "histo": 16.5, "anat": 39, "cbt1": 76, "cbt2": 65.71, "nilai": 70.06, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025031", "nama": "AZKIYA HUSNABILA", "soca": 85, "fisio": 88.5, "histo": 17, "anat": 44, "cbt1": 86, "cbt2": 74.29, "nilai": 76.95, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025032", "nama": "DAVINA NATTAYA KOMARA", "soca": 70, "fisio": 86, "histo": 14, "anat": 33, "cbt1": 70, "cbt2": 58.86, "nilai": 62.96, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025033", "nama": "MARIA CATHLEEN LIEM", "soca": 96.25, "fisio": 90, "histo": 19.25, "anat": 48, "cbt1": 93, "cbt2": 80.57, "nilai": 84.37, "grade": "A", "ket": "LULUS" },
+            { "nim": "G1A025034", "nama": "AYU WULAN PUTRIANA", "soca": 28.75, "fisio": 50, "histo": 5.75, "anat": 29, "cbt1": 46, "cbt2": 42.86, "nilai": 36.69, "grade": "E", "ket": "WAJIB REMED" },
+            { "nim": "G1A025035", "nama": "KEISYA BEAUTY STANZA", "soca": 73.8, "fisio": 87.5, "histo": 14.76, "anat": 47, "cbt1": 81, "cbt2": 73.14, "nilai": 75.49, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025036", "nama": "MU'AFA NAZHMIR ROBBANI", "soca": 66.25, "fisio": 52.5, "histo": 13.25, "anat": 26, "cbt1": 44, "cbt2": 40, "nilai": 41.66, "grade": "E", "ket": "WAJIB REMED" },
+            { "nim": "G1A025037", "nama": "ZAWA HASNA ZAHIDAH", "soca": 88.75, "fisio": 92.5, "histo": 17.75, "anat": 44, "cbt1": 85, "cbt2": 73.71, "nilai": 75.07, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025038", "nama": "ANWA FATHIMA BIDZIKRI", "soca": 78, "fisio": 83, "histo": 15.6, "anat": 33, "cbt1": 67, "cbt2": 57.14, "nilai": 64.6, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025039", "nama": "MYCHA NAZILA SYAKIROH", "soca": 68.75, "fisio": 80, "histo": 13.75, "anat": 35, "cbt1": 72, "cbt2": 61.14, "nilai": 64.19, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025040", "nama": "MUHAMMAD RAFI' NAUFAREL", "soca": 60, "fisio": 75, "histo": 12, "anat": 37, "cbt1": 67, "cbt2": 59.43, "nilai": 59.44, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025041", "nama": "BATRISYIA ATHA RINDRA JAFNI", "soca": 90, "fisio": 84, "histo": 18, "anat": 44, "cbt1": 78, "cbt2": 69.71, "nilai": 73.58, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025042", "nama": "NAILA FIRDAUZI HARYADINA PUTRI", "soca": 81.25, "fisio": 90.5, "histo": 16.25, "anat": 45, "cbt1": 77, "cbt2": 69.71, "nilai": 73.2, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025043", "nama": "ASIYAH", "soca": 67.5, "fisio": 62.5, "histo": 13.5, "anat": 18, "cbt1": 52, "cbt2": 40, "nilai": 47.14, "grade": "D", "ket": "WAJIB REMED" },
+            { "nim": "G1A025044", "nama": "KHANSA JAHFALATHA BALQIS", "soca": 100, "fisio": 77.5, "histo": 20, "anat": 39, "cbt1": 73, "cbt2": 64, "nilai": 72.01, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025045", "nama": "NASYWA AMANIA HIDAYAT", "soca": 80, "fisio": 87.5, "histo": 16, "anat": 57, "cbt1": 90, "cbt2": 84, "nilai": 83.02, "grade": "A", "ket": "LULUS" },
+            { "nim": "G1A025046", "nama": "MONICA SANCI KONDAWE", "soca": 61.25, "fisio": 85.5, "histo": 12.25, "anat": 23, "cbt1": 47, "cbt2": 40, "nilai": 45.8, "grade": "E", "ket": "WAJIB REMED" },
+            { "nim": "G1A025047", "nama": "MUHAMMAD ALRIZA NASUTION", "soca": 57.5, "fisio": 85, "histo": 11.5, "anat": 36, "cbt1": 62, "cbt2": 56, "nilai": 58.15, "grade": "C", "ket": "WAJIB REMED" },
+            { "nim": "G1A025048", "nama": "HANIFA", "soca": 47.5, "fisio": 82.5, "histo": 9.5, "anat": 36, "cbt1": 66, "cbt2": 58.29, "nilai": 58.39, "grade": "C", "ket": "WAJIB REMED" },
+            { "nim": "G1A025049", "nama": "RIFQAH ZULFA AFANIN", "soca": 96.25, "fisio": 78, "histo": 19.25, "anat": 43, "cbt1": 91, "cbt2": 76.57, "nilai": 77.95, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025050", "nama": "MUHAMMAD NAUVAL PANJI AL HAKIM", "soca": 52.5, "fisio": 54, "histo": 10.5, "anat": 22, "cbt1": 45, "cbt2": 38.29, "nilai": 35.97, "grade": "E", "ket": "WAJIB REMED" },
+            { "nim": "G1A025051", "nama": "AMIRA BALQIS ASSABA", "soca": 67.5, "fisio": 85, "histo": 13.5, "anat": 45, "cbt1": 84, "cbt2": 73.71, "nilai": 72.77, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025052", "nama": "CLAIRINE ZERLINA HANIFAH", "soca": 80, "fisio": 75, "histo": 16, "anat": 41, "cbt1": 77, "cbt2": 67.43, "nilai": 68.94, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025053", "nama": "CHRISTIAN PRAJADI", "soca": 87.5, "fisio": 59.5, "histo": 17.5, "anat": 20, "cbt1": 57, "cbt2": 44, "nilai": 52.56, "grade": "D", "ket": "WAJIB REMED" },
+            { "nim": "G1A025054", "nama": "ALFI NISA DAMAYANTI", "soca": 51.25, "fisio": 93, "histo": 10.25, "anat": 47, "cbt1": 84, "cbt2": 74.86, "nilai": 71.68, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025055", "nama": "VANISSA FATHIAH ARDANI", "soca": 75, "fisio": 85, "histo": 15, "anat": 55, "cbt1": 92, "cbt2": 84, "nilai": 81.45, "grade": "A", "ket": "LULUS" },
+            { "nim": "G1A025056", "nama": "SIGIT PRAMBUDI DIENTI", "soca": 88.75, "fisio": 90, "histo": 17.75, "anat": 40, "cbt1": 81, "cbt2": 69.14, "nilai": 73.12, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025057", "nama": "MUHAMMAD UZAIR ABDILLAH", "soca": 66.25, "fisio": 90, "histo": 13.25, "anat": 38, "cbt1": 66, "cbt2": 59.43, "nilai": 63.45, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025059", "nama": "MAYCO CAHYA TRI ADINANSYAH", "soca": 80, "fisio": 80, "histo": 16, "anat": 25, "cbt1": 49, "cbt2": 42.29, "nilai": 50.3, "grade": "D", "ket": "WAJIB REMED" },
+            { "nim": "G1A025060", "nama": "NADIA CHERYL", "soca": 62.5, "fisio": 90, "histo": 12.5, "anat": 47, "cbt1": 79, "cbt2": 72, "nilai": 72.91, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025061", "nama": "NADIA CHAIRUNNISA OLIA PUTRI", "soca": 81.25, "fisio": 90.5, "histo": 16.25, "anat": 41, "cbt1": 74, "cbt2": 65.71, "nilai": 68.69, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025062", "nama": "LOKANANTA ARKIE AMSAL", "soca": 97.5, "fisio": 82.5, "histo": 19.5, "anat": 37, "cbt1": 78, "cbt2": 65.71, "nilai": 72.58, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025063", "nama": "M.DANAR RAMADHAN TARUNA", "soca": 48.75, "fisio": 76, "histo": 9.75, "anat": 38, "cbt1": 69, "cbt2": 61.14, "nilai": 59.32, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025064", "nama": "RAZITA KHAIRINA PRASAJA MARPAUNG", "soca": 65, "fisio": 93, "histo": 13, "anat": 54, "cbt1": 83, "cbt2": 78.29, "nilai": 73.3, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025065", "nama": "IRSYAD WAHYU MUHARROM", "soca": 76.25, "fisio": 80, "histo": 15.25, "anat": 40, "cbt1": 85, "cbt2": 71.43, "nilai": 72.45, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025066", "nama": "INGRID GAYATRI", "soca": 56.25, "fisio": 65, "histo": 11.25, "anat": 37, "cbt1": 51, "cbt2": 50.29, "nilai": 48.53, "grade": "D", "ket": "WAJIB REMED" },
+            { "nim": "G1A025067", "nama": "FADHILAH AZKA AFKARINA", "soca": 78.75, "fisio": 92.5, "histo": 15.75, "anat": 34, "cbt1": 66, "cbt2": 57.14, "nilai": 63.56, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025068", "nama": "GABRIEL DANENDRA SETYAWAN", "soca": 90, "fisio": 93, "histo": 18, "anat": 53, "cbt1": 87, "cbt2": 80, "nilai": 82.48, "grade": "A", "ket": "LULUS" },
+            { "nim": "G1A025069", "nama": "AMILAH AMATURRAHIM AL MUJAHIDAH", "soca": 57.5, "fisio": 85, "histo": 11.5, "anat": 38, "cbt1": 61, "cbt2": 56.57, "nilai": 58.16, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025070", "nama": "FARID HAMZAH PUTRA PRATAMA", "soca": 78.75, "fisio": 87.5, "histo": 15.75, "anat": 35, "cbt1": 77, "cbt2": 64, "nilai": 67.2, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025071", "nama": "JAMES SUDIANTO RACHMAPUTRA", "soca": 83.75, "fisio": 80, "histo": 16.75, "anat": 47, "cbt1": 81, "cbt2": 73.14, "nilai": 73.93, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025072", "nama": "KHAIRUNNISA AZKA FADILA", "soca": 68.75, "fisio": 91, "histo": 13.75, "anat": 45, "cbt1": 87, "cbt2": 75.43, "nilai": 74.66, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025073", "nama": "ISYRAFUDDIN ABDUN YASYKUR", "soca": 100, "fisio": 90, "histo": 20, "anat": 49, "cbt1": 91, "cbt2": 80, "nilai": 84.06, "grade": "A", "ket": "LULUS" },
+            { "nim": "G1A025074", "nama": "TSALITSA AFIFAH NIDAUL HAQ", "soca": 71.3, "fisio": 82.5, "histo": 14.26, "anat": 32, "cbt1": 70, "cbt2": 58.29, "nilai": 62.15, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025075", "nama": "AISYAH NUR AZIZAH", "soca": 83.75, "fisio": 83, "histo": 16.75, "anat": 39, "cbt1": 69, "cbt2": 61.71, "nilai": 68.04, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025076", "nama": "WAHYUDI", "soca": 50, "fisio": 72.5, "histo": 10, "anat": 19, "cbt1": 46, "cbt2": 37.14, "nilai": 39.36, "grade": "E", "ket": "WAJIB REMED" },
+            { "nim": "G1A025077", "nama": "KAUTSAR PANDYA RAHADYAN", "soca": 61.25, "fisio": 77.5, "histo": 12.25, "anat": 35, "cbt1": 69, "cbt2": 59.43, "nilai": 59.99, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025078", "nama": "CHRISTIAN ALLAN", "soca": 71.25, "fisio": 90, "histo": 14.25, "anat": 53, "cbt1": 91, "cbt2": 82.29, "nilai": 77.21, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025079", "nama": "DEWA AYU MADE SHINTA ANGELINA", "soca": 78.75, "fisio": 100, "histo": 15.75, "anat": 47, "cbt1": 83, "cbt2": 74.29, "nilai": 76.12, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025080", "nama": "DZAKI AMRU SYAFI", "soca": 62.5, "fisio": 85, "histo": 12.5, "anat": 46, "cbt1": 87, "cbt2": 76, "nilai": 72.61, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025081", "nama": "NAURA PUTRI ALEXANDRIA", "soca": 67.5, "fisio": 77.5, "histo": 13.5, "anat": 30, "cbt1": 73, "cbt2": 58.86, "nilai": 64.04, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025082", "nama": "ARKAN FAWWAZ INDARIO", "soca": 81.25, "fisio": 80.5, "histo": 16.25, "anat": 48, "cbt1": 83, "cbt2": 74.86, "nilai": 76.27, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025083", "nama": "GHANIA NAILA NOOR DZAKIYYAH", "soca": 71.3, "fisio": 87.5, "histo": 14.26, "anat": 43, "cbt1": 83, "cbt2": 72, "nilai": 70.05, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025084", "nama": "ANINDYA SAFIRA RIYANTO", "soca": 61.25, "fisio": 90, "histo": 12.25, "anat": 48, "cbt1": 82, "cbt2": 74.29, "nilai": 70.42, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025086", "nama": "UTHI FIDELA SALWA", "soca": 78.75, "fisio": 95, "histo": 15.75, "anat": 46, "cbt1": 83, "cbt2": 73.71, "nilai": 77.25, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025087", "nama": "AUFADHIYA KHAIRANI PUTRI", "soca": 42.5, "fisio": 77.5, "histo": 8.5, "anat": 30, "cbt1": 51, "cbt2": 46.29, "nilai": 47.34, "grade": "D", "ket": "WAJIB REMED" },
+            { "nim": "G1A025088", "nama": "HANUM PRIMANDA", "soca": 82.5, "fisio": 84, "histo": 16.5, "anat": 42, "cbt1": 75, "cbt2": 66.86, "nilai": 71.21, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025089", "nama": "IKA WIDIASTUTI", "soca": 56.25, "fisio": 90, "histo": 11.25, "anat": 41, "cbt1": 78, "cbt2": 68, "nilai": 67.1, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025091", "nama": "CLAUDIA ZAR'IN PUTRI JASMINE", "soca": 81.25, "fisio": 88, "histo": 16.25, "anat": 50, "cbt1": 92, "cbt2": 81.14, "nilai": 78.98, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025092", "nama": "SIXTEENOVA ARINI RAHMATIKA", "soca": 95, "fisio": 82.5, "histo": 19, "anat": 46, "cbt1": 86, "cbt2": 75.43, "nilai": 80, "grade": "A", "ket": "LULUS" },
+            { "nim": "G1A025093", "nama": "AMEERA JASMINE ZAIN", "soca": 67.5, "fisio": 90, "histo": 13.5, "anat": 37, "cbt1": 77, "cbt2": 65.14, "nilai": 67.46, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025094", "nama": "NADYANDRA ARETHA MAIRITZA", "soca": 73.75, "fisio": 87.5, "histo": 14.75, "anat": 40, "cbt1": 73, "cbt2": 64.57, "nilai": 68.83, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025095", "nama": "NADINE PRAMESTHA ARDHANI", "soca": 91.25, "fisio": 97.5, "histo": 18.25, "anat": 54, "cbt1": 91, "cbt2": 82.86, "nilai": 84.43, "grade": "A", "ket": "LULUS" },
+            { "nim": "G1A025096", "nama": "AMELIA AZZAHRA", "soca": 77.5, "fisio": 90, "histo": 15.5, "anat": 41, "cbt1": 78, "cbt2": 68, "nilai": 70.21, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025097", "nama": "RIFAT PRAMUDIA NASUTION", "soca": 62.5, "fisio": 67.5, "histo": 12.5, "anat": 37, "cbt1": 76, "cbt2": 64.57, "nilai": 62.73, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025098", "nama": "JAHFAL AL FARISI", "soca": 81.25, "fisio": 85, "histo": 16.25, "anat": 35, "cbt1": 61, "cbt2": 54.86, "nilai": 60.14, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025099", "nama": "ISTAVANIA NADIA MUFID", "soca": 67.5, "fisio": 82.5, "histo": 13.5, "anat": 35, "cbt1": 77, "cbt2": 64, "nilai": 64.79, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025100", "nama": "RISTY PUTERI KUSUMA MAHARDIKANINGSIH", "soca": 75, "fisio": 90, "histo": 15, "anat": 46, "cbt1": 89, "cbt2": 77.14, "nilai": 75.6, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025101", "nama": "CHELSEA ICHA PUTRI ANZANI", "soca": 60, "fisio": 77.5, "histo": 12, "anat": 27, "cbt1": 72, "cbt2": 56.57, "nilai": 55.27, "grade": "D", "ket": "WAJIB REMED" },
+            { "nim": "G1A025102", "nama": "DZAKWAN HAMMAM NAWAWI", "soca": 87.5, "fisio": 80, "histo": 17.5, "anat": 36, "cbt1": 84, "cbt2": 68.57, "nilai": 69.96, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025103", "nama": "YAZMINE", "soca": 52.5, "fisio": 77.5, "histo": 10.5, "anat": 45, "cbt1": 70, "cbt2": 65.71, "nilai": 62.12, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025104", "nama": "MAULIDIA ZULFA KARTIKA", "soca": 55, "fisio": 82.5, "histo": 11, "anat": 45, "cbt1": 74, "cbt2": 68, "nilai": 66.34, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025105", "nama": "SAVANA RIZKY PURNAMA", "soca": 100, "fisio": 87.5, "histo": 20, "anat": 54, "cbt1": 92, "cbt2": 83.43, "nilai": 86.28, "grade": "A", "ket": "LULUS" },
+            { "nim": "G1A025106", "nama": "YASMIN TAQIYAH TAMBUNAN", "soca": 70, "fisio": 92.5, "histo": 14, "anat": 49, "cbt1": 87, "cbt2": 77.71, "nilai": 77.56, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025107", "nama": "NACHAYA AROFAHNI WIJAYA", "soca": 58.75, "fisio": 87.5, "histo": 11.75, "anat": 39, "cbt1": 62, "cbt2": 57.71, "nilai": 59.06, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025108", "nama": "FRIDA MULIADEWI CHAERANI", "soca": 90, "fisio": 79, "histo": 18, "anat": 45, "cbt1": 88, "cbt2": 76, "nilai": 77.9, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025109", "nama": "GHANIY HILDAN RABBANI", "soca": 93.75, "fisio": 88, "histo": 18.75, "anat": 41, "cbt1": 83, "cbt2": 70.86, "nilai": 76.11, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025110", "nama": "ALTAF FIAN JUNINDA", "soca": 97.5, "fisio": 87.5, "histo": 19.5, "anat": 51, "cbt1": 91, "cbt2": 81.14, "nilai": 82.31, "grade": "A", "ket": "LULUS" },
+            { "nim": "G1A025111", "nama": "FADELLA AZZAHRA", "soca": 63.75, "fisio": 82.5, "histo": 12.75, "anat": 30, "cbt1": 67, "cbt2": 55.43, "nilai": 57.31, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025112", "nama": "HANINDITA NASTITI AYUNINGTIAS", "soca": 76.25, "fisio": 95, "histo": 15.25, "anat": 39, "cbt1": 84, "cbt2": 70.29, "nilai": 73.36, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025113", "nama": "TYANAYA RAHMA", "soca": 86, "fisio": 85, "histo": 17.2, "anat": 43, "cbt1": 77, "cbt2": 68.57, "nilai": 73.85, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025114", "nama": "CHINTYA PUTRI NABILAH", "soca": 56.25, "fisio": 75, "histo": 11.25, "anat": 44, "cbt1": 80, "cbt2": 70.86, "nilai": 68.79, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025115", "nama": "AISYA NURLANGIT FITRI", "soca": 81.25, "fisio": 88, "histo": 16.25, "anat": 42, "cbt1": 89, "cbt2": 74.86, "nilai": 75.04, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025116", "nama": "AVISA ZANDRA CITAGAMI", "soca": 46.3, "fisio": 85, "histo": 9.26, "anat": 42, "cbt1": 67, "cbt2": 62.29, "nilai": 58.01, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025117", "nama": "FIQYA SULISTIANI", "soca": 28.75, "fisio": 25, "histo": 5.75, "anat": 21, "cbt1": 52, "cbt2": 41.71, "nilai": 33.88, "grade": "E", "ket": "WAJIB REMED" },
+            { "nim": "G1A025118", "nama": "RAHMA GRISELDA INDRASTATA", "soca": 86, "fisio": 65, "histo": 17.2, "anat": 38, "cbt1": 65, "cbt2": 58.86, "nilai": 62.78, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025119", "nama": "KHESYIA NAFIA ATMOKO", "soca": 27.5, "fisio": 50, "histo": 5.5, "anat": 25, "cbt1": 42, "cbt2": 38.29, "nilai": 32.59, "grade": "E", "ket": "WAJIB REMED" },
+            { "nim": "G1A025120", "nama": "QAFFAL ZIAN QADSI", "soca": 62.5, "fisio": 80, "histo": 12.5, "anat": 29, "cbt1": 61, "cbt2": 51.43, "nilai": 53.9, "grade": "D", "ket": "WAJIB REMED" },
+            { "nim": "G1A025121", "nama": "KHAIRUNNISA AMIRA AZALIA", "soca": 66.25, "fisio": 38, "histo": 13.25, "anat": 27, "cbt1": 64, "cbt2": 52, "nilai": 54.29, "grade": "D", "ket": "WAJIB REMED" },
+            { "nim": "G1A025122", "nama": "MUHAMMAD RASYID SURYA WICAKSONO", "soca": 32.5, "fisio": 0, "histo": 6.5, "anat": 0, "cbt1": 0, "cbt2": 0, "nilai": 6.5, "grade": "E", "ket": "WAJIB REMED" },
+            { "nim": "G1A025123", "nama": "NAURA ALYA FASHIHA", "soca": 57.5, "fisio": 62.5, "histo": 11.5, "anat": 30, "cbt1": 52, "cbt2": 46.86, "nilai": 49.95, "grade": "D", "ket": "WAJIB REMED" },
+            { "nim": "G1A025124", "nama": "BUNGA PUTRI ANGGINA", "soca": 57.5, "fisio": 68.5, "histo": 11.5, "anat": 32, "cbt1": 59, "cbt2": 52, "nilai": 48.53, "grade": "D", "ket": "WAJIB REMED" },
+            { "nim": "G1A025125", "nama": "M. ANDHIKA PUTRA PRATAMA", "soca": 82.5, "fisio": 90, "histo": 16.5, "anat": 44, "cbt1": 81, "cbt2": 71.43, "nilai": 72.43, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025126", "nama": "HANENDI FAREL SANTAUSO", "soca": 50, "fisio": 68, "histo": 10, "anat": 33, "cbt1": 46, "cbt2": 45.14, "nilai": 49.12, "grade": "D", "ket": "WAJIB REMED" },
+            { "nim": "G1A025127", "nama": "JOVITA BERNADINE AZALIA DWIASTHI", "soca": 78.75, "fisio": 80.5, "histo": 15.75, "anat": 33, "cbt1": 52, "cbt2": 48.57, "nilai": 56.27, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025128", "nama": "RAISHA AQILA ARDANU", "soca": 56.25, "fisio": 82.5, "histo": 11.25, "anat": 35, "cbt1": 72, "cbt2": 61.14, "nilai": 61.58, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025129", "nama": "NAZLA RIFDA AQILLAH", "soca": 97.5, "fisio": 79, "histo": 19.5, "anat": 39, "cbt1": 73, "cbt2": 64, "nilai": 70.42, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025130", "nama": "SYAFIQ ATAULLAH GHAFFAR", "soca": 62.5, "fisio": 78, "histo": 12.5, "anat": 34, "cbt1": 65, "cbt2": 56.57, "nilai": 57.51, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025131", "nama": "ZIDAN ADI HENDRIK TRI PUTRA", "soca": 77.5, "fisio": 90, "histo": 15.5, "anat": 42, "cbt1": 73, "cbt2": 65.71, "nilai": 68.69, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025132", "nama": "FADHEL MUHAMMAD AIHAM", "soca": 28.75, "fisio": 71.5, "histo": 5.75, "anat": 30, "cbt1": 48, "cbt2": 44.57, "nilai": 39, "grade": "E", "ket": "WAJIB REMED" },
+            { "nim": "G1A025133", "nama": "AISYAH LOVIA ZAHRA ROCHMANA", "soca": 42.5, "fisio": 97.5, "histo": 8.5, "anat": 36, "cbt1": 65, "cbt2": 57.71, "nilai": 56, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025134", "nama": "BAGAS ARIEF SETYA WARDANA", "soca": 78.75, "fisio": 97.5, "histo": 15.75, "anat": 40, "cbt1": 86, "cbt2": 72, "nilai": 74.15, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025135", "nama": "KHAMIDYA SAFIRA", "soca": 96, "fisio": 89, "histo": 19.2, "anat": 45, "cbt1": 83, "cbt2": 73.14, "nilai": 76.7, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025136", "nama": "RIKO RAHARDIAN PUTRA WARDANA", "soca": 66.25, "fisio": 78, "histo": 13.25, "anat": 43, "cbt1": 70, "cbt2": 64.57, "nilai": 66, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025138", "nama": "TITEN WIGUNA", "soca": 65, "fisio": 95, "histo": 13, "anat": 30, "cbt1": 74, "cbt2": 59.43, "nilai": 61.11, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025139", "nama": "FANISA MAULIDA RAHARJA", "soca": 92.5, "fisio": 77.5, "histo": 18.5, "anat": 47, "cbt1": 81, "cbt2": 73.14, "nilai": 74.86, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025140", "nama": "DWINANDA FITRIANA PUTRI", "soca": 48.75, "fisio": 50, "histo": 9.75, "anat": 33, "cbt1": 49, "cbt2": 46.86, "nilai": 43.3, "grade": "E", "ket": "WAJIB REMED" },
+            { "nim": "G1A025141", "nama": "BERMASAUT ADIPUTRA TAMPUBOLON", "soca": 76, "fisio": 42.5, "histo": 15.2, "anat": 29, "cbt1": 60, "cbt2": 50.86, "nilai": 53.09, "grade": "D", "ket": "WAJIB REMED" },
+            { "nim": "G1A025142", "nama": "ZASKIA YUFLIHA ALYA NISA", "soca": 72.5, "fisio": 85, "histo": 14.5, "anat": 39, "cbt1": 66, "cbt2": 60, "nilai": 62.44, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025143", "nama": "SYAHRU SYABANA SETIYANTO", "soca": 92.5, "fisio": 95, "histo": 18.5, "anat": 32, "cbt1": 74, "cbt2": 60.57, "nilai": 69.93, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025144", "nama": "NISRINA ATIRA AFLAH GUNNARTO", "soca": 47.5, "fisio": 65, "histo": 9.5, "anat": 28, "cbt1": 36, "cbt2": 36.57, "nilai": 41.28, "grade": "E", "ket": "WAJIB REMED" },
+            { "nim": "G1A025145", "nama": "HASAN TRI GUNAWAN", "soca": 80, "fisio": 81, "histo": 16, "anat": 44, "cbt1": 83, "cbt2": 72.57, "nilai": 72.48, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025146", "nama": "NADHIRA YUSTRINA", "soca": 50, "fisio": 85, "histo": 10, "anat": 31, "cbt1": 69, "cbt2": 57.14, "nilai": 58.3, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025147", "nama": "WAHYU CAN ARUM PUTRI RAMBIATI", "soca": 73.75, "fisio": 95, "histo": 14.75, "anat": 38, "cbt1": 73, "cbt2": 63.43, "nilai": 68.92, "grade": "R", "ket": "LULUS" },
+            { "nim": "G1A025148", "nama": "ARSELAN RIZQY DARMAWAN", "soca": 77.5, "fisio": 81, "histo": 15.5, "anat": 43, "cbt1": 87, "cbt2": 74.29, "nilai": 74.05, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025149", "nama": "NARDIIN FATHIYYAH SUNYOTO", "soca": 100, "fisio": 90, "histo": 20, "anat": 32, "cbt1": 61, "cbt2": 53.14, "nilai": 62.28, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025150", "nama": "AQBIL REZKY BUNAYYA", "soca": 65, "fisio": 82.5, "histo": 13, "anat": 34, "cbt1": 55, "cbt2": 50.86, "nilai": 58.35, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025151", "nama": "MUHAMMAD THORIQ AL ROSYID", "soca": 83.75, "fisio": 86, "histo": 16.75, "anat": 49, "cbt1": 78, "cbt2": 72.57, "nilai": 75.42, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025152", "nama": "RAFI DINAN AL FARISI", "soca": 60, "fisio": 72, "histo": 12, "anat": 36, "cbt1": 61, "cbt2": 55.43, "nilai": 59.08, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025153", "nama": "MUHAMMAD FARRELL ARCHARD ZHAFIF SUCIPTO", "soca": 45, "fisio": 82, "histo": 9, "anat": 29, "cbt1": 57, "cbt2": 49.14, "nilai": 47.99, "grade": "D", "ket": "WAJIB REMED" },
+            { "nim": "G1A025154", "nama": "JOSEPHINE MELYNA EVANY ESTAFANA", "soca": 73.75, "fisio": 90, "histo": 14.75, "anat": 43, "cbt1": 78, "cbt2": 69.14, "nilai": 71.61, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025155", "nama": "GAFIN AULIA RAHARJO", "soca": 86.25, "fisio": 85, "histo": 17.25, "anat": 43, "cbt1": 78, "cbt2": 69.14, "nilai": 73.73, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025156", "nama": "CLEARY SHAYNA HANIN", "soca": 82.5, "fisio": 82.5, "histo": 16.5, "anat": 30, "cbt1": 54, "cbt2": 48, "nilai": 56.06, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025157", "nama": "RAZZA RASENDRIYA NANDANA ARDI", "soca": 46.25, "fisio": 62.5, "histo": 9.25, "anat": 29, "cbt1": 35, "cbt2": 36.57, "nilai": 40.85, "grade": "E", "ket": "WAJIB REMED" },
+            { "nim": "G1A025159", "nama": "KEYSHA FAUSTA ZAINI", "soca": 48.75, "fisio": 55.5, "histo": 9.75, "anat": 25, "cbt1": 52, "cbt2": 44, "nilai": 43.02, "grade": "E", "ket": "WAJIB REMED" },
+            { "nim": "G1A025160", "nama": "NADIYA BINTANG RAZIA NIKO", "soca": 60, "fisio": 90, "histo": 12, "anat": 37, "cbt1": 67, "cbt2": 59.43, "nilai": 62.07, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025161", "nama": "MOH. ILHAM ARDIATSYAH", "soca": 40, "fisio": 52.5, "histo": 8, "anat": 23, "cbt1": 40, "cbt2": 36, "nilai": 31.54, "grade": "E", "ket": "WAJIB REMED" },
+            { "nim": "G1A025163", "nama": "ASTRELLA AIMEE KHOIRUNNISA", "soca": 86, "fisio": 87.5, "histo": 17.2, "anat": 42, "cbt1": 81, "cbt2": 70.29, "nilai": 71.84, "grade": "B", "ket": "LULUS" },
+            { "nim": "G1A025164", "nama": "ATHIFATUL JANNAH", "soca": 53.75, "fisio": 65, "histo": 10.75, "anat": 19, "cbt1": 51, "cbt2": 40, "nilai": 39.09, "grade": "E", "ket": "WAJIB REMED" },
+            { "nim": "G1A025165", "nama": "MUHAMMAD SYAFIEQ ADZKA", "soca": 66.25, "fisio": 82.5, "histo": 13.25, "anat": 38, "cbt1": 71, "cbt2": 62.29, "nilai": 64.75, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025166", "nama": "SYIFA NURJANAH", "soca": 51.25, "fisio": 71.5, "histo": 10.25, "anat": 30, "cbt1": 53, "cbt2": 47.43, "nilai": 49.83, "grade": "D", "ket": "WAJIB REMED" },
+            { "nim": "G1A025167", "nama": "DIMAS ZAHRAN HERDYASSAGAF", "soca": 63.75, "fisio": 32.5, "histo": 12.75, "anat": 20, "cbt1": 39, "cbt2": 33.71, "nilai": 36.42, "grade": "E", "ket": "WAJIB REMED" },
+            { "nim": "G1A025168", "nama": "FARREL MOZA DHIYAUL HAQ", "soca": 0, "fisio": 65.5, "histo": 0, "anat": 40, "cbt1": 68, "cbt2": 61.71, "nilai": 48.7, "grade": "D", "ket": "WAJIB REMED" },
+            { "nim": "G1A025169", "nama": "REECHARD BURHANUDIN FUADY", "soca": 56.25, "fisio": 62.5, "histo": 11.25, "anat": 28, "cbt1": 70, "cbt2": 56, "nilai": 56.76, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025170", "nama": "ADDINI FATMA ARINI", "soca": 38.75, "fisio": 68.5, "histo": 7.75, "anat": 24, "cbt1": 40, "cbt2": 36.57, "nilai": 34.95, "grade": "E", "ket": "WAJIB REMED" },
+            { "nim": "G1A025171", "nama": "HANIN NAURA FARIHA", "soca": 47.5, "fisio": 42.5, "histo": 9.5, "anat": 34, "cbt1": 55, "cbt2": 50.86, "nilai": 48.02, "grade": "D", "ket": "WAJIB REMED" },
+            { "nim": "G1A025172", "nama": "AHMAD ABDUL HAQQI", "soca": 78, "fisio": 55, "histo": 15.6, "anat": 21, "cbt1": 40, "cbt2": 34.86, "nilai": 43.8, "grade": "E", "ket": "WAJIB REMED" },
+            { "nim": "G1A025173", "nama": "FASYA AULIA FAUSTINA", "soca": 68.75, "fisio": 88, "histo": 13.75, "anat": 31, "cbt1": 65, "cbt2": 54.86, "nilai": 59.87, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025174", "nama": "AHMAD MUQORROBIN", "soca": 52.5, "fisio": 79.5, "histo": 10.5, "anat": 34, "cbt1": 73, "cbt2": 61.14, "nilai": 58.87, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025175", "nama": "AKBAR BAGUS SRI ZENA", "soca": 60, "fisio": 80, "histo": 12, "anat": 29, "cbt1": 72, "cbt2": 57.71, "nilai": 58.19, "grade": "C", "ket": "BOLEH REMED" },
+            { "nim": "G1A025176", "nama": "RAFID NAUFAL NURIMANUZAKI", "soca": 76.25, "fisio": 62.5, "histo": 15.25, "anat": 31, "cbt1": 59, "cbt2": 51.43, "nilai": 54.96, "grade": "D", "ket": "WAJIB REMED" }
+        ];
+
+        // --- PROCESSING LOGIC ---
+        
+        let processedData = [];
+
+        function calculateRankAndStats() {
+            // 1. Sort by Nilai Akhir Descending to get New Rank
+            rawData13.sort((a, b) => b.nilai - a.nilai);
+
+            // 2. Assign Rank and Compare
+            rawData13.forEach((student, index) => {
+                const currentRank = index + 1;
+                const oldStats = oldDataMap[student.nim] || { rank: 999, nilai: 50, anat: 50, histo: 50, cbt: 50 };
+                const oldRank = oldStats.rank;
+                const oldNilai = oldStats.nilai;
+
+                // Difference Calculation
+                const rankDiff = oldRank - currentRank; // Positive means improved (e.g. 100 -> 50 = +50)
+                const scoreDiff = student.nilai - oldNilai;
+
+                // Determine Titles
+                let title = "";
+                let titleColor = "";
+                
+                // Title Logic
+                if (currentRank === 1) { title = "The Apex Sovereign"; titleColor = "text-amber-300"; }
+                else if (currentRank <= 3) { title = "Grand Duke"; titleColor = "text-amber-400"; }
+                else if (currentRank <= 10) { title = "Elite Knight"; titleColor = "text-purple-300"; }
+                
+                if (rankDiff > 50) { title = "Comeback King"; titleColor = "text-emerald-400"; }
+                else if (rankDiff < -50) { title = "Fallen Angel"; titleColor = "text-red-400"; }
+                
+                if (student.soca === 100 || student.fisio === 100) { title = "Perfect Score"; titleColor = "text-cyan-300"; }
+
+                processedData.push({
+                    ...student,
+                    rank: currentRank,
+                    rankDiff: rankDiff,
+                    scoreDiff: scoreDiff,
+                    oldStats: oldStats,
+                    title: title,
+                    titleColor: titleColor,
+                    cbtAvg: (student.cbt1 + student.cbt2) / 2
+                });
+            });
+        }
+
+        function getCardStyle(keterangan) {
+            if (keterangan.includes('LULUS')) return { border: 'border-emerald-500/30', bg: 'bg-emerald-900/10', text: 'text-emerald-400' };
+            if (keterangan.includes('BOLEH')) return { border: 'border-blue-500/30', bg: 'bg-blue-900/10', text: 'text-blue-400' };
+            return { border: 'border-red-500/30', bg: 'bg-red-900/10', text: 'text-red-400' };
+        }
+
+        function renderGrid(data) {
+            const grid = document.getElementById('student-grid');
+            grid.innerHTML = '';
+
+            data.forEach(student => {
+                const style = getCardStyle(student.ket);
+                
+                // Arrow Logic
+                const rankArrow = student.rankDiff > 0 
+                    ? `<span class="text-emerald-400 text-xs flex items-center">▲ ${student.rankDiff}</span>` 
+                    : (student.rankDiff < 0 ? `<span class="text-red-400 text-xs flex items-center">▼ ${Math.abs(student.rankDiff)}</span>` : '<span class="text-gray-500 text-xs">-</span>');
+
+                const scoreArrow = student.scoreDiff > 0 
+                    ? `<span class="text-emerald-400 text-[10px] ml-1">(+${student.scoreDiff.toFixed(1)})</span>` 
+                    : `<span class="text-red-400 text-[10px] ml-1">(${student.scoreDiff.toFixed(1)})</span>`;
+
+                const titleHtml = student.title 
+                    ? `<div class="mb-2"><span class="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${student.titleColor.replace('text', 'border')} ${student.titleColor} bg-white/5">${student.title}</span></div>`
+                    : '<div class="h-6"></div>';
+
+                const card = document.createElement('div');
+                card.className = `glass-card card-hover rounded-2xl p-5 relative overflow-hidden transition-all duration-300 group`;
+                card.setAttribute('data-search', `${student.nama.toLowerCase()} ${student.nim.toLowerCase()} ${student.title.toLowerCase()}`);
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2 relative z-10">
+                        <div>
+                            <h3 class="font-bold text-lg text-white leading-tight truncate w-48">${student.nama}</h3>
+                            <p class="text-xs text-gray-500 font-mono">${student.nim}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs text-gray-400 uppercase">Rank</p>
+                            <div class="flex flex-col items-end">
+                                <span class="text-3xl font-black text-white">#${student.rank}</span>
+                                ${rankArrow}
+                            </div>
+                        </div>
+                    </div>
+
+                    ${titleHtml}
+
+                    <div class="bg-black/40 rounded-lg p-3 grid grid-cols-2 gap-4 mb-4 backdrop-blur-sm border border-white/5">
+                        <div>
+                            <p class="text-[10px] text-gray-400 uppercase">Nilai Akhir</p>
+                            <div class="flex items-baseline">
+                                <span class="text-2xl font-bold text-white">${student.nilai.toFixed(2)}</span>
+                                ${scoreArrow}
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] text-gray-400 uppercase">Status</p>
+                            <span class="text-sm font-bold ${style.text}">${student.ket}</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1 relative z-10">
+                        <div class="flex justify-between text-xs">
+                            <span class="text-gray-400">Fisiologi</span>
+                            <div class="flex-1 mx-2 h-1.5 bg-gray-700 rounded-full self-center overflow-hidden">
+                                <div class="h-full bg-purple-500" style="width: ${student.fisio}%"></div>
+                            </div>
+                            <span class="font-mono text-white w-8 text-right">${student.fisio}</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-gray-400">SOCA</span>
+                            <div class="flex-1 mx-2 h-1.5 bg-gray-700 rounded-full self-center overflow-hidden">
+                                <div class="h-full bg-pink-500" style="width: ${student.soca}%"></div>
+                            </div>
+                            <span class="font-mono text-white w-8 text-right">${student.soca}</span>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span class="text-gray-400">CBT Avg</span>
+                            <div class="flex-1 mx-2 h-1.5 bg-gray-700 rounded-full self-center overflow-hidden">
+                                <div class="h-full bg-blue-500" style="width: ${student.cbtAvg}%"></div>
+                            </div>
+                            <span class="font-mono text-white w-8 text-right">${student.cbtAvg.toFixed(1)}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Decorative Glow -->
+                    <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-purple-600/20 rounded-full blur-3xl group-hover:bg-purple-600/30 transition-colors"></div>
+                `;
+
+                card.addEventListener('click', () => openModal(student));
+                grid.appendChild(card);
+            });
+            
+            document.getElementById('loading').classList.add('hidden');
+        }
+
+        // --- MODAL & CHART LOGIC ---
+        const modal = document.getElementById('modal');
+        const modalContent = document.getElementById('modal-content');
+        let comparisonChartInstance = null;
+
+        function openModal(student) {
+            // Populate Text Data
+            document.getElementById('modal-name').textContent = student.nama;
+            document.getElementById('modal-nim').textContent = student.nim;
+            
+            const style = getCardStyle(student.ket);
+            const statusEl = document.getElementById('modal-status');
+            statusEl.textContent = `${student.ket} (${student.grade})`;
+            statusEl.className = `px-3 py-1 rounded text-sm font-bold ${style.bg} ${style.text} border ${style.border}`;
+
+            // Rank Evolution
+            document.getElementById('modal-rank-old').textContent = student.oldStats.rank > 500 ? '?' : `#${student.oldStats.rank}`;
+            document.getElementById('modal-rank-new').textContent = `#${student.rank}`;
+            
+            const arrowContainer = document.getElementById('modal-arrow-container');
+            const diffText = document.getElementById('modal-rank-diff');
+            
+            if (student.rankDiff > 0) {
+                arrowContainer.innerHTML = '<span class="text-emerald-400 text-xl">▲</span>';
+                arrowContainer.className = 'p-3 rounded-full bg-emerald-900/30 border border-emerald-500/30 mb-2';
+                diffText.textContent = `+${student.rankDiff} Positions`;
+                diffText.className = 'text-sm font-bold font-mono text-emerald-400';
+            } else if (student.rankDiff < 0) {
+                arrowContainer.innerHTML = '<span class="text-red-400 text-xl">▼</span>';
+                arrowContainer.className = 'p-3 rounded-full bg-red-900/30 border border-red-500/30 mb-2';
+                diffText.textContent = `${student.rankDiff} Positions`;
+                diffText.className = 'text-sm font-bold font-mono text-red-400';
+            } else {
+                arrowContainer.innerHTML = '<span class="text-gray-400 text-xl">=</span>';
+                diffText.textContent = 'Stable';
+                diffText.className = 'text-sm font-bold font-mono text-gray-400';
+            }
+
+            // Scores
+            document.getElementById('modal-soca').textContent = student.soca;
+            document.getElementById('modal-fisio').textContent = student.fisio;
+            document.getElementById('modal-histo').textContent = student.histo; // Note: This is Identifikasi Histo (max 20 usually?)
+            document.getElementById('modal-anat').textContent = student.anat;
+            document.getElementById('modal-cbt-avg').textContent = student.cbtAvg.toFixed(1);
+            document.getElementById('modal-cbt1').textContent = student.cbt1;
+            document.getElementById('modal-cbt2').textContent = student.cbt2;
+
+            // Chart
+            renderChart(student);
+
+            // Show Modal
+            modal.classList.remove('pointer-events-none', 'opacity-0');
+            modalContent.classList.remove('scale-95');
+            modalContent.classList.add('scale-100');
+        }
+
+        function closeModal() {
+            modal.classList.add('pointer-events-none', 'opacity-0');
+            modalContent.classList.add('scale-95');
+            modalContent.classList.remove('scale-100');
+        }
+
+        function renderChart(student) {
+            const ctx = document.getElementById('comparisonChart').getContext('2d');
+            
+            if (comparisonChartInstance) {
+                comparisonChartInstance.destroy();
+            }
+
+            // Data Preparation for Chart
+            // We compare similar components: Anatomi, CBT Avg, Nilai Akhir
+            // Histo in 1.3 is "Identifikasi" (Small score), Histo in 1.2 was full subject. We cannot compare directly.
+            // We will compare: Anatomi, CBT, Nilai Akhir
+            
+            comparisonChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Anatomi', 'CBT Avg', 'Nilai Akhir'],
+                    datasets: [
+                        {
+                            label: 'Blok 1.2 (Old)',
+                            data: [student.oldStats.anat, student.oldStats.cbt, student.oldStats.nilai],
+                            backgroundColor: 'rgba(107, 114, 128, 0.5)',
+                            borderColor: 'rgba(107, 114, 128, 1)',
+                            borderWidth: 1,
+                            barPercentage: 0.6,
+                            categoryPercentage: 0.8
+                        },
+                        {
+                            label: 'Blok 1.3 (Current)',
+                            data: [student.anat, student.cbtAvg, student.nilai],
+                            backgroundColor: [
+                                'rgba(168, 85, 247, 0.7)', // Purple for Anat
+                                'rgba(59, 130, 246, 0.7)', // Blue for CBT
+                                student.scoreDiff >= 0 ? 'rgba(52, 211, 153, 0.8)' : 'rgba(248, 113, 113, 0.8)' // Green/Red for Final
+                            ],
+                            borderColor: [
+                                'rgba(168, 85, 247, 1)',
+                                'rgba(59, 130, 246, 1)',
+                                student.scoreDiff >= 0 ? 'rgba(52, 211, 153, 1)' : 'rgba(248, 113, 113, 1)'
+                            ],
+                            borderWidth: 1,
+                            barPercentage: 0.6,
+                            categoryPercentage: 0.8
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#9ca3af' } },
+                        tooltip: {
+                            callbacks: {
+                                afterBody: (context) => {
+                                    if(context[0].dataIndex === 2) { // Nilai Akhir column
+                                        return `Improvement: ${student.scoreDiff > 0 ? '+' : ''}${student.scoreDiff.toFixed(2)}`;
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#9ca3af' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#d1d5db' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- INIT & LISTENERS ---
+        document.getElementById('close-modal').addEventListener('click', closeModal);
+        document.getElementById('modal-backdrop').addEventListener('click', closeModal);
+        
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.glass-card[data-search]');
+            let visible = 0;
+            
+            cards.forEach(card => {
+                if(card.dataset.search.includes(term)) {
+                    card.classList.remove('hidden');
+                    visible++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            document.getElementById('not-found').classList.toggle('hidden', visible > 0);
+        });
+
+        // Initialize
+        calculateRankAndStats();
+        setTimeout(() => renderGrid(processedData), 800); // Small delay for "Processing" effect
+
+    </script>
+</body>
+</html>
