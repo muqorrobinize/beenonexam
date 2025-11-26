@@ -198,372 +198,426 @@
     </div>
 
     <script>
-        // --- DATA BLOK 1.2 (OLD) ---
-        // Extracted & Ranked from 'Deadmatch 1.2 Ranked.html'
-        const oldDataMap = {
-            "G1A025001": { "rank": 98, "nilai": 53.55, "anat": 72.78, "histo": 70, "cbt": 49.55 },
-            "G1A025002": { "rank": 54, "nilai": 66.06, "anat": 70, "histo": 82.91, "cbt": 67.75 },
-            "G1A025003": { "rank": 110, "nilai": 51.89, "anat": 43.33, "histo": 46.25, "cbt": 60.75 },
-            "G1A025004": { "rank": 82, "nilai": 59.29, "anat": 66.5, "histo": 86.67, "cbt": 65.85 },
-            "G1A025005": { "rank": 147, "nilai": 46.29, "anat": 55, "histo": 57.91, "cbt": 57.45 },
-            "G1A025006": { "rank": 17, "nilai": 78.08, "anat": 89.17, "histo": 42, "cbt": 67.3 },
-            "G1A025007": { "rank": 149, "nilai": 46.03, "anat": 75.5, "histo": 29.58, "cbt": 68.85 },
-            "G1A025008": { "rank": 113, "nilai": 51.23, "anat": 87.91, "histo": 43, "cbt": 56 },
-            "G1A025009": { "rank": 67, "nilai": 62.83, "anat": 81.67, "histo": 65.41, "cbt": 59.95 },
-            "G1A025010": { "rank": 42, "nilai": 69.56, "anat": 76.67, "histo": 89.58, "cbt": 67.25 },
-            "G1A025011": { "rank": 172, "nilai": 39.75, "anat": 43, "histo": 23.33, "cbt": 46.15 },
-            "G1A025012": { "rank": 21, "nilai": 75, "anat": 89.83, "histo": 77.91, "cbt": 80.25 },
-            "G1A025013": { "rank": 18, "nilai": 77.78, "anat": 80.5, "histo": 81.25, "cbt": 84.2 },
-            "G1A025014": { "rank": 22, "nilai": 74.53, "anat": 70.16, "histo": 77, "cbt": 80.25 },
-            "G1A025015": { "rank": 74, "nilai": 60.94, "anat": 51.6, "histo": 53.75, "cbt": 71.55 },
-            "G1A025016": { "rank": 32, "nilai": 70.98, "anat": 75.83, "histo": 85, "cbt": 82.25 },
-            "G1A025017": { "rank": 8, "nilai": 81.38, "anat": 84.16, "histo": 80.41, "cbt": 83.65 },
-            "G1A025018": { "rank": 36, "nilai": 70.2, "anat": 85.16, "histo": 77.1, "cbt": 68.55 },
-            "G1A025019": { "rank": 187, "nilai": 21.92, "anat": 11.33, "histo": 1.67, "cbt": 23.6 },
-            "G1A025020": { "rank": 90, "nilai": 56.89, "anat": 45.83, "histo": 67.75, "cbt": 57.25 },
-            "G1A025021": { "rank": 87, "nilai": 57.68, "anat": 40.83, "histo": 80.83, "cbt": 57.35 },
-            "G1A025022": { "rank": 93, "nilai": 55.54, "anat": 57.17, "histo": 60.83, "cbt": 56.15 },
-            "G1A025023": { "rank": 66, "nilai": 62.83, "anat": 44.5, "histo": 71.25, "cbt": 58.15 },
-            "G1A025024": { "rank": 176, "nilai": 35.33, "anat": 29, "histo": 22.08, "cbt": 43.65 },
-            "G1A025025": { "rank": 2, "nilai": 86.19, "anat": 93.33, "histo": 95.83, "cbt": 91.15 },
-            "G1A025026": { "rank": 70, "nilai": 62.06, "anat": 59.5, "histo": 65.41, "cbt": 69.55 },
-            "G1A025027": { "rank": 53, "nilai": 66.09, "anat": 82.66, "histo": 82.92, "cbt": 74.05 },
-            "G1A025028": { "rank": 48, "nilai": 67.56, "anat": 85.25, "histo": 85, "cbt": 75.85 },
-            "G1A025029": { "rank": 14, "nilai": 79.39, "anat": 79.33, "histo": 89.58, "cbt": 79 },
-            "G1A025030": { "rank": 86, "nilai": 58.12, "anat": 65.67, "histo": 62.08, "cbt": 64.55 },
-            "G1A025031": { "rank": 10, "nilai": 79.82, "anat": 79.67, "histo": 91.67, "cbt": 81.6 },
-            "G1A025032": { "rank": 69, "nilai": 62.21, "anat": 47.16, "histo": 86.66, "cbt": 60.05 },
-            "G1A025033": { "rank": 44, "nilai": 68.99, "anat": 73, "histo": 81.25, "cbt": 67.45 },
-            "G1A025034": { "rank": 182, "nilai": 33.27, "anat": 19.58, "histo": 10, "cbt": 51.9 },
-            "G1A025035": { "rank": 88, "nilai": 57.75, "anat": 86.3, "histo": 29.58, "cbt": 83.45 },
-            "G1A025036": { "rank": 178, "nilai": 34.88, "anat": 22.5, "histo": 12.92, "cbt": 43.7 },
-            "G1A025037": { "rank": 80, "nilai": 59.85, "anat": 62.17, "histo": 63.75, "cbt": 67.1 },
-            "G1A025038": { "rank": 156, "nilai": 44.46, "anat": 33, "histo": 63, "cbt": 57.45 },
-            "G1A025039": { "rank": 81, "nilai": 59.83, "anat": 65.17, "histo": 54.17, "cbt": 59.25 },
-            "G1A025040": { "rank": 111, "nilai": 51.66, "anat": 66.17, "histo": 47.5, "cbt": 54.1 },
-            "G1A025041": { "rank": 73, "nilai": 61.3, "anat": 78.88, "histo": 66.25, "cbt": 65.2 },
-            "G1A025042": { "rank": 64, "nilai": 63.62, "anat": 91.93, "histo": 75.83, "cbt": 59.4 },
-            "G1A025043": { "rank": 154, "nilai": 44.98, "anat": 31.67, "histo": 48.3, "cbt": 50.35 },
-            "G1A025044": { "rank": 76, "nilai": 60.54, "anat": 45.33, "histo": 76.67, "cbt": 74.6 },
-            "G1A025045": { "rank": 9, "nilai": 80.11, "anat": 82.93, "histo": 94.58, "cbt": 83.6 },
-            "G1A025046": { "rank": 184, "nilai": 30.28, "anat": 39.5, "histo": 35, "cbt": 28.55 },
-            "G1A025047": { "rank": 141, "nilai": 47.13, "anat": 54.88, "histo": 45, "cbt": 51.55 },
-            "G1A025048": { "rank": 97, "nilai": 54.14, "anat": 67.9, "histo": 42.5, "cbt": 54.85 },
-            "G1A025049": { "rank": 65, "nilai": 63.13, "anat": 56.17, "histo": 81, "cbt": 67.75 },
-            "G1A025050": { "rank": 186, "nilai": 22.87, "anat": 13.72, "histo": 7.25, "cbt": 24.15 },
-            "G1A025051": { "rank": 46, "nilai": 68.3, "anat": 49.5, "histo": 64.2, "cbt": 69.1 },
-            "G1A025052": { "rank": 79, "nilai": 60.14, "anat": 72.08, "histo": 65.5, "cbt": 60 },
-            "G1A025053": { "rank": 165, "nilai": 41.9, "anat": 79.17, "histo": 58.5, "cbt": 44.45 },
-            "G1A025054": { "rank": 29, "nilai": 71.69, "anat": 76.67, "histo": 79.58, "cbt": 85.95 },
-            "G1A025055": { "rank": 28, "nilai": 72.36, "anat": 71.5, "histo": 83.75, "cbt": 83.55 },
-            "G1A025056": { "rank": 37, "nilai": 70.2, "anat": 61.5, "histo": 74.42, "cbt": 69.2 },
-            "G1A025057": { "rank": 114, "nilai": 51.09, "anat": 78.3, "histo": 51.67, "cbt": 57 },
-            "G1A025059": { "rank": 95, "nilai": 55.08, "anat": 40, "histo": 43.5, "cbt": 53.8 },
-            "G1A025060": { "rank": 62, "nilai": 63.52, "anat": 71.5, "histo": 90, "cbt": 63.25 },
-            "G1A025061": { "rank": 68, "nilai": 62.46, "anat": 70.33, "histo": 66.67, "cbt": 66.55 },
-            "G1A025062": { "rank": 59, "nilai": 64.45, "anat": 68.6, "histo": 79.58, "cbt": 73.4 },
-            "G1A025063": { "rank": 92, "nilai": 55.62, "anat": 43.67, "histo": 37.08, "cbt": 69.7 },
-            "G1A025064": { "rank": 78, "nilai": 59.89, "anat": 74, "histo": 66.67, "cbt": 69.1 },
-            "G1A025065": { "rank": 30, "nilai": 71.59, "anat": 89.93, "histo": 75.83, "cbt": 75.3 },
-            "G1A025066": { "rank": 163, "nilai": 42.04, "anat": 35.83, "histo": 62, "cbt": 53.8 },
-            "G1A025067": { "rank": 112, "nilai": 51.36, "anat": 53.67, "histo": 44, "cbt": 70.2 },
-            "G1A025068": { "rank": 19, "nilai": 76.69, "anat": 81.83, "histo": 98.75, "cbt": 84.8 },
-            "G1A025069": { "rank": 140, "nilai": 47.54, "anat": 76, "histo": 40.41, "cbt": 63.25 },
-            "G1A025070": { "rank": 128, "nilai": 50, "anat": 72.43, "histo": 25.83, "cbt": 57 },
-            "G1A025071": { "rank": 72, "nilai": 61.57, "anat": 73, "histo": 62.91, "cbt": 52.2 },
-            "G1A025072": { "rank": 43, "nilai": 69.04, "anat": 68, "histo": 71, "cbt": 84.15 },
-            "G1A025073": { "rank": 50, "nilai": 67.12, "anat": 88.83, "histo": 76.25, "cbt": 76.45 },
-            "G1A025074": { "rank": 99, "nilai": 53.36, "anat": 57.08, "histo": 71.5, "cbt": 65.15 },
-            "G1A025075": { "rank": 107, "nilai": 52.07, "anat": 51.25, "histo": 48.17, "cbt": 62 },
-            "G1A025076": { "rank": 180, "nilai": 34.26, "anat": 33.83, "histo": 19.58, "cbt": 29.75 },
-            "G1A025077": { "rank": 164, "nilai": 41.93, "anat": 11.33, "histo": 21.67, "cbt": 66.4 },
-            "G1A025078": { "rank": 7, "nilai": 80.46, "anat": 74, "histo": 76.67, "cbt": 89.85 },
-            "G1A025079": { "rank": 61, "nilai": 64.25, "anat": 86.25, "histo": 78.67, "cbt": 75.95 },
-            "G1A025080": { "rank": 51, "nilai": 67.04, "anat": 73.83, "histo": 77.91, "cbt": 84.75 },
-            "G1A025081": { "rank": 85, "nilai": 58.15, "anat": 66.83, "histo": 66, "cbt": 72.7 },
-            "G1A025082": { "rank": 47, "nilai": 68.07, "anat": 87.08, "histo": 54, "cbt": 68.45 },
-            "G1A025083": { "rank": 63, "nilai": 62.55, "anat": 62, "histo": 72, "cbt": 62.7 },
-            "G1A025084": { "rank": 34, "nilai": 70.73, "anat": 67.83, "histo": 73.3, "cbt": 81.6 },
-            "G1A025086": { "rank": 57, "nilai": 64.88, "anat": 71.25, "histo": 54.17, "cbt": 79.75 },
-            "G1A025087": { "rank": 153, "nilai": 45.02, "anat": 50, "histo": 42.91, "cbt": 47.65 },
-            "G1A025088": { "rank": 56, "nilai": 64.95, "anat": 83, "histo": 50, "cbt": 57.05 },
-            "G1A025089": { "rank": 55, "nilai": 65.47, "anat": 78.3, "histo": 75, "cbt": 79.7 },
-            "G1A025091": { "rank": 71, "nilai": 61.38, "anat": 76.83, "histo": 87.91, "cbt": 61.35 },
-            "G1A025092": { "rank": 23, "nilai": 74.33, "anat": 92.91, "histo": 89, "cbt": 79.1 },
-            "G1A025093": { "rank": 66, "nilai": 62.86, "anat": 47.88, "histo": 85, "cbt": 81.55 },
-            "G1A025094": { "rank": 75, "nilai": 60.65, "anat": 35, "histo": 72.5, "cbt": 64.7 },
-            "G1A025095": { "rank": 15, "nilai": 78.57, "anat": 86.6, "histo": 76, "cbt": 80.5 },
-            "G1A025096": { "rank": 60, "nilai": 64.39, "anat": 72.16, "histo": 60, "cbt": 73.35 },
-            "G1A025097": { "rank": 52, "nilai": 65.76, "anat": 85.41, "histo": 83.33, "cbt": 68.4 },
-            "G1A025098": { "rank": 78, "nilai": 60.21, "anat": 42.5, "histo": 45.8, "cbt": 56.4 },
-            "G1A025099": { "rank": 63, "nilai": 63.62, "anat": 73.17, "histo": 92.9, "cbt": 73.35 },
-            "G1A025100": { "rank": 20, "nilai": 74.81, "anat": 68, "histo": 85.41, "cbt": 76.05 },
-            "G1A025101": { "rank": 137, "nilai": 47.97, "anat": 45.5, "histo": 45, "cbt": 49.55 },
-            "G1A025102": { "rank": 49, "nilai": 67.44, "anat": 55.41, "histo": 77.5, "cbt": 77.25 },
-            "G1A025103": { "rank": 55, "nilai": 64.98, "anat": 80, "histo": 60.83, "cbt": 65.85 },
-            "G1A025104": { "rank": 31, "nilai": 71.44, "anat": 86.97, "histo": 82.08, "cbt": 74.7 },
-            "G1A025105": { "rank": 16, "nilai": 78.08, "anat": 92.8, "histo": 89.58, "cbt": 83.6 },
-            "G1A025106": { "rank": 24, "nilai": 77.1, "anat": 87.08, "histo": 55, "cbt": 83.45 },
-            "G1A025107": { "rank": 152, "nilai": 45.16, "anat": 59.16, "histo": 61.5, "cbt": 41.85 },
-            "G1A025108": { "rank": 45, "nilai": 68.95, "anat": 76.5, "histo": 69.16, "cbt": 73.1 },
-            "G1A025109": { "rank": 27, "nilai": 72.45, "anat": 84.33, "histo": 68.33, "cbt": 77.25 },
-            "G1A025110": { "rank": 41, "nilai": 69.04, "anat": 75.17, "histo": 59.58, "cbt": 77.45 },
-            "G1A025111": { "rank": 127, "nilai": 50.12, "anat": 50, "histo": 54.16, "cbt": 59.5 },
-            "G1A025112": { "rank": 52, "nilai": 66.13, "anat": 85, "histo": 81.67, "cbt": 72.1 },
-            "G1A025113": { "rank": 38, "nilai": 69.95, "anat": 70.2, "histo": 85.41, "cbt": 79.7 },
-            "G1A025114": { "rank": 44, "nilai": 68.65, "anat": 88.67, "histo": 77.08, "cbt": 77.8 },
-            "G1A025115": { "rank": 58, "nilai": 64.09, "anat": 68.17, "histo": 63.75, "cbt": 72.2 },
-            "G1A025116": { "rank": 133, "nilai": 48.67, "anat": 39.67, "histo": 47.08, "cbt": 62.05 },
-            "G1A025117": { "rank": 183, "nilai": 31.15, "anat": 23.5, "histo": 33.08, "cbt": 49.3 },
-            "G1A025118": { "rank": 77, "nilai": 60.42, "anat": 56.67, "histo": 62.91, "cbt": 70.9 },
-            "G1A025119": { "rank": 185, "nilai": 29.54, "anat": 23.5, "histo": 30, "cbt": 43.2 },
-            "G1A025120": { "rank": 132, "nilai": 48.78, "anat": 38.04, "histo": 53.17, "cbt": 59.35 },
-            "G1A025121": { "rank": 142, "nilai": 47.01, "anat": 52.5, "histo": 35.38, "cbt": 60.15 },
-            "G1A025122": { "rank": 186, "nilai": 23.1, "anat": 20, "histo": 5, "cbt": 19.88 },
-            "G1A025123": { "rank": 135, "nilai": 48.32, "anat": 31.25, "histo": 40.33, "cbt": 50.35 },
-            "G1A025124": { "rank": 159, "nilai": 43.75, "anat": 25.67, "histo": 47, "cbt": 49.35 },
-            "G1A025125": { "rank": 51, "nilai": 66.66, "anat": 67.67, "histo": 67.64, "cbt": 78.45 },
-            "G1A025126": { "rank": 134, "nilai": 48.63, "anat": 48.17, "histo": 54.73, "cbt": 54.5 },
-            "G1A025127": { "rank": 103, "nilai": 52.94, "anat": 56.17, "histo": 71.25, "cbt": 60.65 },
-            "G1A025128": { "rank": 87, "nilai": 57.76, "anat": 60.22, "histo": 91.25, "cbt": 62 },
-            "G1A025129": { "rank": 89, "nilai": 57.53, "anat": 49.83, "histo": 62, "cbt": 77.1 },
-            "G1A025130": { "rank": 167, "nilai": 41.38, "anat": 51.67, "histo": 47, "cbt": 46.9 },
-            "G1A025131": { "rank": 125, "nilai": 50.61, "anat": 72.17, "histo": 53.89, "cbt": 58.85 },
-            "G1A025132": { "rank": 173, "nilai": 39.28, "anat": 18.83, "histo": 28.75, "cbt": 47.65 },
-            "G1A025133": { "rank": 96, "nilai": 54.33, "anat": 53.16, "histo": 54.5, "cbt": 67.55 },
-            "G1A025134": { "rank": 104, "nilai": 52.83, "anat": 54.33, "histo": 48.75, "cbt": 54.55 },
-            "G1A025135": { "rank": 33, "nilai": 70.89, "anat": 60.17, "histo": 90.4, "cbt": 69.7 },
-            "G1A025136": { "rank": 102, "nilai": 52.85, "anat": 37.42, "histo": 48.33, "cbt": 60.85 },
-            "G1A025138": { "rank": 129, "nilai": 49.91, "anat": 29.83, "histo": 45.41, "cbt": 52.6 },
-            "G1A025139": { "rank": 92, "nilai": 55.55, "anat": 44.67, "histo": 75, "cbt": 69.7 },
-            "G1A025140": { "rank": 181, "nilai": 33.91, "anat": 16.5, "histo": 31.88, "cbt": 39.95 },
-            "G1A025141": { "rank": 131, "nilai": 48.86, "anat": 38.16, "histo": 33, "cbt": 48.15 },
-            "G1A025142": { "rank": 101, "nilai": 52.87, "anat": 42.67, "histo": 48.75, "cbt": 65.2 },
-            "G1A025143": { "rank": 75, "nilai": 60.73, "anat": 63.83, "histo": 65.41, "cbt": 58.95 },
-            "G1A025144": { "rank": 185, "nilai": 29.05, "anat": 26, "histo": 24.17, "cbt": 32.25 },
-            "G1A025145": { "rank": 26, "nilai": 77.29, "anat": 69.33, "histo": 87.91, "cbt": 79.8 },
-            "G1A025146": { "rank": 91, "nilai": 55.76, "anat": 67.5, "histo": 52, "cbt": 59.5 },
-            "G1A025147": { "rank": 83, "nilai": 59.15, "anat": 61, "histo": 42, "cbt": 60.2 },
-            "G1A025148": { "rank": 47, "nilai": 67.57, "anat": 73.75, "histo": 65.41, "cbt": 82.75 },
-            "G1A025149": { "rank": 62, "nilai": 63.87, "anat": 42.3, "histo": 75, "cbt": 62.65 },
-            "G1A025150": { "rank": 155, "nilai": 44.58, "anat": 62.33, "histo": 77.5, "cbt": 54.1 },
-            "G1A025151": { "rank": 40, "nilai": 69.21, "anat": 67.83, "histo": 73.75, "cbt": 68.95 },
-            "G1A025152": { "rank": 109, "nilai": 51.9, "anat": 51.67, "histo": 52, "cbt": 60.1 },
-            "G1A025153": { "rank": 113, "nilai": 51.24, "anat": 23, "histo": 52.5, "cbt": 58.2 },
-            "G1A025154": { "rank": 85, "nilai": 57.88, "anat": 54.67, "histo": 28, "cbt": 77.7 },
-            "G1A025155": { "rank": 66, "nilai": 62.9, "anat": 57.17, "histo": 81, "cbt": 67.75 },
-            "G1A025156": { "rank": 130, "nilai": 49.3, "anat": 71.71, "histo": 53.75, "cbt": 46.8 },
-            "G1A025157": { "rank": 170, "nilai": 40.57, "anat": 23.67, "histo": 27.5, "cbt": 40.5 },
-            "G1A025159": { "rank": 171, "nilai": 40.25, "anat": 32.16, "histo": 71.5, "cbt": 44.95 },
-            "G1A025160": { "rank": 90, "nilai": 56.29, "anat": 61.05, "histo": 73.3, "cbt": 67.7 },
-            "G1A025161": { "rank": 188, "nilai": 27.13, "anat": 4.16, "histo": 71.5, "cbt": 31.65 },
-            "G1A025163": { "rank": 76, "nilai": 60.48, "anat": 65, "histo": 52.5, "cbt": 62.8 },
-            "G1A025164": { "rank": 189, "nilai": 26.95, "anat": 8, "histo": 10.83, "cbt": 38.6 },
-            "G1A025165": { "rank": 68, "nilai": 62.47, "anat": 73.26, "histo": 61.5, "cbt": 72.05 },
-            "G1A025166": { "rank": 150, "nilai": 45.31, "anat": 35.17, "histo": 25, "cbt": 52.6 },
-            "G1A025167": { "rank": 190, "nilai": 25.42, "anat": 20, "histo": 9.58, "cbt": 39.8 },
-            "G1A025168": { "rank": 96, "nilai": 54.4, "anat": 50.5, "histo": 56.67, "cbt": 50.25 },
-            "G1A025169": { "rank": 166, "nilai": 41.54, "anat": 54.67, "histo": 70, "cbt": 36.2 },
-            "G1A025170": { "rank": 179, "nilai": 32.4, "anat": 37.17, "histo": 25.83, "cbt": 46.15 },
-            "G1A025171": { "rank": 161, "nilai": 42.02, "anat": 39.5, "histo": 39.58, "cbt": 40.5 },
-            "G1A025172": { "rank": 110, "nilai": 51.6, "anat": 17.5, "histo": 61.5, "cbt": 58.85 },
-            "G1A025174": { "rank": 130, "nilai": 48.84, "anat": 33.33, "histo": 35.83, "cbt": 56.45 },
-            "G1A025175": { "rank": 153, "nilai": 45.45, "anat": 47.41, "histo": 66, "cbt": 58.8 },
-            "G1A025176": { "rank": 168, "nilai": 40.41, "anat": 50, "histo": 38, "cbt": 38.7 }
-        };
-
-        // --- DATA 1.3 (NEW) ---
-        // Extracted from PDF using User's Mapping Logic
-        const rawData13 = [
-            { "nim": "G1A025001", "nama": "MUSTIKA ZHAFARINA", "soca": 73.75, "fisio": 63, "histo": 14.75, "anat": 42, "cbt1": 72, "cbt2": 65.14, "nilai": 69.4, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025002", "nama": "ANINDITA RAHMAZYANTI", "soca": 81.25, "fisio": 70, "histo": 16.25, "anat": 49, "cbt1": 79, "cbt2": 73.14, "nilai": 73.28, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025003", "nama": "RONALD JASON NOVIANTO", "soca": 50, "fisio": 80, "histo": 10, "anat": 35, "cbt1": 65, "cbt2": 57.14, "nilai": 54.67, "grade": "D", "ket": "WAJIB REMED" },
-            { "nim": "G1A025004", "nama": "WANDA WIDYASWARA", "soca": 70, "fisio": 85, "histo": 14, "anat": 37, "cbt1": 70, "cbt2": 61.14, "nilai": 66, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025005", "nama": "NATASYA PUTRI AZALIA", "soca": 50, "fisio": 53.5, "histo": 10, "anat": 27, "cbt1": 58, "cbt2": 48.57, "nilai": 49.72, "grade": "D", "ket": "WAJIB REMED" },
-            { "nim": "G1A025006", "nama": "ALIF MUHAMMAD SATRIAS", "soca": 60, "fisio": 95, "histo": 12, "anat": 53, "cbt1": 93, "cbt2": 83.43, "nilai": 79.47, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025007", "nama": "ANGGUN SEKAR AMALIA", "soca": 57.5, "fisio": 75, "histo": 11.5, "anat": 35, "cbt1": 53, "cbt2": 50.29, "nilai": 53.16, "grade": "D", "ket": "WAJIB REMED" },
-            { "nim": "G1A025008", "nama": "MUHAMMAD RIZKI MAULANA", "soca": 31.25, "fisio": 80, "histo": 6.25, "anat": 42, "cbt1": 75, "cbt2": 66.86, "nilai": 56.8, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025009", "nama": "IVANA WIDYA PARAMITA", "soca": 87.5, "fisio": 78, "histo": 17.5, "anat": 43, "cbt1": 71, "cbt2": 65.14, "nilai": 69.81, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025010", "nama": "MIFTAKHUL RIZKY ALWI ZAKARIA", "soca": 82.5, "fisio": 84.5, "histo": 16.5, "anat": 50, "cbt1": 79, "cbt2": 73.71, "nilai": 76.03, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025011", "nama": "RIFA AFRIANTI PRIMANTO", "soca": 42.5, "fisio": 51, "histo": 8.5, "anat": 25, "cbt1": 57, "cbt2": 46.86, "nilai": 44.41, "grade": "E", "ket": "WAJIB REMED" },
-            { "nim": "G1A025012", "nama": "ARZETA HAFIFATUZZAHROH", "soca": 82.5, "fisio": 82.5, "histo": 16.5, "anat": 38, "cbt1": 87, "cbt2": 71.43, "nilai": 73.44, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025013", "nama": "ALYSA ILMI AULIA", "soca": 91.25, "fisio": 100, "histo": 18.25, "anat": 54, "cbt1": 93, "cbt2": 84, "nilai": 87.55, "grade": "A", "ket": "LULUS" },
-            { "nim": "G1A025014", "nama": "NURUL UZMA ARIFINIANTI", "soca": 90, "fisio": 97.5, "histo": 18, "anat": 48, "cbt1": 89, "cbt2": 78.29, "nilai": 79.29, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025015", "nama": "NASHWA RIHADATUL 'AISY", "soca": 88.75, "fisio": 70, "histo": 17.75, "anat": 38, "cbt1": 66, "cbt2": 59.43, "nilai": 66.58, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025016", "nama": "HAIBA ZAHWA ADNINDYA ZIEN", "soca": 80, "fisio": 98, "histo": 16, "anat": 44, "cbt1": 92, "cbt2": 77.71, "nilai": 79.56, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025017", "nama": "ARKAAN ARRASYID S", "soca": 67.5, "fisio": 85.5, "histo": 13.5, "anat": 48, "cbt1": 89, "cbt2": 78.29, "nilai": 77.18, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025018", "nama": "ANDHIKA NUR HAKIM", "soca": 51.25, "fisio": 90, "histo": 10.25, "anat": 46, "cbt1": 86, "cbt2": 75.43, "nilai": 70.91, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025019", "nama": "ILHAM RAMADHAN TAUFIQ", "soca": 51.25, "fisio": 25, "histo": 10.25, "anat": 18, "cbt1": 41, "cbt2": 33.71, "nilai": 30.77, "grade": "E", "ket": "WAJIB REMED" },
-            { "nim": "G1A025020", "nama": "SYIFA AULIA WIDIANA", "soca": 88, "fisio": 83, "histo": 17.6, "anat": 36, "cbt1": 65, "cbt2": 57.71, "nilai": 64.94, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025021", "nama": "NAYRAH BARIZKY RITONGA", "soca": 67.5, "fisio": 85, "histo": 13.5, "anat": 33, "cbt1": 64, "cbt2": 55.43, "nilai": 60.91, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025022", "nama": "NATASYA AURA PUTRI AHMAD", "soca": 78.7, "fisio": 82.5, "histo": 15.74, "anat": 38, "cbt1": 70, "cbt2": 61.71, "nilai": 66, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025023", "nama": "LUTHFI FADHILAH FATURAHMAN", "soca": 57.5, "fisio": 90, "histo": 11.5, "anat": 36, "cbt1": 77, "cbt2": 64.57, "nilai": 64.51, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025024", "nama": "NABILA QURROTA A'INI", "soca": 81.25, "fisio": 62.5, "histo": 16.25, "anat": 31, "cbt1": 57, "cbt2": 50.29, "nilai": 52.3, "grade": "D", "ket": "WAJIB REMED" },
-            { "nim": "G1A025025", "nama": "LOVINA DINA KAMILA", "soca": 96.25, "fisio": 100, "histo": 19.25, "anat": 59, "cbt1": 97, "cbt2": 89.14, "nilai": 90.64, "grade": "A", "ket": "LULUS" },
-            { "nim": "G1A025026", "nama": "AVELIKA LADYSA SHANETIN", "soca": 87.5, "fisio": 75, "histo": 17.5, "anat": 41, "cbt1": 66, "cbt2": 61.14, "nilai": 64.55, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025027", "nama": "SHARFINA AURIZMA TITANIA WARDANI", "soca": 95, "fisio": 87.5, "histo": 19, "anat": 45, "cbt1": 87, "cbt2": 75.43, "nilai": 81.44, "grade": "A", "ket": "LULUS" },
-            { "nim": "G1A025028", "nama": "RAFI HAZZA SAPUTRA", "soca": 77.5, "fisio": 85, "histo": 15.5, "anat": 49, "cbt1": 90, "cbt2": 79.43, "nilai": 79.54, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025029", "nama": "FATWA DINATA", "soca": 82.5, "fisio": 95, "histo": 16.5, "anat": 45, "cbt1": 90, "cbt2": 77.14, "nilai": 78.35, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025030", "nama": "REZA HARUN", "soca": 82.5, "fisio": 90, "histo": 16.5, "anat": 39, "cbt1": 76, "cbt2": 65.71, "nilai": 70.06, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025031", "nama": "AZKIYA HUSNABILA", "soca": 85, "fisio": 88.5, "histo": 17, "anat": 44, "cbt1": 86, "cbt2": 74.29, "nilai": 76.95, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025032", "nama": "DAVINA NATTAYA KOMARA", "soca": 70, "fisio": 86, "histo": 14, "anat": 33, "cbt1": 70, "cbt2": 58.86, "nilai": 62.96, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025033", "nama": "MARIA CATHLEEN LIEM", "soca": 96.25, "fisio": 90, "histo": 19.25, "anat": 48, "cbt1": 93, "cbt2": 80.57, "nilai": 84.37, "grade": "A", "ket": "LULUS" },
-            { "nim": "G1A025034", "nama": "AYU WULAN PUTRIANA", "soca": 28.75, "fisio": 50, "histo": 5.75, "anat": 29, "cbt1": 46, "cbt2": 42.86, "nilai": 36.69, "grade": "E", "ket": "WAJIB REMED" },
-            { "nim": "G1A025035", "nama": "KEISYA BEAUTY STANZA", "soca": 73.8, "fisio": 87.5, "histo": 14.76, "anat": 47, "cbt1": 81, "cbt2": 73.14, "nilai": 75.49, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025036", "nama": "MU'AFA NAZHMIR ROBBANI", "soca": 66.25, "fisio": 52.5, "histo": 13.25, "anat": 26, "cbt1": 44, "cbt2": 40, "nilai": 41.66, "grade": "E", "ket": "WAJIB REMED" },
-            { "nim": "G1A025037", "nama": "ZAWA HASNA ZAHIDAH", "soca": 88.75, "fisio": 92.5, "histo": 17.75, "anat": 44, "cbt1": 85, "cbt2": 73.71, "nilai": 75.07, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025038", "nama": "ANWA FATHIMA BIDZIKRI", "soca": 78, "fisio": 83, "histo": 15.6, "anat": 33, "cbt1": 67, "cbt2": 57.14, "nilai": 64.6, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025039", "nama": "MYCHA NAZILA SYAKIROH", "soca": 68.75, "fisio": 80, "histo": 13.75, "anat": 35, "cbt1": 72, "cbt2": 61.14, "nilai": 64.19, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025040", "nama": "MUHAMMAD RAFI' NAUFAREL", "soca": 60, "fisio": 75, "histo": 12, "anat": 37, "cbt1": 67, "cbt2": 59.43, "nilai": 59.44, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025041", "nama": "BATRISYIA ATHA RINDRA JAFNI", "soca": 90, "fisio": 84, "histo": 18, "anat": 44, "cbt1": 78, "cbt2": 69.71, "nilai": 73.58, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025042", "nama": "NAILA FIRDAUZI HARYADINA PUTRI", "soca": 81.25, "fisio": 90.5, "histo": 16.25, "anat": 45, "cbt1": 77, "cbt2": 69.71, "nilai": 73.2, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025043", "nama": "ASIYAH", "soca": 67.5, "fisio": 62.5, "histo": 13.5, "anat": 18, "cbt1": 52, "cbt2": 40, "nilai": 47.14, "grade": "D", "ket": "WAJIB REMED" },
-            { "nim": "G1A025044", "nama": "KHANSA JAHFALATHA BALQIS", "soca": 100, "fisio": 77.5, "histo": 20, "anat": 39, "cbt1": 73, "cbt2": 64, "nilai": 72.01, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025045", "nama": "NASYWA AMANIA HIDAYAT", "soca": 80, "fisio": 87.5, "histo": 16, "anat": 57, "cbt1": 90, "cbt2": 84, "nilai": 83.02, "grade": "A", "ket": "LULUS" },
-            { "nim": "G1A025046", "nama": "MONICA SANCI KONDAWE", "soca": 61.25, "fisio": 85.5, "histo": 12.25, "anat": 23, "cbt1": 47, "cbt2": 40, "nilai": 45.8, "grade": "E", "ket": "WAJIB REMED" },
-            { "nim": "G1A025047", "nama": "MUHAMMAD ALRIZA NASUTION", "soca": 57.5, "fisio": 85, "histo": 11.5, "anat": 36, "cbt1": 62, "cbt2": 56, "nilai": 58.15, "grade": "C", "ket": "WAJIB REMED" },
-            { "nim": "G1A025048", "nama": "HANIFA", "soca": 47.5, "fisio": 82.5, "histo": 9.5, "anat": 36, "cbt1": 66, "cbt2": 58.29, "nilai": 58.39, "grade": "C", "ket": "WAJIB REMED" },
-            { "nim": "G1A025049", "nama": "RIFQAH ZULFA AFANIN", "soca": 96.25, "fisio": 78, "histo": 19.25, "anat": 43, "cbt1": 91, "cbt2": 76.57, "nilai": 77.95, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025050", "nama": "MUHAMMAD NAUVAL PANJI AL HAKIM", "soca": 52.5, "fisio": 54, "histo": 10.5, "anat": 22, "cbt1": 45, "cbt2": 38.29, "nilai": 35.97, "grade": "E", "ket": "WAJIB REMED" },
-            { "nim": "G1A025051", "nama": "AMIRA BALQIS ASSABA", "soca": 67.5, "fisio": 85, "histo": 13.5, "anat": 45, "cbt1": 84, "cbt2": 73.71, "nilai": 72.77, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025052", "nama": "CLAIRINE ZERLINA HANIFAH", "soca": 80, "fisio": 75, "histo": 16, "anat": 41, "cbt1": 77, "cbt2": 67.43, "nilai": 68.94, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025053", "nama": "CHRISTIAN PRAJADI", "soca": 87.5, "fisio": 59.5, "histo": 17.5, "anat": 20, "cbt1": 57, "cbt2": 44, "nilai": 52.56, "grade": "D", "ket": "WAJIB REMED" },
-            { "nim": "G1A025054", "nama": "ALFI NISA DAMAYANTI", "soca": 51.25, "fisio": 93, "histo": 10.25, "anat": 47, "cbt1": 84, "cbt2": 74.86, "nilai": 71.68, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025055", "nama": "VANISSA FATHIAH ARDANI", "soca": 75, "fisio": 85, "histo": 15, "anat": 55, "cbt1": 92, "cbt2": 84, "nilai": 81.45, "grade": "A", "ket": "LULUS" },
-            { "nim": "G1A025056", "nama": "SIGIT PRAMBUDI DIENTI", "soca": 88.75, "fisio": 90, "histo": 17.75, "anat": 40, "cbt1": 81, "cbt2": 69.14, "nilai": 73.12, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025057", "nama": "MUHAMMAD UZAIR ABDILLAH", "soca": 66.25, "fisio": 90, "histo": 13.25, "anat": 38, "cbt1": 66, "cbt2": 59.43, "nilai": 63.45, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025059", "nama": "MAYCO CAHYA TRI ADINANSYAH", "soca": 80, "fisio": 80, "histo": 16, "anat": 25, "cbt1": 49, "cbt2": 42.29, "nilai": 50.3, "grade": "D", "ket": "WAJIB REMED" },
-            { "nim": "G1A025060", "nama": "NADIA CHERYL", "soca": 62.5, "fisio": 90, "histo": 12.5, "anat": 47, "cbt1": 79, "cbt2": 72, "nilai": 72.91, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025061", "nama": "NADIA CHAIRUNNISA OLIA PUTRI", "soca": 81.25, "fisio": 90.5, "histo": 16.25, "anat": 41, "cbt1": 74, "cbt2": 65.71, "nilai": 68.69, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025062", "nama": "LOKANANTA ARKIE AMSAL", "soca": 97.5, "fisio": 82.5, "histo": 19.5, "anat": 37, "cbt1": 78, "cbt2": 65.71, "nilai": 72.58, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025063", "nama": "M.DANAR RAMADHAN TARUNA", "soca": 48.75, "fisio": 76, "histo": 9.75, "anat": 38, "cbt1": 69, "cbt2": 61.14, "nilai": 59.32, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025064", "nama": "RAZITA KHAIRINA PRASAJA MARPAUNG", "soca": 65, "fisio": 93, "histo": 13, "anat": 54, "cbt1": 83, "cbt2": 78.29, "nilai": 73.3, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025065", "nama": "IRSYAD WAHYU MUHARROM", "soca": 76.25, "fisio": 80, "histo": 15.25, "anat": 40, "cbt1": 85, "cbt2": 71.43, "nilai": 72.45, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025066", "nama": "INGRID GAYATRI", "soca": 56.25, "fisio": 65, "histo": 11.25, "anat": 37, "cbt1": 51, "cbt2": 50.29, "nilai": 48.53, "grade": "D", "ket": "WAJIB REMED" },
-            { "nim": "G1A025067", "nama": "FADHILAH AZKA AFKARINA", "soca": 78.75, "fisio": 92.5, "histo": 15.75, "anat": 34, "cbt1": 66, "cbt2": 57.14, "nilai": 63.56, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025068", "nama": "GABRIEL DANENDRA SETYAWAN", "soca": 90, "fisio": 93, "histo": 18, "anat": 53, "cbt1": 87, "cbt2": 80, "nilai": 82.48, "grade": "A", "ket": "LULUS" },
-            { "nim": "G1A025069", "nama": "AMILAH AMATURRAHIM AL MUJAHIDAH", "soca": 57.5, "fisio": 85, "histo": 11.5, "anat": 38, "cbt1": 61, "cbt2": 56.57, "nilai": 58.16, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025070", "nama": "FARID HAMZAH PUTRA PRATAMA", "soca": 78.75, "fisio": 87.5, "histo": 15.75, "anat": 35, "cbt1": 77, "cbt2": 64, "nilai": 67.2, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025071", "nama": "JAMES SUDIANTO RACHMAPUTRA", "soca": 83.75, "fisio": 80, "histo": 16.75, "anat": 47, "cbt1": 81, "cbt2": 73.14, "nilai": 73.93, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025072", "nama": "KHAIRUNNISA AZKA FADILA", "soca": 68.75, "fisio": 91, "histo": 13.75, "anat": 45, "cbt1": 87, "cbt2": 75.43, "nilai": 74.66, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025073", "nama": "ISYRAFUDDIN ABDUN YASYKUR", "soca": 100, "fisio": 90, "histo": 20, "anat": 49, "cbt1": 91, "cbt2": 80, "nilai": 84.06, "grade": "A", "ket": "LULUS" },
-            { "nim": "G1A025074", "nama": "TSALITSA AFIFAH NIDAUL HAQ", "soca": 71.3, "fisio": 82.5, "histo": 14.26, "anat": 32, "cbt1": 70, "cbt2": 58.29, "nilai": 62.15, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025075", "nama": "AISYAH NUR AZIZAH", "soca": 83.75, "fisio": 83, "histo": 16.75, "anat": 39, "cbt1": 69, "cbt2": 61.71, "nilai": 68.04, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025076", "nama": "WAHYUDI", "soca": 50, "fisio": 72.5, "histo": 10, "anat": 19, "cbt1": 46, "cbt2": 37.14, "nilai": 39.36, "grade": "E", "ket": "WAJIB REMED" },
-            { "nim": "G1A025077", "nama": "KAUTSAR PANDYA RAHADYAN", "soca": 61.25, "fisio": 77.5, "histo": 12.25, "anat": 35, "cbt1": 69, "cbt2": 59.43, "nilai": 59.99, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025078", "nama": "CHRISTIAN ALLAN", "soca": 71.25, "fisio": 90, "histo": 14.25, "anat": 53, "cbt1": 91, "cbt2": 82.29, "nilai": 77.21, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025079", "nama": "DEWA AYU MADE SHINTA ANGELINA", "soca": 78.75, "fisio": 100, "histo": 15.75, "anat": 47, "cbt1": 83, "cbt2": 74.29, "nilai": 76.12, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025080", "nama": "DZAKI AMRU SYAFI", "soca": 62.5, "fisio": 85, "histo": 12.5, "anat": 46, "cbt1": 87, "cbt2": 76, "nilai": 72.61, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025081", "nama": "NAURA PUTRI ALEXANDRIA", "soca": 67.5, "fisio": 77.5, "histo": 13.5, "anat": 30, "cbt1": 73, "cbt2": 58.86, "nilai": 64.04, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025082", "nama": "ARKAN FAWWAZ INDARIO", "soca": 81.25, "fisio": 80.5, "histo": 16.25, "anat": 48, "cbt1": 83, "cbt2": 74.86, "nilai": 76.27, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025083", "nama": "GHANIA NAILA NOOR DZAKIYYAH", "soca": 71.3, "fisio": 87.5, "histo": 14.26, "anat": 43, "cbt1": 83, "cbt2": 72, "nilai": 70.05, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025084", "nama": "ANINDYA SAFIRA RIYANTO", "soca": 61.25, "fisio": 90, "histo": 12.25, "anat": 48, "cbt1": 82, "cbt2": 74.29, "nilai": 70.42, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025086", "nama": "UTHI FIDELA SALWA", "soca": 78.75, "fisio": 95, "histo": 15.75, "anat": 46, "cbt1": 83, "cbt2": 73.71, "nilai": 77.25, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025087", "nama": "AUFADHIYA KHAIRANI PUTRI", "soca": 42.5, "fisio": 77.5, "histo": 8.5, "anat": 30, "cbt1": 51, "cbt2": 46.29, "nilai": 47.34, "grade": "D", "ket": "WAJIB REMED" },
-            { "nim": "G1A025088", "nama": "HANUM PRIMANDA", "soca": 82.5, "fisio": 84, "histo": 16.5, "anat": 42, "cbt1": 75, "cbt2": 66.86, "nilai": 71.21, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025089", "nama": "IKA WIDIASTUTI", "soca": 56.25, "fisio": 90, "histo": 11.25, "anat": 41, "cbt1": 78, "cbt2": 68, "nilai": 67.1, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025091", "nama": "CLAUDIA ZAR'IN PUTRI JASMINE", "soca": 81.25, "fisio": 88, "histo": 16.25, "anat": 50, "cbt1": 92, "cbt2": 81.14, "nilai": 78.98, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025092", "nama": "SIXTEENOVA ARINI RAHMATIKA", "soca": 95, "fisio": 82.5, "histo": 19, "anat": 46, "cbt1": 86, "cbt2": 75.43, "nilai": 80, "grade": "A", "ket": "LULUS" },
-            { "nim": "G1A025093", "nama": "AMEERA JASMINE ZAIN", "soca": 67.5, "fisio": 90, "histo": 13.5, "anat": 37, "cbt1": 77, "cbt2": 65.14, "nilai": 67.46, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025094", "nama": "NADYANDRA ARETHA MAIRITZA", "soca": 73.75, "fisio": 87.5, "histo": 14.75, "anat": 40, "cbt1": 73, "cbt2": 64.57, "nilai": 68.83, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025095", "nama": "NADINE PRAMESTHA ARDHANI", "soca": 91.25, "fisio": 97.5, "histo": 18.25, "anat": 54, "cbt1": 91, "cbt2": 82.86, "nilai": 84.43, "grade": "A", "ket": "LULUS" },
-            { "nim": "G1A025096", "nama": "AMELIA AZZAHRA", "soca": 77.5, "fisio": 90, "histo": 15.5, "anat": 41, "cbt1": 78, "cbt2": 68, "nilai": 70.21, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025097", "nama": "RIFAT PRAMUDIA NASUTION", "soca": 62.5, "fisio": 67.5, "histo": 12.5, "anat": 37, "cbt1": 76, "cbt2": 64.57, "nilai": 62.73, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025098", "nama": "JAHFAL AL FARISI", "soca": 81.25, "fisio": 85, "histo": 16.25, "anat": 35, "cbt1": 61, "cbt2": 54.86, "nilai": 60.14, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025099", "nama": "ISTAVANIA NADIA MUFID", "soca": 67.5, "fisio": 82.5, "histo": 13.5, "anat": 35, "cbt1": 77, "cbt2": 64, "nilai": 64.79, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025100", "nama": "RISTY PUTERI KUSUMA MAHARDIKANINGSIH", "soca": 75, "fisio": 90, "histo": 15, "anat": 46, "cbt1": 89, "cbt2": 77.14, "nilai": 75.6, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025101", "nama": "CHELSEA ICHA PUTRI ANZANI", "soca": 60, "fisio": 77.5, "histo": 12, "anat": 27, "cbt1": 72, "cbt2": 56.57, "nilai": 55.27, "grade": "D", "ket": "WAJIB REMED" },
-            { "nim": "G1A025102", "nama": "DZAKWAN HAMMAM NAWAWI", "soca": 87.5, "fisio": 80, "histo": 17.5, "anat": 36, "cbt1": 84, "cbt2": 68.57, "nilai": 69.96, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025103", "nama": "YAZMINE", "soca": 52.5, "fisio": 77.5, "histo": 10.5, "anat": 45, "cbt1": 70, "cbt2": 65.71, "nilai": 62.12, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025104", "nama": "MAULIDIA ZULFA KARTIKA", "soca": 55, "fisio": 82.5, "histo": 11, "anat": 45, "cbt1": 74, "cbt2": 68, "nilai": 66.34, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025105", "nama": "SAVANA RIZKY PURNAMA", "soca": 100, "fisio": 87.5, "histo": 20, "anat": 54, "cbt1": 92, "cbt2": 83.43, "nilai": 86.28, "grade": "A", "ket": "LULUS" },
-            { "nim": "G1A025106", "nama": "YASMIN TAQIYAH TAMBUNAN", "soca": 70, "fisio": 92.5, "histo": 14, "anat": 49, "cbt1": 87, "cbt2": 77.71, "nilai": 77.56, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025107", "nama": "NACHAYA AROFAHNI WIJAYA", "soca": 58.75, "fisio": 87.5, "histo": 11.75, "anat": 39, "cbt1": 62, "cbt2": 57.71, "nilai": 59.06, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025108", "nama": "FRIDA MULIADEWI CHAERANI", "soca": 90, "fisio": 79, "histo": 18, "anat": 45, "cbt1": 88, "cbt2": 76, "nilai": 77.9, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025109", "nama": "GHANIY HILDAN RABBANI", "soca": 93.75, "fisio": 88, "histo": 18.75, "anat": 41, "cbt1": 83, "cbt2": 70.86, "nilai": 76.11, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025110", "nama": "ALTAF FIAN JUNINDA", "soca": 97.5, "fisio": 87.5, "histo": 19.5, "anat": 51, "cbt1": 91, "cbt2": 81.14, "nilai": 82.31, "grade": "A", "ket": "LULUS" },
-            { "nim": "G1A025111", "nama": "FADELLA AZZAHRA", "soca": 63.75, "fisio": 82.5, "histo": 12.75, "anat": 30, "cbt1": 67, "cbt2": 55.43, "nilai": 57.31, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025112", "nama": "HANINDITA NASTITI AYUNINGTIAS", "soca": 76.25, "fisio": 95, "histo": 15.25, "anat": 39, "cbt1": 84, "cbt2": 70.29, "nilai": 73.36, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025113", "nama": "TYANAYA RAHMA", "soca": 86, "fisio": 85, "histo": 17.2, "anat": 43, "cbt1": 77, "cbt2": 68.57, "nilai": 73.85, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025114", "nama": "CHINTYA PUTRI NABILAH", "soca": 56.25, "fisio": 75, "histo": 11.25, "anat": 44, "cbt1": 80, "cbt2": 70.86, "nilai": 68.79, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025115", "nama": "AISYA NURLANGIT FITRI", "soca": 81.25, "fisio": 88, "histo": 16.25, "anat": 42, "cbt1": 89, "cbt2": 74.86, "nilai": 75.04, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025116", "nama": "AVISA ZANDRA CITAGAMI", "soca": 46.3, "fisio": 85, "histo": 9.26, "anat": 42, "cbt1": 67, "cbt2": 62.29, "nilai": 58.01, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025117", "nama": "FIQYA SULISTIANI", "soca": 28.75, "fisio": 25, "histo": 5.75, "anat": 21, "cbt1": 52, "cbt2": 41.71, "nilai": 33.88, "grade": "E", "ket": "WAJIB REMED" },
-            { "nim": "G1A025118", "nama": "RAHMA GRISELDA INDRASTATA", "soca": 86, "fisio": 65, "histo": 17.2, "anat": 38, "cbt1": 65, "cbt2": 58.86, "nilai": 62.78, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025119", "nama": "KHESYIA NAFIA ATMOKO", "soca": 27.5, "fisio": 50, "histo": 5.5, "anat": 25, "cbt1": 42, "cbt2": 38.29, "nilai": 32.59, "grade": "E", "ket": "WAJIB REMED" },
-            { "nim": "G1A025120", "nama": "QAFFAL ZIAN QADSI", "soca": 62.5, "fisio": 80, "histo": 12.5, "anat": 29, "cbt1": 61, "cbt2": 51.43, "nilai": 53.9, "grade": "D", "ket": "WAJIB REMED" },
-            { "nim": "G1A025121", "nama": "KHAIRUNNISA AMIRA AZALIA", "soca": 66.25, "fisio": 38, "histo": 13.25, "anat": 27, "cbt1": 64, "cbt2": 52, "nilai": 54.29, "grade": "D", "ket": "WAJIB REMED" },
-            { "nim": "G1A025122", "nama": "MUHAMMAD RASYID SURYA WICAKSONO", "soca": 32.5, "fisio": 0, "histo": 6.5, "anat": 0, "cbt1": 0, "cbt2": 0, "nilai": 6.5, "grade": "E", "ket": "WAJIB REMED" },
-            { "nim": "G1A025123", "nama": "NAURA ALYA FASHIHA", "soca": 57.5, "fisio": 62.5, "histo": 11.5, "anat": 30, "cbt1": 52, "cbt2": 46.86, "nilai": 49.95, "grade": "D", "ket": "WAJIB REMED" },
-            { "nim": "G1A025124", "nama": "BUNGA PUTRI ANGGINA", "soca": 57.5, "fisio": 68.5, "histo": 11.5, "anat": 32, "cbt1": 59, "cbt2": 52, "nilai": 48.53, "grade": "D", "ket": "WAJIB REMED" },
-            { "nim": "G1A025125", "nama": "M. ANDHIKA PUTRA PRATAMA", "soca": 82.5, "fisio": 90, "histo": 16.5, "anat": 44, "cbt1": 81, "cbt2": 71.43, "nilai": 72.43, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025126", "nama": "HANENDI FAREL SANTAUSO", "soca": 50, "fisio": 68, "histo": 10, "anat": 33, "cbt1": 46, "cbt2": 45.14, "nilai": 49.12, "grade": "D", "ket": "WAJIB REMED" },
-            { "nim": "G1A025127", "nama": "JOVITA BERNADINE AZALIA DWIASTHI", "soca": 78.75, "fisio": 80.5, "histo": 15.75, "anat": 33, "cbt1": 52, "cbt2": 48.57, "nilai": 56.27, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025128", "nama": "RAISHA AQILA ARDANU", "soca": 56.25, "fisio": 82.5, "histo": 11.25, "anat": 35, "cbt1": 72, "cbt2": 61.14, "nilai": 61.58, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025129", "nama": "NAZLA RIFDA AQILLAH", "soca": 97.5, "fisio": 79, "histo": 19.5, "anat": 39, "cbt1": 73, "cbt2": 64, "nilai": 70.42, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025130", "nama": "SYAFIQ ATAULLAH GHAFFAR", "soca": 62.5, "fisio": 78, "histo": 12.5, "anat": 34, "cbt1": 65, "cbt2": 56.57, "nilai": 57.51, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025131", "nama": "ZIDAN ADI HENDRIK TRI PUTRA", "soca": 77.5, "fisio": 90, "histo": 15.5, "anat": 42, "cbt1": 73, "cbt2": 65.71, "nilai": 68.69, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025132", "nama": "FADHEL MUHAMMAD AIHAM", "soca": 28.75, "fisio": 71.5, "histo": 5.75, "anat": 30, "cbt1": 48, "cbt2": 44.57, "nilai": 39, "grade": "E", "ket": "WAJIB REMED" },
-            { "nim": "G1A025133", "nama": "AISYAH LOVIA ZAHRA ROCHMANA", "soca": 42.5, "fisio": 97.5, "histo": 8.5, "anat": 36, "cbt1": 65, "cbt2": 57.71, "nilai": 56, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025134", "nama": "BAGAS ARIEF SETYA WARDANA", "soca": 78.75, "fisio": 97.5, "histo": 15.75, "anat": 40, "cbt1": 86, "cbt2": 72, "nilai": 74.15, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025135", "nama": "KHAMIDYA SAFIRA", "soca": 96, "fisio": 89, "histo": 19.2, "anat": 45, "cbt1": 83, "cbt2": 73.14, "nilai": 76.7, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025136", "nama": "RIKO RAHARDIAN PUTRA WARDANA", "soca": 66.25, "fisio": 78, "histo": 13.25, "anat": 43, "cbt1": 70, "cbt2": 64.57, "nilai": 66, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025138", "nama": "TITEN WIGUNA", "soca": 65, "fisio": 95, "histo": 13, "anat": 30, "cbt1": 74, "cbt2": 59.43, "nilai": 61.11, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025139", "nama": "FANISA MAULIDA RAHARJA", "soca": 92.5, "fisio": 77.5, "histo": 18.5, "anat": 47, "cbt1": 81, "cbt2": 73.14, "nilai": 74.86, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025140", "nama": "DWINANDA FITRIANA PUTRI", "soca": 48.75, "fisio": 50, "histo": 9.75, "anat": 33, "cbt1": 49, "cbt2": 46.86, "nilai": 43.3, "grade": "E", "ket": "WAJIB REMED" },
-            { "nim": "G1A025141", "nama": "BERMASAUT ADIPUTRA TAMPUBOLON", "soca": 76, "fisio": 42.5, "histo": 15.2, "anat": 29, "cbt1": 60, "cbt2": 50.86, "nilai": 53.09, "grade": "D", "ket": "WAJIB REMED" },
-            { "nim": "G1A025142", "nama": "ZASKIA YUFLIHA ALYA NISA", "soca": 72.5, "fisio": 85, "histo": 14.5, "anat": 39, "cbt1": 66, "cbt2": 60, "nilai": 62.44, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025143", "nama": "SYAHRU SYABANA SETIYANTO", "soca": 92.5, "fisio": 95, "histo": 18.5, "anat": 32, "cbt1": 74, "cbt2": 60.57, "nilai": 69.93, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025144", "nama": "NISRINA ATIRA AFLAH GUNNARTO", "soca": 47.5, "fisio": 65, "histo": 9.5, "anat": 28, "cbt1": 36, "cbt2": 36.57, "nilai": 41.28, "grade": "E", "ket": "WAJIB REMED" },
-            { "nim": "G1A025145", "nama": "HASAN TRI GUNAWAN", "soca": 80, "fisio": 81, "histo": 16, "anat": 44, "cbt1": 83, "cbt2": 72.57, "nilai": 72.48, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025146", "nama": "NADHIRA YUSTRINA", "soca": 50, "fisio": 85, "histo": 10, "anat": 31, "cbt1": 69, "cbt2": 57.14, "nilai": 58.3, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025147", "nama": "WAHYU CAN ARUM PUTRI RAMBIATI", "soca": 73.75, "fisio": 95, "histo": 14.75, "anat": 38, "cbt1": 73, "cbt2": 63.43, "nilai": 68.92, "grade": "R", "ket": "LULUS" },
-            { "nim": "G1A025148", "nama": "ARSELAN RIZQY DARMAWAN", "soca": 77.5, "fisio": 81, "histo": 15.5, "anat": 43, "cbt1": 87, "cbt2": 74.29, "nilai": 74.05, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025149", "nama": "NARDIIN FATHIYYAH SUNYOTO", "soca": 100, "fisio": 90, "histo": 20, "anat": 32, "cbt1": 61, "cbt2": 53.14, "nilai": 62.28, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025150", "nama": "AQBIL REZKY BUNAYYA", "soca": 65, "fisio": 82.5, "histo": 13, "anat": 34, "cbt1": 55, "cbt2": 50.86, "nilai": 58.35, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025151", "nama": "MUHAMMAD THORIQ AL ROSYID", "soca": 83.75, "fisio": 86, "histo": 16.75, "anat": 49, "cbt1": 78, "cbt2": 72.57, "nilai": 75.42, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025152", "nama": "RAFI DINAN AL FARISI", "soca": 60, "fisio": 72, "histo": 12, "anat": 36, "cbt1": 61, "cbt2": 55.43, "nilai": 59.08, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025153", "nama": "MUHAMMAD FARRELL ARCHARD ZHAFIF SUCIPTO", "soca": 45, "fisio": 82, "histo": 9, "anat": 29, "cbt1": 57, "cbt2": 49.14, "nilai": 47.99, "grade": "D", "ket": "WAJIB REMED" },
-            { "nim": "G1A025154", "nama": "JOSEPHINE MELYNA EVANY ESTAFANA", "soca": 73.75, "fisio": 90, "histo": 14.75, "anat": 43, "cbt1": 78, "cbt2": 69.14, "nilai": 71.61, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025155", "nama": "GAFIN AULIA RAHARJO", "soca": 86.25, "fisio": 85, "histo": 17.25, "anat": 43, "cbt1": 78, "cbt2": 69.14, "nilai": 73.73, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025156", "nama": "CLEARY SHAYNA HANIN", "soca": 82.5, "fisio": 82.5, "histo": 16.5, "anat": 30, "cbt1": 54, "cbt2": 48, "nilai": 56.06, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025157", "nama": "RAZZA RASENDRIYA NANDANA ARDI", "soca": 46.25, "fisio": 62.5, "histo": 9.25, "anat": 29, "cbt1": 35, "cbt2": 36.57, "nilai": 40.85, "grade": "E", "ket": "WAJIB REMED" },
-            { "nim": "G1A025159", "nama": "KEYSHA FAUSTA ZAINI", "soca": 48.75, "fisio": 55.5, "histo": 9.75, "anat": 25, "cbt1": 52, "cbt2": 44, "nilai": 43.02, "grade": "E", "ket": "WAJIB REMED" },
-            { "nim": "G1A025160", "nama": "NADIYA BINTANG RAZIA NIKO", "soca": 60, "fisio": 90, "histo": 12, "anat": 37, "cbt1": 67, "cbt2": 59.43, "nilai": 62.07, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025161", "nama": "MOH. ILHAM ARDIATSYAH", "soca": 40, "fisio": 52.5, "histo": 8, "anat": 23, "cbt1": 40, "cbt2": 36, "nilai": 31.54, "grade": "E", "ket": "WAJIB REMED" },
-            { "nim": "G1A025163", "nama": "ASTRELLA AIMEE KHOIRUNNISA", "soca": 86, "fisio": 87.5, "histo": 17.2, "anat": 42, "cbt1": 81, "cbt2": 70.29, "nilai": 71.84, "grade": "B", "ket": "LULUS" },
-            { "nim": "G1A025164", "nama": "ATHIFATUL JANNAH", "soca": 53.75, "fisio": 65, "histo": 10.75, "anat": 19, "cbt1": 51, "cbt2": 40, "nilai": 39.09, "grade": "E", "ket": "WAJIB REMED" },
-            { "nim": "G1A025165", "nama": "MUHAMMAD SYAFIEQ ADZKA", "soca": 66.25, "fisio": 82.5, "histo": 13.25, "anat": 38, "cbt1": 71, "cbt2": 62.29, "nilai": 64.75, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025166", "nama": "SYIFA NURJANAH", "soca": 51.25, "fisio": 71.5, "histo": 10.25, "anat": 30, "cbt1": 53, "cbt2": 47.43, "nilai": 49.83, "grade": "D", "ket": "WAJIB REMED" },
-            { "nim": "G1A025167", "nama": "DIMAS ZAHRAN HERDYASSAGAF", "soca": 63.75, "fisio": 32.5, "histo": 12.75, "anat": 20, "cbt1": 39, "cbt2": 33.71, "nilai": 36.42, "grade": "E", "ket": "WAJIB REMED" },
-            { "nim": "G1A025168", "nama": "FARREL MOZA DHIYAUL HAQ", "soca": 0, "fisio": 65.5, "histo": 0, "anat": 40, "cbt1": 68, "cbt2": 61.71, "nilai": 48.7, "grade": "D", "ket": "WAJIB REMED" },
-            { "nim": "G1A025169", "nama": "REECHARD BURHANUDIN FUADY", "soca": 56.25, "fisio": 62.5, "histo": 11.25, "anat": 28, "cbt1": 70, "cbt2": 56, "nilai": 56.76, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025170", "nama": "ADDINI FATMA ARINI", "soca": 38.75, "fisio": 68.5, "histo": 7.75, "anat": 24, "cbt1": 40, "cbt2": 36.57, "nilai": 34.95, "grade": "E", "ket": "WAJIB REMED" },
-            { "nim": "G1A025171", "nama": "HANIN NAURA FARIHA", "soca": 47.5, "fisio": 42.5, "histo": 9.5, "anat": 34, "cbt1": 55, "cbt2": 50.86, "nilai": 48.02, "grade": "D", "ket": "WAJIB REMED" },
-            { "nim": "G1A025172", "nama": "AHMAD ABDUL HAQQI", "soca": 78, "fisio": 55, "histo": 15.6, "anat": 21, "cbt1": 40, "cbt2": 34.86, "nilai": 43.8, "grade": "E", "ket": "WAJIB REMED" },
-            { "nim": "G1A025173", "nama": "FASYA AULIA FAUSTINA", "soca": 68.75, "fisio": 88, "histo": 13.75, "anat": 31, "cbt1": 65, "cbt2": 54.86, "nilai": 59.87, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025174", "nama": "AHMAD MUQORROBIN", "soca": 52.5, "fisio": 79.5, "histo": 10.5, "anat": 34, "cbt1": 73, "cbt2": 61.14, "nilai": 58.87, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025175", "nama": "AKBAR BAGUS SRI ZENA", "soca": 60, "fisio": 80, "histo": 12, "anat": 29, "cbt1": 72, "cbt2": 57.71, "nilai": 58.19, "grade": "C", "ket": "BOLEH REMED" },
-            { "nim": "G1A025176", "nama": "RAFID NAUFAL NURIMANUZAKI", "soca": 76.25, "fisio": 62.5, "histo": 15.25, "anat": 31, "cbt1": 59, "cbt2": 51.43, "nilai": 54.96, "grade": "D", "ket": "WAJIB REMED" }
+        // --- RAW DATA BLOK 1.2 (OLD) ---
+        // Copied from original Deadmatch 1.2 file to ensure 100% accuracy in ranking calculation
+        const rawOldDataList = [
+            { nim: 'G1A025001', nama: 'MUSTIKA ZHAFARINA', anatomi: 72.78, histologi: 70, biokimia: 52, pk: 70, cbt1: 55.1, cbt2: 44, rataCBT: 49.55, soe: 37, nilaiAkhir: 53.5452 },
+            { nim: 'G1A025002', nama: 'ANINDITA RAHMAZYANTI', anatomi: 70, histologi: 82.91, biokimia: 52, pk: 65, cbt1: 78.2, cbt2: 57.3, rataCBT: 67.75, soe: 48, nilaiAkhir: 66.0615 },
+            { nim: 'G1A025003', nama: 'RONALD JASON NOVIANTO', anatomi: 43.33, histologi: 46.25, biokimia: 60, pk: 30, cbt1: 62.8, cbt2: 58.7, rataCBT: 60.75, soe: 41, nilaiAkhir: 51.8922 },
+            { nim: 'G1A025004', nama: 'WANDA WIDYASWARA', anatomi: 66.5, histologi: 86.67, biokimia: 71.25, pk: 45.3, cbt1: 66.7, cbt2: 65, rataCBT: 65.85, soe: 42, nilaiAkhir: 59.2928 },
+            { nim: 'G1A025005', nama: 'NATASYA PUTRI AZALIA', anatomi: 55, histologi: 57.91, biokimia: 32.5, pk: 34.7, cbt1: 70, cbt2: 44.9, rataCBT: 57.45, soe: 46, nilaiAkhir: 46.2915 },
+            { nim: 'G1A025006', nama: 'ALIF MUHAMMAD SATRIAS', anatomi: 89.17, histologi: 42, biokimia: 50.83, pk: 90, cbt1: 83.3, cbt2: 51.3, rataCBT: 67.3, soe: 71, nilaiAkhir: 78.0818 },
+            { nim: 'G1A025007', nama: 'ANGGUN SEKAR AMALIA', anatomi: 75.5, histologi: 29.58, biokimia: 55.83, pk: 48, cbt1: 80, cbt2: 57.7, rataCBT: 68.85, soe: 40, nilaiAkhir: 46.032 },
+            { nim: 'G1A025008', nama: 'MUHAMMAD RIZKI MAULANA', anatomi: 87.91, histologi: 43, biokimia: 65, pk: 85, cbt1: 68, cbt2: 44, rataCBT: 56, soe: 37, nilaiAkhir: 51.2342 },
+            { nim: 'G1A025009', nama: 'IVANA WIDYA PARAMITA', anatomi: 81.67, histologi: 65.41, biokimia: 62, pk: 75, cbt1: 67.9, cbt2: 52, rataCBT: 59.95, soe: 56, nilaiAkhir: 62.8268 },
+            { nim: 'G1A025010', nama: 'MIFTAKHUL RIZKY ALWI ZAKARIA', anatomi: 76.67, histologi: 89.58, biokimia: 70, pk: 90, cbt1: 71.8, cbt2: 62.7, rataCBT: 67.25, soe: 50, nilaiAkhir: 69.5623 },
+            { nim: 'G1A025011', nama: 'RIFA AFRIANTI PRIMANTO', anatomi: 43, histologi: 23.33, biokimia: 45, pk: 38.7, cbt1: 50, cbt2: 42.3, rataCBT: 46.15, soe: 46, nilaiAkhir: 39.7495 },
+            { nim: 'G1A025012', nama: 'ARZETA HAFIFATUZZAHROH', anatomi: 89.83, histologi: 77.91, biokimia: 45, pk: 95, cbt1: 88.5, cbt2: 72, rataCBT: 80.25, soe: 50, nilaiAkhir: 74.9962 },
+            { nim: 'G1A025013', nama: 'ALYSA ILMI AULIA', anatomi: 80.5, histologi: 81.25, biokimia: 75, pk: 100, cbt1: 89.7, cbt2: 78.7, rataCBT: 84.2, soe: 50, nilaiAkhir: 77.7825 },
+            { nim: 'G1A025014', nama: 'NURUL UZMA ARIFINIANTI', anatomi: 70.16, histologi: 77, biokimia: 75, pk: 95, cbt1: 87.2, cbt2: 73.3, rataCBT: 80.25, soe: 53, nilaiAkhir: 74.5294 },
+            { nim: 'G1A025015', nama: 'NASHWA RIHADATUL \'AISY', anatomi: 51.6, histologi: 53.75, biokimia: 71.5, pk: 62.7, cbt1: 70, cbt2: 73.1, rataCBT: 71.55, soe: 48, nilaiAkhir: 60.9415 },
+            { nim: 'G1A025016', nama: 'HAIBA ZAHWA ADNINDYA ZIEN', anatomi: 75.83, histologi: 85, biokimia: 60, pk: 57.3, cbt1: 79.5, cbt2: 85, rataCBT: 82.25, soe: 62, nilaiAkhir: 70.9847 },
+            { nim: 'G1A025017', nama: 'ARKAAN ARRASYID S', anatomi: 84.16, histologi: 80.41, biokimia: 75, pk: 85.3, cbt1: 75, cbt2: 92.3, rataCBT: 83.65, soe: 63, nilaiAkhir: 81.3759 },
+            { nim: 'G1A025018', nama: 'ANDHIKA NUR HAKIM', anatomi: 85.16, histologi: 77.1, biokimia: 80, pk: 70, cbt1: 64, cbt2: 73.1, rataCBT: 68.55, soe: 60, nilaiAkhir: 70.2044 },
+            { nim: 'G1A025019', nama: 'ILHAM RAMADHAN TAUFIQ', anatomi: 11.33, histologi: 1.67, biokimia: 24, pk: 33.3, cbt1: 10, cbt2: 37.2, rataCBT: 23.6, soe: 10, nilaiAkhir: 21.9152 },
+            { nim: 'G1A025020', nama: 'SYIFA AULIA WIDIANA', anatomi: 45.83, histologi: 67.75, biokimia: 33.5, pk: 65, cbt1: 70.5, cbt2: 44, rataCBT: 57.25, soe: 54, nilaiAkhir: 56.8872 },
+            { nim: 'G1A025021', nama: 'NAYRAH BARIZKY RITONGA', anatomi: 40.83, histologi: 80.83, biokimia: 58.5, pk: 85, cbt1: 65.4, cbt2: 49.3, rataCBT: 57.35, soe: 40, nilaiAkhir: 57.6792 },
+            { nim: 'G1A025022', nama: 'NATASYA AURA PUTRI AHMAD', anatomi: 57.17, histologi: 60.83, biokimia: 57, pk: 42.5, cbt1: 60.3, cbt2: 52, rataCBT: 56.15, soe: 52, nilaiAkhir: 55.5398 },
+            { nim: 'G1A025023', nama: 'LUTHFI FADHILAH FATURAHMAN', anatomi: 44.5, histologi: 71.25, biokimia: 56, pk: 52.5, cbt1: 60.3, cbt2: 56, rataCBT: 58.15, soe: 82, nilaiAkhir: 62.8325 },
+            { nim: 'G1A025024', nama: 'NABILA QURROTA A\'INI', anatomi: 29, histologi: 22.08, biokimia: 62, pk: 37.3, cbt1: 45, cbt2: 42.3, rataCBT: 43.65, soe: 30, nilaiAkhir: 35.332 },
+            { nim: 'G1A025025', nama: 'LOVINA DINA KAMILA', anatomi: 93.33, histologi: 95.83, biokimia: 90.5, pk: 89.3, cbt1: 90, cbt2: 92.3, rataCBT: 91.15, soe: 60, nilaiAkhir: 86.1892 },
+            { nim: 'G1A025026', nama: 'AVELIKA LADYSA SHANETIN', anatomi: 59.5, histologi: 65.41, biokimia: 61.5, pk: 50.7, cbt1: 75, cbt2: 64.1, rataCBT: 69.55, soe: 70, nilaiAkhir: 62.0615 },
+            { nim: 'G1A025027', nama: 'SHARFINA AURIZMA TITANIA WARDANI', anatomi: 82.66, histologi: 82.92, biokimia: 49, pk: 52, cbt1: 75, cbt2: 73.1, rataCBT: 74.05, soe: 54, nilaiAkhir: 66.0924 },
+            { nim: 'G1A025028', nama: 'RAFI HAZZA SAPUTRA', anatomi: 85.25, histologi: 85, biokimia: 60, pk: 78.2, cbt1: 85, cbt2: 66.7, rataCBT: 75.85, soe: 27, nilaiAkhir: 67.5575 },
+            { nim: 'G1A025029', nama: 'FATWA DINATA', anatomi: 79.33, histologi: 89.58, biokimia: 77.5, pk: 95, cbt1: 83.3, cbt2: 74.7, rataCBT: 79, soe: 68, nilaiAkhir: 79.3917 },
+            { nim: 'G1A025030', nama: 'REZA HARUN', anatomi: 65.67, histologi: 62.08, biokimia: 52.5, pk: 49.3, cbt1: 65, cbt2: 64.1, rataCBT: 64.55, soe: 54, nilaiAkhir: 58.1173 },
+            { nim: 'G1A025031', nama: 'AZKIYA HUSNABILA', anatomi: 79.67, histologi: 91.67, biokimia: 86, pk: 80, cbt1: 88.5, cbt2: 74.7, rataCBT: 81.6, soe: 64, nilaiAkhir: 79.8208 },
+            { nim: 'G1A025032', nama: 'DAVINA NATTAYA KOMARA', anatomi: 47.16, histologi: 86.66, biokimia: 43, pk: 75, cbt1: 62.8, cbt2: 57.3, rataCBT: 60.05, soe: 55, nilaiAkhir: 62.2084 },
+            { nim: 'G1A025033', nama: 'MARIA CATHLEEN LIEM', anatomi: 73, histologi: 81.25, biokimia: 81, pk: 48, cbt1: 90, cbt2: 44.9, rataCBT: 67.45, soe: 76, nilaiAkhir: 68.9925 },
+            { nim: 'G1A025034', nama: 'AYU WULAN PUTRIANA', anatomi: 19.58, histologi: 10, biokimia: 43, pk: 35, cbt1: 70.5, cbt2: 33.3, rataCBT: 51.9, soe: 38, nilaiAkhir: 33.267 },
+            { nim: 'G1A025035', nama: 'KEISYA BEAUTY STANZA', anatomi: 86.3, histologi: 29.58, biokimia: 71, pk: 50.7, cbt1: 90, cbt2: 76.9, rataCBT: 83.45, soe: 39, nilaiAkhir: 57.754 },
+            { nim: 'G1A025036', nama: 'MU\'AFA NAZHMIR ROBBANI', anatomi: 22.5, histologi: 12.92, biokimia: 66.5, pk: 38.7, cbt1: 40, cbt2: 47.4, rataCBT: 43.7, soe: 30, nilaiAkhir: 34.883 },
+            { nim: 'G1A025037', nama: 'ZAWA HASNA\' ZAHIDAH', anatomi: 62.17, histologi: 63.75, biokimia: 70, pk: 49.3, cbt1: 65, cbt2: 69.2, rataCBT: 67.1, soe: 54, nilaiAkhir: 59.8528 },
+            { nim: 'G1A025038', nama: 'ANWA FATHIMA BIDZIKRI', anatomi: 33, histologi: 63, biokimia: 61.67, pk: 37.3, cbt1: 70, cbt2: 44.9, rataCBT: 57.45, soe: 25, nilaiAkhir: 44.4605 },
+            { nim: 'G1A025039', nama: 'MYCHA NAZILA SYAKIROH', anatomi: 65.17, histologi: 54.17, biokimia: 71, pk: 80, cbt1: 69.2, cbt2: 49.3, rataCBT: 59.25, soe: 56, nilaiAkhir: 59.8258 },
+            { nim: 'G1A025040', nama: 'MUHAMMAD RAFI\' NAUFAREL', anatomi: 66.17, histologi: 47.5, biokimia: 51.5, pk: 70, cbt1: 61.5, cbt2: 46.7, rataCBT: 54.1, soe: 36, nilaiAkhir: 51.6553 },
+            { nim: 'G1A025041', nama: 'BATRISYIA ATHA RINDRA JAFNI', anatomi: 78.88, histologi: 66.25, biokimia: 56.5, pk: 57.3, cbt1: 65, cbt2: 65.4, rataCBT: 65.2, soe: 48, nilaiAkhir: 61.2967 },
+            { nim: 'G1A025042', nama: 'NAILA FIRDAUZI HARYADINA PUTRI', anatomi: 91.93, histologi: 75.83, biokimia: 43.5, pk: 65, cbt1: 64.1, cbt2: 54.7, rataCBT: 59.4, soe: 54, nilaiAkhir: 63.6232 },
+            { nim: 'G1A025043', nama: 'ASIYAH', anatomi: 31.67, histologi: 48.3, biokimia: 43.5, pk: 60, cbt1: 48.7, cbt2: 52, rataCBT: 50.35, soe: 30, nilaiAkhir: 44.9753 },
+            { nim: 'G1A025044', nama: 'KHANSA JAHFALATHA BALQIS', anatomi: 45.33, histologi: 76.67, biokimia: 76, pk: 56, cbt1: 80, cbt2: 69.2, rataCBT: 74.6, soe: 41, nilaiAkhir: 60.5402 },
+            { nim: 'G1A025045', nama: 'NASYWA AMANIA HIDAYAT', anatomi: 82.93, histologi: 94.58, biokimia: 52.5, pk: 65.3, cbt1: 80, cbt2: 87.2, rataCBT: 83.6, soe: 82, nilaiAkhir: 80.1107 },
+            { nim: 'G1A025046', nama: 'MONICA SANCI KONDAWE', anatomi: 39.5, histologi: 35, biokimia: 37.67, pk: 26.7, cbt1: 25, cbt2: 32.1, rataCBT: 28.55, soe: 25, nilaiAkhir: 30.2753 },
+            { nim: 'G1A025047', nama: 'MUHAMMAD ALRIZA NASUTION', anatomi: 54.88, histologi: 45, biokimia: 42.5, pk: 85, cbt1: 56.4, cbt2: 46.7, rataCBT: 51.55, soe: 23, nilaiAkhir: 47.1292 },
+            { nim: 'G1A025048', nama: 'HANIFA', anatomi: 67.9, histologi: 42.5, biokimia: 69, pk: 80, cbt1: 57.7, cbt2: 52, rataCBT: 54.85, soe: 28, nilaiAkhir: 54.135 },
+            { nim: 'G1A025049', nama: 'RIFQAH ZULFA AFANIN', anatomi: 56.17, histologi: 81, biokimia: 87, pk: 66.7, cbt1: 70.5, cbt2: 65, rataCBT: 67.75, soe: 28, nilaiAkhir: 63.1253 },
+            { nim: 'G1A025050', nama: 'MUHAMMAD NAUVAL PANJI AL HAKIM', anatomi: 13.72, histologi: 7.25, biokimia: 5, pk: 28, cbt1: 15, cbt2: 33.3, rataCBT: 24.15, soe: 24, nilaiAkhir: 22.8673 },
+            { nim: 'G1A025051', nama: 'AMIRA BALQIS ASSABA', anatomi: 49.5, histologi: 64.2, biokimia: 49.5, pk: 65, cbt1: 79.5, cbt2: 58.7, rataCBT: 69.1, soe: 69, nilaiAkhir: 68.295 },
+            { nim: 'G1A025052', nama: 'CLAIRINE ZERLINA HANIFAH', anatomi: 72.08, histologi: 65.5, biokimia: 30, pk: 70, cbt1: 66.7, cbt2: 53.3, rataCBT: 60, soe: 41, nilaiAkhir: 60.1355 },
+            { nim: 'G1A025053', nama: 'CHRISTIAN PRAJADI', anatomi: 79.17, histologi: 58.5, biokimia: 51.17, pk: 25, cbt1: 44.9, cbt2: 44, rataCBT: 44.45, soe: 42, nilaiAkhir: 41.8953 },
+            { nim: 'G1A025054', nama: 'ALFI NISA DAMAYANTI', anatomi: 76.67, histologi: 79.58, biokimia: 62, pk: 62.7, cbt1: 95, cbt2: 76.9, rataCBT: 85.95, soe: 63, nilaiAkhir: 71.6873 },
+            { nim: 'G1A025055', nama: 'VANISSA FATHIAH ARDANI', anatomi: 71.5, histologi: 83.75, biokimia: 70.17, pk: 57.3, cbt1: 85, cbt2: 82.1, rataCBT: 83.55, soe: 68, nilaiAkhir: 72.3628 },
+            { nim: 'G1A025056', nama: 'SIGIT PRAMBUDI DIENTI', anatomi: 61.5, histologi: 74.42, biokimia: 86.6, pk: 72.5, cbt1: 73.1, cbt2: 65.3, rataCBT: 69.2, soe: 58, nilaiAkhir: 70.1978 },
+            { nim: 'G1A025057', nama: 'MUHAMMAD UZAIR ABDILLAH', anatomi: 78.3, histologi: 51.67, biokimia: 60, pk: 50.7, cbt1: 55, cbt2: 59, rataCBT: 57, soe: 24, nilaiAkhir: 51.0925 },
+            { nim: 'G1A025059', nama: 'MAYCO CAHYA TRI ADINANSYAH', anatomi: 40, histologi: 43.5, biokimia: 58.8, pk: 52, cbt1: 55, cbt2: 52.6, rataCBT: 53.8, soe: 68, nilaiAkhir: 55.075 },
+            { nim: 'G1A025060', nama: 'NADIA CHERYL', anatomi: 71.5, histologi: 90, biokimia: 46.1, pk: 80, cbt1: 69.2, cbt2: 57.3, rataCBT: 63.25, soe: 45, nilaiAkhir: 63.519 },
+            { nim: 'G1A025061', nama: 'NADIA CHAIRUNNISA OLIA PUTRI', anatomi: 70.33, histologi: 66.67, biokimia: 43, pk: 64, cbt1: 60, cbt2: 73.1, rataCBT: 66.55, soe: 42, nilaiAkhir: 62.4552 },
+            { nim: 'G1A025062', nama: 'LOKANANTA ARKIE AMSAL', anatomi: 68.6, histologi: 79.58, biokimia: 71.5, pk: 54.7, cbt1: 75, cbt2: 71.8, rataCBT: 73.4, soe: 49, nilaiAkhir: 64.451 },
+            { nim: 'G1A025063', nama: 'M.DANAR RAMADHAN TARUNA', anatomi: 43.67, histologi: 37.08, biokimia: 70, pk: 52, cbt1: 65, cbt2: 74.4, rataCBT: 69.7, soe: 51, nilaiAkhir: 55.6223 },
+            { nim: 'G1A025064', nama: 'RAZITA KHAIRINA PRASAJA MARPAUNG', anatomi: 74, histologi: 66.67, biokimia: 50.5, pk: 49.3, cbt1: 60, cbt2: 78.2, rataCBT: 69.1, soe: 38, nilaiAkhir: 59.8905 },
+            { nim: 'G1A025065', nama: 'IRSYAD WAHYU MUHARROM', anatomi: 89.93, histologi: 75.83, biokimia: 56.5, pk: 60, cbt1: 75, cbt2: 75.6, rataCBT: 75.3, soe: 71, nilaiAkhir: 71.5932 },
+            { nim: 'G1A025066', nama: 'INGRID GAYATRI', anatomi: 35.83, histologi: 62, biokimia: 27, pk: 40, cbt1: 55, cbt2: 52.6, rataCBT: 53.8, soe: 36, nilaiAkhir: 42.0445 },
+            { nim: 'G1A025067', nama: 'FADHILAH AZKA AFKARINA', anatomi: 53.67, histologi: 44, biokimia: 49.5, pk: 45.3, cbt1: 75, cbt2: 65.4, rataCBT: 70.2, soe: 39, nilaiAkhir: 51.3603 },
+            { nim: 'G1A025068', nama: 'GABRIEL DANENDRA SETYAWAN', anatomi: 81.83, histologi: 98.75, biokimia: 71, pk: 81.3, cbt1: 85, cbt2: 84.6, rataCBT: 84.8, soe: 37, nilaiAkhir: 76.6922 },
+            { nim: 'G1A025069', nama: 'AMILAH AMATURRAHIM AL MUJAHIDAH', anatomi: 76, histologi: 40.41, biokimia: 57.5, pk: 40, cbt1: 65, cbt2: 61.5, rataCBT: 63.25, soe: 30, nilaiAkhir: 47.5415 },
+            { nim: 'G1A025070', nama: 'FARID HAMZAH PUTRA PRATAMA', anatomi: 72.43, histologi: 25.83, biokimia: 56.5, pk: 50.7, cbt1: 55, cbt2: 59, rataCBT: 57, soe: 43, nilaiAkhir: 50.0032 },
+            { nim: 'G1A025071', nama: 'JAMES SUDIANTO RACHMAPUTRA', anatomi: 73, histologi: 62.91, biokimia: 60, pk: 68, cbt1: 30, cbt2: 74.4, rataCBT: 52.2, soe: 37, nilaiAkhir: 61.5665 },
+            { nim: 'G1A025072', nama: 'KHAIRUNNISA AZKA FADILA', anatomi: 68, histologi: 71, biokimia: 59.2, pk: 61.3, cbt1: 85, cbt2: 83.3, rataCBT: 84.15, soe: 61, nilaiAkhir: 69.038 },
+            { nim: 'G1A025073', nama: 'ISYRAFUDDIN ABDUN YASYKUR', anatomi: 88.83, histologi: 76.25, biokimia: 61.5, pk: 56, cbt1: 85, cbt2: 67.9, rataCBT: 76.45, soe: 59, nilaiAkhir: 67.1222 },
+            { nim: 'G1A025074', nama: 'TSALITSA AFIFAH NIDAUL HAQ', anatomi: 57.08, histologi: 71.5, biokimia: 64.67, pk: 50.7, cbt1: 70, cbt2: 60.3, rataCBT: 65.15, soe: 31, nilaiAkhir: 53.3573 },
+            { nim: 'G1A025075', nama: 'AISYAH NUR AZIZAH', anatomi: 51.25, histologi: 48.17, biokimia: 60, pk: 49.3, cbt1: 65, cbt2: 59, rataCBT: 62, soe: 44, nilaiAkhir: 52.0678 },
+            { nim: 'G1A025076', nama: 'WAHYUDI', anatomi: 33.83, histologi: 19.58, biokimia: 33, pk: 42.7, cbt1: 30, cbt2: 29.5, rataCBT: 29.75, soe: 43, nilaiAkhir: 34.2617 },
+            { nim: 'G1A025077', nama: 'KAUTSAR PANDYA RAHADYAN', anatomi: 11.33, histologi: 21.67, biokimia: 61.5, pk: 42.7, cbt1: 70, cbt2: 62.8, rataCBT: 66.4, soe: 33, nilaiAkhir: 41.9302 },
+            { nim: 'G1A025078', nama: 'CHRISTIAN ALLAN', anatomi: 74, histologi: 76.67, biokimia: 75, pk: 72, cbt1: 90, cbt2: 89.7, rataCBT: 89.85, soe: 84, nilaiAkhir: 80.4555 },
+            { nim: 'G1A025079', nama: 'I DEWA AYU MADE SHINTA ANGELINA', anatomi: 86.25, histologi: 78.67, biokimia: 71.5, pk: 70.7, cbt1: 75, cbt2: 76.9, rataCBT: 75.95, soe: 8, nilaiAkhir: 64.2528 },
+            { nim: 'G1A025080', nama: 'DZAKI AMRU SYAFI', anatomi: 73.83, histologi: 77.91, biokimia: 52.5, pk: 68, cbt1: 90, cbt2: 79.5, rataCBT: 84.75, soe: 32, nilaiAkhir: 67.0412 },
+            { nim: 'G1A025081', nama: 'NAURA PUTRI ALEXANDRIA', anatomi: 66.83, histologi: 66, biokimia: 71.67, pk: 46.7, cbt1: 80, cbt2: 65.4, rataCBT: 72.7, soe: 41, nilaiAkhir: 58.1502 },
+            { nim: 'G1A025082', nama: 'ARKAN FAWWAZ INDARJO', anatomi: 87.08, histologi: 54, biokimia: 52, pk: 68, cbt1: 60, cbt2: 76.9, rataCBT: 68.45, soe: 52, nilaiAkhir: 68.067 },
+            { nim: 'G1A025083', nama: 'GHANIA NAILA NOOR DZAKIYYAH', anatomi: 62, histologi: 72, biokimia: 44, pk: 64, cbt1: 57.5, cbt2: 67.9, rataCBT: 62.7, soe: 56, nilaiAkhir: 62.55 },
+            { nim: 'G1A025084', nama: 'ANINDYA SAFIRA RIYANTO', anatomi: 67.83, histologi: 73.3, biokimia: 53, pk: 64, cbt1: 85, cbt2: 78.2, rataCBT: 81.6, soe: 68, nilaiAkhir: 70.7297 },
+            { nim: 'G1A025086', nama: 'UTHI FIDELA SALWA', anatomi: 71.25, histologi: 54.17, biokimia: 76, pk: 65.3, cbt1: 80, cbt2: 79.5, rataCBT: 79.75, soe: 38, nilaiAkhir: 64.8828 },
+            { nim: 'G1A025087', nama: 'AUFADHIYA KHAIRANI PUTRI', anatomi: 50, histologi: 42.91, biokimia: 19.67, pk: 75, cbt1: 45.3, cbt2: 50, rataCBT: 47.65, soe: 43, nilaiAkhir: 45.0218 },
+            { nim: 'G1A025088', nama: 'HANUM PRIMANDA KHAIRUNNISA', anatomi: 83, histologi: 50, biokimia: 66.38, pk: 69.3, cbt1: 50, cbt2: 64.1, rataCBT: 57.05, soe: 51, nilaiAkhir: 64.9542 },
+            { nim: 'G1A025089', nama: 'IKA WIDIASTUTI', anatomi: 78.3, histologi: 75, biokimia: 47.83, pk: 61.3, cbt1: 85, cbt2: 74.4, rataCBT: 79.7, soe: 50, nilaiAkhir: 65.4747 },
+            { nim: 'G1A025091', nama: 'CLAUDIA ZAR\'IN PUTRI JASMINE', anatomi: 76.83, histologi: 87.91, biokimia: 71.5, pk: 0, cbt1: 56, cbt2: 66.7, rataCBT: 61.35, soe: 47, nilaiAkhir: 61.3812 },
+            { nim: 'G1A025092', nama: 'SIXTEENOVA ARINI RAHMATIKA', anatomi: 92.91, histologi: 89, biokimia: 81, pk: 65.3, cbt1: 80, cbt2: 78.2, rataCBT: 79.1, soe: 56, nilaiAkhir: 74.3315 },
+            { nim: 'G1A025093', nama: 'AMEERA JASMINE ZAIN', anatomi: 47.88, histologi: 85, biokimia: 85, pk: 56, cbt1: 90, cbt2: 73.1, rataCBT: 81.55, soe: 36, nilaiAkhir: 62.8642 },
+            { nim: 'G1A025094', nama: 'NADYANDRA ARETHA MAIRITZA', anatomi: 35, histologi: 72.5, biokimia: 80.67, pk: 85, cbt1: 65.3, cbt2: 64.1, rataCBT: 64.7, soe: 27, nilaiAkhir: 60.6453 },
+            { nim: 'G1A025095', nama: 'NADINE PRAMESTHA ARDHANI', anatomi: 86.6, histologi: 76, biokimia: 86.5, pk: 76, cbt1: 70, cbt2: 91, rataCBT: 80.5, soe: 57, nilaiAkhir: 78.565 },
+            { nim: 'G1A025096', nama: 'AMELIA AZZAHRA', anatomi: 72.16, histologi: 60, biokimia: 56.5, pk: 57.3, cbt1: 80, cbt2: 66.7, rataCBT: 73.35, soe: 46, nilaiAkhir: 64.3859 },
+            { nim: 'G1A025097', nama: 'RIFAT PRAMUDIA NASUTION', anatomi: 85.41, histologi: 83.33, biokimia: 71.22, pk: 62.7, cbt1: 65, cbt2: 71.8, rataCBT: 68.4, soe: 46, nilaiAkhir: 65.7593 },
+            { nim: 'G1A025098', nama: 'JAHFAL AL FARISI', anatomi: 42.5, histologi: 45.8, biokimia: 67.43, pk: 50.7, cbt1: 50, cbt2: 62.8, rataCBT: 56.4, soe: 84, nilaiAkhir: 60.2087 },
+            { nim: 'G1A025099', nama: 'ISTAVANIA NADIA MUFID', anatomi: 73.17, histologi: 92.9, biokimia: 61.5, pk: 60, cbt1: 80, cbt2: 66.7, rataCBT: 73.35, soe: 31, nilaiAkhir: 63.6203 },
+            { nim: 'G1A025100', nama: 'RISTY PUTERI KUSUMA MAHARDIKANINGSIH', anatomi: 68, histologi: 85.41, biokimia: 61.5, pk: 65.3, cbt1: 70, cbt2: 82.1, rataCBT: 76.05, soe: 76, nilaiAkhir: 74.8065 },
+            { nim: 'G1A025101', nama: 'CHELSEA ICHA PUTRI ANZANI', anatomi: 45.5, histologi: 45, biokimia: 60.66, pk: 70, cbt1: 42.7, cbt2: 56.4, rataCBT: 49.55, soe: 33, nilaiAkhir: 47.9715 },
+            { nim: 'G1A025102', nama: 'DZAKWAN HAMMAM NAWAWI', anatomi: 55.41, histologi: 77.5, biokimia: 51.5, pk: 70.7, cbt1: 75, cbt2: 79.5, rataCBT: 77.25, soe: 37, nilaiAkhir: 67.4444 },
+            { nim: 'G1A025103', nama: 'YAZMINE', anatomi: 80, histologi: 60.83, biokimia: 72.08, pk: 69.3, cbt1: 65, cbt2: 66.7, rataCBT: 65.85, soe: 55, nilaiAkhir: 64.9817 },
+            { nim: 'G1A025104', nama: 'MAULIDIA ZULFA KARTIKA', anatomi: 86.97, histologi: 82.08, biokimia: 81, pk: 77.3, cbt1: 75, cbt2: 74.4, rataCBT: 74.7, soe: 40, nilaiAkhir: 71.4443 },
+            { nim: 'G1A025105', nama: 'SAVANA RIZKY PURNAMA', anatomi: 92.8, histologi: 89.58, biokimia: 65, pk: 76, cbt1: 80, cbt2: 87.2, rataCBT: 83.6, soe: 53, nilaiAkhir: 78.079 },
+            { nim: 'G1A025106', nama: 'YASMIN TAQIYAH TAMBUNAN', anatomi: 87.08, histologi: 55, biokimia: 89.6, pk: 72, cbt1: 90, cbt2: 76.9, rataCBT: 83.45, soe: 70, nilaiAkhir: 77.101 },
+            { nim: 'G1A025107', nama: 'NACHAYA AROFAHNI WIJAYA', anatomi: 59.16, histologi: 61.5, biokimia: 53.5, pk: 62.5, cbt1: 44, cbt2: 39.7, rataCBT: 41.85, soe: 31, nilaiAkhir: 45.164 },
+            { nim: 'G1A025108', nama: 'FRIDA MULIADEWI CHAERANI', anatomi: 76.5, histologi: 69.16, biokimia: 47.5, pk: 80, cbt1: 69.3, cbt2: 76.9, rataCBT: 73.1, soe: 54, nilaiAkhir: 68.954 },
+            { nim: 'G1A025109', nama: 'GHANIY HILDAN RABBANI', anatomi: 84.33, histologi: 68.33, biokimia: 71.5, pk: 69.3, cbt1: 75, cbt2: 79.5, rataCBT: 77.25, soe: 64, nilaiAkhir: 72.4542 },
+            { nim: 'G1A025110', nama: 'ALTAF FIAN JUNINDA', anatomi: 75.17, histologi: 59.58, biokimia: 48.5, pk: 74.7, cbt1: 60, cbt2: 94.9, rataCBT: 77.45, soe: 36, nilaiAkhir: 69.0373 },
+            { nim: 'G1A025111', nama: 'FADELLA AZZAHRA', anatomi: 50, histologi: 54.16, biokimia: 55, pk: 40, cbt1: 60, cbt2: 59, rataCBT: 59.5, soe: 45, nilaiAkhir: 50.124 },
+            { nim: 'G1A025112', nama: 'HANINDITA NASTITI AYUNINGTIAS', anatomi: 85, histologi: 81.67, biokimia: 66.5, pk: 56, cbt1: 75, cbt2: 69.2, rataCBT: 72.1, soe: 51, nilaiAkhir: 66.1255 },
+            { nim: 'G1A025113', nama: 'TYANAYA RAHMA', anatomi: 70.2, histologi: 85.41, biokimia: 81, pk: 64, cbt1: 85, cbt2: 74.4, rataCBT: 79.7, soe: 53, nilaiAkhir: 69.9495 },
+            { nim: 'G1A025114', nama: 'CHINTYA PUTRI NABILAH', anatomi: 88.67, histologi: 77.08, biokimia: 43, pk: 50.7, cbt1: 80, cbt2: 75.6, rataCBT: 77.8, soe: 68, nilaiAkhir: 68.6473 },
+            { nim: 'G1A025115', nama: 'AISYA NURLANGIT FITRI', anatomi: 68.17, histologi: 63.75, biokimia: 81, pk: 57.3, cbt1: 70, cbt2: 74.4, rataCBT: 72.2, soe: 53, nilaiAkhir: 64.0928 },
+            { nim: 'G1A025116', nama: 'AVISA ZANDRA CITAGAMI', anatomi: 39.67, histologi: 47.08, biokimia: 43, pk: 49.3, cbt1: 60, cbt2: 64.1, rataCBT: 62.05, soe: 30, nilaiAkhir: 48.6723 },
+            { nim: 'G1A025117', nama: 'FIQYA SULISTIANI', anatomi: 23.5, histologi: 33.08, biokimia: 24, pk: 38.7, cbt1: 55, cbt2: 43.6, rataCBT: 49.3, soe: 0, nilaiAkhir: 31.152 },
+            { nim: 'G1A025118', nama: 'RAHMA GRISELDA INDRASTATA', anatomi: 56.67, histologi: 62.91, biokimia: 62, pk: 50.7, cbt1: 70, cbt2: 71.8, rataCBT: 70.9, soe: 55, nilaiAkhir: 60.4218 },
+            { nim: 'G1A025119', nama: 'KHESYIA NAFIA ATMOKO', anatomi: 23.5, histologi: 30, biokimia: 6.25, pk: 15, cbt1: 46.7, cbt2: 39.7, rataCBT: 43.2, soe: 18, nilaiAkhir: 29.5425 },
+            { nim: 'G1A025120', nama: 'QAFFAL ZIAN QADSI', anatomi: 38.04, histologi: 53.17, biokimia: 51.5, pk: 53.3, cbt1: 70, cbt2: 48.7, rataCBT: 59.35, soe: 43, nilaiAkhir: 48.7763 },
+            { nim: 'G1A025121', nama: 'AMIRA AZALIA', anatomi: 52.5, histologi: 35.38, biokimia: 60.6, pk: 34.7, cbt1: 60, cbt2: 60.3, rataCBT: 60.15, soe: 44, nilaiAkhir: 47.006 },
+            { nim: 'G1A025122', nama: 'MUHAMMAD RASYID SURYA WICAKSONO', anatomi: 20, histologi: 5, biokimia: 33.3, pk: 0, cbt1: 15.4, cbt2: 24.35, rataCBT: 19.875, soe: 56, nilaiAkhir: 23.105 },
+            { nim: 'G1A025123', nama: 'NAURA ALYA FASHIHA', anatomi: 31.25, histologi: 40.33, biokimia: 51, pk: 50, cbt1: 53.3, cbt2: 47.4, rataCBT: 50.35, soe: 60, nilaiAkhir: 48.3222 },
+            { nim: 'G1A025124', nama: 'BUNGA PUTRI ANGGINA', anatomi: 25.67, histologi: 47, biokimia: 45.4, pk: 53.3, cbt1: 50, cbt2: 48.7, rataCBT: 49.35, soe: 29, nilaiAkhir: 43.7503 },
+            { nim: 'G1A025125', nama: 'M. ANDHIKA PUTRA PRATAMA', anatomi: 67.67, histologi: 67.64, biokimia: 66, pk: 62.7, cbt1: 80, cbt2: 76.9, rataCBT: 78.45, soe: 53, nilaiAkhir: 66.6563 },
+            { nim: 'G1A025126', nama: 'HANENDI FAREL SANTAUSO', anatomi: 48.17, histologi: 54.73, biokimia: 40, pk: 36, cbt1: 50, cbt2: 59, rataCBT: 54.5, soe: 48, nilaiAkhir: 48.6348 },
+            { nim: 'G1A025127', nama: 'JOVITA BERNADINE AZALIA DWIASTHI', anatomi: 56.17, histologi: 71.25, biokimia: 52, pk: 42.7, cbt1: 70, cbt2: 51.3, rataCBT: 60.65, soe: 48, nilaiAkhir: 52.9428 },
+            { nim: 'G1A025128', nama: 'RAISHA AQILA ARDANU', anatomi: 60.22, histologi: 91.25, biokimia: 52.5, pk: 54.7, cbt1: 65, cbt2: 59, rataCBT: 62, soe: 30, nilaiAkhir: 57.7573 },
+            { nim: 'G1A025129', nama: 'NAZLA RIFDA AQILLAH', anatomi: 49.83, histologi: 62, biokimia: 65.41, pk: 44, cbt1: 85, cbt2: 69.2, rataCBT: 77.1, soe: 49, nilaiAkhir: 57.5262 },
+            { nim: 'G1A025130', nama: 'SYAFIQ ATAULLAH GHAFFAR', anatomi: 51.67, histologi: 47, biokimia: 31.25, pk: 41.3, cbt1: 40, cbt2: 53.8, rataCBT: 46.9, soe: 27, nilaiAkhir: 41.3828 },
+            { nim: 'G1A025131', nama: 'ZIDAN ADI HENDRIK TRI PUTRA', anatomi: 72.17, histologi: 53.89, biokimia: 23.5, pk: 49.3, cbt1: 60, cbt2: 57.7, rataCBT: 58.85, soe: 31, nilaiAkhir: 50.6138 },
+            { nim: 'G1A025132', nama: 'FADHEL MUHAMMAD AIHAM', anatomi: 18.83, histologi: 28.75, biokimia: 24, pk: 41.3, cbt1: 35, cbt2: 60.3, rataCBT: 47.65, soe: 30, nilaiAkhir: 39.2772 },
+            { nim: 'G1A025133', nama: 'AISYAH LOVIA ZAHRA ROCHMANA', anatomi: 53.16, histologi: 54.5, biokimia: 54, pk: 44, cbt1: 80, cbt2: 55.1, rataCBT: 67.55, soe: 61, nilaiAkhir: 54.3344 },
+            { nim: 'G1A025134', nama: 'BAGAS ARIEF SETYA WARDANA', anatomi: 54.33, histologi: 48.75, biokimia: 75.5, pk: 57.3, cbt1: 45, cbt2: 64.1, rataCBT: 54.55, soe: 32, nilaiAkhir: 52.8272 },
+            { nim: 'G1A025135', nama: 'KHAMIDYA SAFIRA', anatomi: 60.17, histologi: 90.4, biokimia: 62, pk: 65.3, cbt1: 65, cbt2: 74.4, rataCBT: 69.7, soe: 66, nilaiAkhir: 70.8903 },
+            { nim: 'G1A025136', nama: 'RIKO RAHARDIAN PUTRA WARDANA', anatomi: 37.42, histologi: 48.33, biokimia: 62, pk: 41.3, cbt1: 55, cbt2: 66.7, rataCBT: 60.85, soe: 59, nilaiAkhir: 52.8473 },
+            { nim: 'G1A025138', nama: 'TITEN WIGUNA', anatomi: 29.83, histologi: 45.41, biokimia: 76, pk: 58.7, cbt1: 47.5, cbt2: 57.7, rataCBT: 52.6, soe: 37, nilaiAkhir: 49.9112 },
+            { nim: 'G1A025139', nama: 'FANISA MAULIDA RAHARJA', anatomi: 44.67, histologi: 75, biokimia: 57.5, pk: 49.3, cbt1: 65, cbt2: 74.4, rataCBT: 69.7, soe: 36, nilaiAkhir: 55.5503 },
+            { nim: 'G1A025140', nama: 'DWINANDA FITRIANA PUTRI', anatomi: 16.5, histologi: 31.88, biokimia: 45, pk: 36, cbt1: 35, cbt2: 44.9, rataCBT: 39.95, soe: 26, nilaiAkhir: 33.912 },
+            { nim: 'G1A025141', nama: 'BERMASAUT ADIPUTRA TAMPUBOLON', anatomi: 38.16, histologi: 33, biokimia: 38.06, pk: 49.3, cbt1: 45, cbt2: 51.3, rataCBT: 48.15, soe: 52, nilaiAkhir: 48.8569 },
+            { nim: 'G1A025142', nama: 'ZASKIA YUFLIHA ALYA NISA', anatomi: 42.67, histologi: 48.75, biokimia: 61.5, pk: 58.7, cbt1: 65, cbt2: 65.4, rataCBT: 65.2, soe: 40, nilaiAkhir: 52.8693 },
+            { nim: 'G1A025143', nama: 'SYAHRU SYABANA SETIYANTO', anatomi: 63.83, histologi: 65.41, biokimia: 71.5, pk: 61.11, cbt1: 50, cbt2: 67.9, rataCBT: 58.95, soe: 46, nilaiAkhir: 60.7337 },
+            { nim: 'G1A025144', nama: 'NISRINA ATIRA AFLAH GUNNARTO', anatomi: 26, histologi: 24.17, biokimia: 28, pk: 28, cbt1: 35, cbt2: 29.5, rataCBT: 32.25, soe: 34, nilaiAkhir: 29.0505 },
+            { nim: 'G1A025145', nama: 'HASAN TRI GUNAWAN', anatomi: 69.33, histologi: 87.91, biokimia: 62, pk: 73.3, cbt1: 75, cbt2: 84.6, rataCBT: 79.8, soe: 71, nilaiAkhir: 77.2912 },
+            { nim: 'G1A025146', nama: 'NADHIRA YUSTRINA', anatomi: 67.5, histologi: 52, biokimia: 78.75, pk: 41.3, cbt1: 57.5, cbt2: 61.5, rataCBT: 59.5, soe: 43, nilaiAkhir: 55.7625 },
+            { nim: 'G1A025147', nama: 'WAHYU CAN ARUM PUTRI RAMBIATI', anatomi: 61, histologi: 42, biokimia: 74.1, pk: 52, cbt1: 55, cbt2: 65.4, rataCBT: 60.2, soe: 51, nilaiAkhir: 59.145 },
+            { nim: 'G1A025148', nama: 'ARSELAN RIZQY DARMAWAN', anatomi: 73.75, histologi: 65.41, biokimia: 57, pk: 70.7, cbt1: 95, cbt2: 70.5, rataCBT: 82.75, soe: 52, nilaiAkhir: 67.569 },
+            { nim: 'G1A025149', nama: 'NARDIIN FATHIYYAH SUNYOTO', anatomi: 42.3, histologi: 75, biokimia: 79, pk: 58.7, cbt1: 65, cbt2: 60.3, rataCBT: 62.65, soe: 72, nilaiAkhir: 63.867 },
+            { nim: 'G1A025150', nama: 'AQBIL REZKY BUNAYYA', anatomi: 62.33, histologi: 77.5, biokimia: 46.5, pk: 37.3, cbt1: 80, cbt2: 28.2, rataCBT: 54.1, soe: 31, nilaiAkhir: 44.5847 },
+            { nim: 'G1A025151', nama: 'MUHAMMAD THORIQ AL ROSYID', anatomi: 67.83, histologi: 73.75, biokimia: 57, pk: 64, cbt1: 70, cbt2: 67.9, rataCBT: 68.95, soe: 77, nilaiAkhir: 69.2122 },
+            { nim: 'G1A025152', nama: 'RAFI DINAN AL FARISI', anatomi: 51.67, histologi: 52, biokimia: 67.91, pk: 38.7, cbt1: 62.5, cbt2: 57.7, rataCBT: 60.1, soe: 46, nilaiAkhir: 51.9018 },
+            { nim: 'G1A025153', nama: 'MUHAMMAD FARRELL ARCHARD ZHAFIF SUCIPTO', anatomi: 23, histologi: 52.5, biokimia: 52.5, pk: 48, cbt1: 60, cbt2: 56.4, rataCBT: 58.2, soe: 59, nilaiAkhir: 51.24 },
+            { nim: 'G1A025154', nama: 'JOSEPHINE MELYNA EVANY ESTAFANA', anatomi: 54.67, histologi: 28, biokimia: 66.6, pk: 52, cbt1: 90, cbt2: 65.4, rataCBT: 77.7, soe: 46, nilaiAkhir: 57.8803 },
+            { nim: 'G1A025155', nama: 'GAFIN AULIA RAHARJO', anatomi: 57.17, histologi: 81, biokimia: 74.16, pk: 57.3, cbt1: 65, cbt2: 70.5, rataCBT: 67.75, soe: 50, nilaiAkhir: 62.8993 },
+            { nim: 'G1A025156', nama: 'CLEARY SHAYNA HANIN', anatomi: 71.71, histologi: 53.75, biokimia: 42, pk: 37.3, cbt1: 50, cbt2: 43.6, rataCBT: 46.8, soe: 60, nilaiAkhir: 49.3014 },
+            { nim: 'G1A025157', nama: 'RAZZA RASENDRIYA NANDANA ARDI', anatomi: 23.67, histologi: 27.5, biokimia: 62, pk: 33.3, cbt1: 40, cbt2: 41, rataCBT: 40.5, soe: 66, nilaiAkhir: 40.5703 },
+            { nim: 'G1A025159', nama: 'KEYSHA FAUSTA ZAINI', anatomi: 32.16, histologi: 71.5, biokimia: 25.41, pk: 40, cbt1: 45, cbt2: 44.9, rataCBT: 44.95, soe: 44, nilaiAkhir: 40.2459 },
+            { nim: 'G1A025160', nama: 'NADIYA BINTANG RAZIA NIKO', anatomi: 61.05, histologi: 73.3, biokimia: 55, pk: 45.3, cbt1: 70, cbt2: 65.4, rataCBT: 67.7, soe: 36, nilaiAkhir: 56.2895 },
+            { nim: 'G1A025161', nama: 'MOH. ILHAM ARDIATSYAH', anatomi: 4.16, histologi: 71.5, biokimia: 15.83, pk: 29.3, cbt1: 30, cbt2: 33.3, rataCBT: 31.65, soe: 31, nilaiAkhir: 27.1289 },
+            { nim: 'G1A025163', nama: 'ASTRELLA AIMEE KHOIRUNNISA', anatomi: 65, histologi: 52.5, biokimia: 58, pk: 58.7, cbt1: 50, cbt2: 75.6, rataCBT: 62.8, soe: 46, nilaiAkhir: 60.48 },
+            { nim: 'G1A025164', nama: 'ATHIFATUL JANNAH', anatomi: 8, histologi: 10.83, biokimia: 23.5, pk: 36, cbt1: 40, cbt2: 37.2, rataCBT: 38.6, soe: 20, nilaiAkhir: 26.9495 },
+            { nim: 'G1A025165', nama: 'MUHAMMAD SYAFIEQ ADZKA', anatomi: 73.26, histologi: 61.5, biokimia: 82.08, pk: 58.7, cbt1: 80, cbt2: 64.1, rataCBT: 72.05, soe: 39, nilaiAkhir: 62.4704 },
+            { nim: 'G1A025166', nama: 'SYIFA NURJANAH', anatomi: 35.17, histologi: 25, biokimia: 52.5, pk: 46.7, cbt1: 47.5, cbt2: 57.7, rataCBT: 52.6, soe: 28, nilaiAkhir: 45.3053 },
+            { nim: 'G1A025167', nama: 'DIMAS ZAHRAN HERDYASSAGAF', anatomi: 20, histologi: 9.58, biokimia: 45, pk: 34.7, cbt1: 45, cbt2: 34.6, rataCBT: 39.8, soe: 7, nilaiAkhir: 25.422 },
+            { nim: 'G1A025168', nama: 'FARREL MOZA DHIYAUL HAQ', anatomi: 50.5, histologi: 56.67, biokimia: 51.5, pk: 45.3, cbt1: 30, cbt2: 70.5, rataCBT: 50.25, soe: 52, nilaiAkhir: 54.4005 },
+            { nim: 'G1A025169', nama: 'REECHARD BURHANUDIN FUADY', anatomi: 54.67, histologi: 70, biokimia: 52.5, pk: 44, cbt1: 25, cbt2: 47.4, rataCBT: 36.2, soe: 14, nilaiAkhir: 41.5353 },
+            { nim: 'G1A025170', nama: 'ADDINI FATMA ARINI', anatomi: 37.17, histologi: 25.83, biokimia: 24, pk: 33.3, cbt1: 50, cbt2: 42.3, rataCBT: 46.15, soe: 23, nilaiAkhir: 32.3998 },
+            { nim: 'G1A025171', nama: 'HANIN NAURA FARIHA', anatomi: 39.5, histologi: 39.58, biokimia: 32, pk: 52, cbt1: 40, cbt2: 41, rataCBT: 40.5, soe: 35, nilaiAkhir: 42.0173 },
+            { nim: 'G1A025172', nama: 'AHMAD ABDUL HAQQI', anatomi: 17.5, histologi: 61.5, biokimia: 49.58, pk: 53.3, cbt1: 60, cbt2: 57.7, rataCBT: 58.85, soe: 42, nilaiAkhir: 51.6042 },
+            { nim: 'G1A025174', nama: 'AHMAD MUQORROBIN', anatomi: 33.33, histologi: 35.83, biokimia: 33.5, pk: 50.7, cbt1: 45, cbt2: 67.9, rataCBT: 56.45, soe: 42, nilaiAkhir: 48.8392 },
+            { nim: 'G1A025175', nama: 'AKBAR BAGUS SRI ZENA', anatomi: 47.41, histologi: 66, biokimia: 50.41, pk: 48, cbt1: 65, cbt2: 52.6, rataCBT: 58.8, soe: 18, nilaiAkhir: 45.4484 },
+            { nim: 'G1A025176', nama: 'RAFID NAUFAL NURIMANUZAKI', anatomi: 50, histologi: 38, biokimia: 26.67, pk: 38.7, cbt1: 30, cbt2: 47.4, rataCBT: 38.7, soe: 43, nilaiAkhir: 40.4055 },
         ];
+
+        // --- CSV DATA 1.3 (NEW) ---
+        // Extracted from PDF text to ensure full data coverage
+        const csv1_3 = `
+        "17","G1A025001","MUSTIKA ZHAFARINA","73.75","63","14.75","42","72","65.14","69.40","B","LULUS"
+        "18","G1A025002","ANINDITA RAHMAZYANTI","81.25","70","16.25","49","79","73.14","73.28","B","LULUS"
+        "19","G1A025003","RONALD JASON NOVIANTO","50","80","10","35","65","57.14","54.67","D","WAJIB REMED"
+        "20","G1A025004","WANDA WIDYASWARA","70","85","14","37","70","61.14","66","B","LULUS"
+        "21","G1A025005","NATASYA PUTRI AZALIA","50","53.5","10","27","58","48.57","49.72","D","WAJIB REMED"
+        "22","G1A025006","ALIF MUHAMMAD SATRIAS","60","95","12","53","93","83.43","79.47","B","LULUS"
+        "23","G1A025007","ANGGUN SEKAR AMALIA","57.5","75","11.5","35","53","50.29","53.16","D","WAJIB REMED"
+        "24","G1A025008","MUHAMMAD RIZKI MAULANA","31.25","80","6.25","42","75","66.86","56.80","C","BOLEH REMED"
+        "25","G1A025009","IVANA WIDYA PARAMITA","87.5","78","17.5","43","71","65.14","69.81","B","LULUS"
+        "26","G1A025010","MIFTAKHUL RIZKY ALWI ZAKARIA","82.5","84.5","16.5","50","79","73.71","76.03","B","LULUS"
+        "27","G1A025011","RIFA AFRIANTI PRIMANTO","42.5","51","8.5","25","57","46.86","44.41","E","WAJIB REMED"
+        "28","G1A025012","ARZETA HAFIFATUZZAHROH","82.5","82.5","16.5","38","87","71.43","73.44","B","LULUS"
+        "29","G1A025013","ALYSA ILMI AULIA","91.25","100","18.25","54","93","84.00","87.55","A","LULUS"
+        "30","G1A025014","NURUL UZMA ARIFINIANTI","90","97.5","18","48","89","78.29","79.29","B","LULUS"
+        "31","G1A025015","NASHWA RIHADATUL 'AISY","88.75","70","17.75","38","66","59.43","66.58","B","LULUS"
+        "32","G1A025016","HAIBA ZAHWA ADNINDYA ZIEN","80","98","16","44","92","77.71","79.56","B","LULUS"
+        "33","G1A025017","ARKAAN ARRASYID S","67.5","85.5","13.5","48","89","78.29","77.18","B","LULUS"
+        "34","G1A025018","ANDHIKA NUR HAKIM","51.25","90","10.25","46","86","75.43","70.91","B","LULUS"
+        "35","G1A025019","ILHAM RAMADHAN TAUFIQ","51.25","25","10.25","18","41","33.71","30.77","E","WAJIB REMED"
+        "36","G1A025020","SYIFA AULIA WIDIANA","88","83","17.6","36","65","57.71","64.94","C","BOLEH REMED"
+        "37","G1A025021","NAYRAH BARIZKY RITONGA","67.5","85","13.5","33","64","55.43","60.91","C","BOLEH REMED"
+        "38","G1A025022","NATASYA AURA PUTRI AHMAD","78.7","82.5","15.74","38","70","61.71","66","B","LULUS"
+        "39","G1A025023","LUTHFI FADHILAH FATURAHMAN","57.5","90","11.5","36","77","64.57","64.51","C","BOLEH REMED"
+        "40","G1A025024","NABILA QURROTA A'INI","81.25","62.5","16.25","31","57","50.29","52.30","D","WAJIB REMED"
+        "41","G1A025025","LOVINA DINA KAMILA","96.25","100","19.25","59","97","89.14","90.64","A","LULUS"
+        "42","G1A025026","AVELIKA LADYSA SHANETIN","87.5","75","17.5","41","66","61.14","64.55","C","BOLEH REMED"
+        "43","G1A025027","SHARFINA AURIZMA TITANIA WARDANI","95","87.5","19","45","87","75.43","81.44","A","LULUS"
+        "44","G1A025028","RAFI HAZZA SAPUTRA","77.5","85","15.5","49","90","79.43","79.54","B","LULUS"
+        "45","G1A025029","FATWA DINATA","82.5","95","16.5","45","90","77.14","78.35","B","LULUS"
+        "46","G1A025030","REZA HARUN","82.5","90","16.5","39","76","65.71","70.06","B","LULUS"
+        "47","G1A025031","AZKIYA HUSNABILA","85","88.5","17","44","86","74.29","76.95","B","LULUS"
+        "48","G1A025032","DAVINA NATTAYA KOMARA","70","86","14","33","70","58.86","62.96","C","BOLEH REMED"
+        "49","G1A025033","MARIA CATHLEEN LIEM","96.25","90","19.25","48","93","80.57","84.37","A","LULUS"
+        "50","G1A025034","AYU WULAN PUTRIANA","28.75","50","5.75","29","46","42.86","36.69","E","WAJIB REMED"
+        "51","G1A025035","KEISYA BEAUTY STANZA","73.8","87.5","14.76","47","81","73.14","75.49","B","LULUS"
+        "52","G1A025036","MU'AFA NAZHMIR ROBBANI","66.25","52.5","13.25","26","44","40.00","41.66","E","WAJIB REMED"
+        "53","G1A025037","ZAWA HASNA ZAHIDAH","88.75","92.5","17.75","44","85","73.71","75.07","B","LULUS"
+        "54","G1A025038","ANWA FATHIMA BIDZIKRI","78","83","15.6","33","67","57.14","64.60","C","BOLEH REMED"
+        "55","G1A025039","MYCHA NAZILA SYAKIROH","68.75","80","13.75","35","72","61.14","64.19","C","BOLEH REMED"
+        "56","G1A025040","MUHAMMAD RAFI' NAUFAREL","60","75","12","37","67","59.43","59.44","C","BOLEH REMED"
+        "57","G1A025041","BATRISYIA ATHA RINDRA JAFNI","90","84","18","44","78","69.71","73.58","B","LULUS"
+        "58","G1A025042","NAILA FIRDAUZI HARYADINA PUTRI","81.25","90.5","16.25","45","77","69.71","73.20","B","LULUS"
+        "59","G1A025043","ASIYAH","67.5","62.5","13.5","18","52","40.00","47.14","D","WAJIB REMED"
+        "60","G1A025044","KHANSA JAHFALATHA BALQIS","100","77.5","20","39","73","64.00","72.01","B","LULUS"
+        "61","G1A025045","NASYWA AMANIA HIDAYAT","80","87.5","16","57","90","84.00","83.02","A","LULUS"
+        "62","G1A025046","MONICA SANCI KONDAWE","61.25","85.5","12.25","23","47","40.00","45.80","E","WAJIB REMED"
+        "63","G1A025047","MUHAMMAD ALRIZA NASUTION","57.5","85","11.5","36","62","56.00","58.15","C","WAJIB REMED"
+        "64","G1A025048","HANIFA","47.5","82.5","9.5","36","66","58.29","58.39","C","WAJIB REMED"
+        "65","G1A025049","RIFQAH ZULFA AFANIN","96.25","78","19.25","43","91","76.57","77.95","B","LULUS"
+        "66","G1A025050","MUHAMMAD NAUVAL PANJI AL HAKIM","52.5","54","10.5","22","45","38.29","35.97","E","WAJIB REMED"
+        "67","G1A025051","AMIRA BALQIS ASSABA","67.5","85","13.5","45","84","73.71","72.77","B","LULUS"
+        "68","G1A025052","CLAIRINE ZERLINA HANIFAH","80","75","16","41","77","67.43","68.94","B","LULUS"
+        "69","G1A025053","CHRISTIAN PRAJADI","87.5","59.5","17.5","20","57","44.00","52.56","D","WAJIB REMED"
+        "70","G1A025054","ALFI NISA DAMAYANTI","51.25","93","10.25","47","84","74.86","71.68","B","LULUS"
+        "71","G1A025055","VANISSA FATHIAH ARDANI","75","85","15","55","92","84.00","81.45","A","LULUS"
+        "72","G1A025056","SIGIT PRAMBUDI DIENTI","88.75","90","17.75","40","81","69.14","73.12","B","LULUS"
+        "73","G1A025057","MUHAMMAD UZAIR ABDILLAH","66.25","90","13.25","38","66","59.43","63.45","C","BOLEH REMED"
+        "74","G1A025059","MAYCO CAHYA TRI ADINANSYAH","80","80","16","25","49","42.29","50.30","D","WAJIB REMED"
+        "75","G1A025060","NADIA CHERYL","62.5","90","12.5","47","79","72.00","72.91","B","LULUS"
+        "76","G1A025061","NADIA CHAIRUNNISA OLIA PUTRI","81.25","90.5","16.25","41","74","65.71","68.69","B","LULUS"
+        "77","G1A025062","LOKANANTA ARKIE AMSAL","97.5","82.5","19.5","37","78","65.71","72.58","B","LULUS"
+        "78","G1A025063","M.DANAR RAMADHAN TARUNA","48.75","76","9.75","38","69","61.14","59.32","C","BOLEH REMED"
+        "79","G1A025064","RAZITA KHAIRINA PRASAJA MARPAUNG","65","93","13","54","83","78.29","73.30","B","LULUS"
+        "80","G1A025065","IRSYAD WAHYU MUHARROM","76.25","80","15.25","40","85","71.43","72.45","B","LULUS"
+        "81","G1A025066","INGRID GAYATRI","56.25","65","11.25","37","51","50.29","48.53","D","WAJIB REMED"
+        "82","G1A025067","FADHILAH AZKA AFKARINA","78.75","92.5","15.75","34","66","57.14","63.56","C","BOLEH REMED"
+        "83","G1A025068","GABRIEL DANENDRA SETYAWAN","90","93","18","53","87","80.00","82.48","A","LULUS"
+        "84","G1A025069","AMILAH AMATURRAHIM AL MUJAHIDAH","57.5","85","11.5","38","61","56.57","58.16","C","BOLEH REMED"
+        "85","G1A025070","FARID HAMZAH PUTRA PRATAMA","78.75","87.5","15.75","35","77","64.00","67.20","B","LULUS"
+        "86","G1A025071","JAMES SUDIANTO RACHMAPUTRA","83.75","80","16.75","47","81","73.14","73.93","B","LULUS"
+        "87","G1A025072","KHAIRUNNISA AZKA FADILA","68.75","91","13.75","45","87","75.43","74.66","B","LULUS"
+        "88","G1A025073","ISYRAFUDDIN ABDUN YASYKUR","100","90","20","49","91","80.00","84.06","A","LULUS"
+        "89","G1A025074","TSALITSA AFIFAH NIDAUL HAQ","71.3","82.5","14.26","32","70","58.29","62.15","C","BOLEH REMED"
+        "90","G1A025075","AISYAH NUR AZIZAH","83.75","83","16.75","39","69","61.71","68.04","B","LULUS"
+        "91","G1A025076","WAHYUDI","50","72.5","10","19","46","37.14","39.36","E","WAJIB REMED"
+        "92","G1A025077","KAUTSAR PANDYA RAHADYAN","61.25","77.5","12.25","35","69","59.43","59.99","C","BOLEH REMED"
+        "93","G1A025078","CHRISTIAN ALLAN","71.25","90","14.25","53","91","82.29","77.21","B","LULUS"
+        "94","G1A025079","DEWA AYU MADE SHINTA ANGELINA","78.75","100","15.75","47","83","74.29","76.12","B","LULUS"
+        "95","G1A025080","DZAKI AMRU SYAFI","62.5","85","12.5","46","87","76.00","72.61","B","LULUS"
+        "96","G1A025081","NAURA PUTRI ALEXANDRIA","67.5","77.5","13.5","30","73","58.86","64.04","C","BOLEH REMED"
+        "97","G1A025082","ARKAN FAWWAZ INDARIO","81.25","80.5","16.25","48","83","74.86","76.27","B","LULUS"
+        "98","G1A025083","GHANIA NAILA NOOR DZAKIYYAH","71.3","87.5","14.26","43","83","72.00","70.05","B","LULUS"
+        "99","G1A025084","ANINDYA SAFIRA RIYANTO","61.25","90","12.25","48","82","74.29","70.42","B","LULUS"
+        "100","G1A025086","UTHI FIDELA SALWA","78.75","95","15.75","46","83","73.71","77.25","B","LULUS"
+        "101","G1A025087","AUFADHIYA KHAIRANI PUTRI","42.5","77.5","8.5","30","51","46.29","47.34","D","WAJIB REMED"
+        "102","G1A025088","HANUM PRIMANDA","82.5","84","16.5","42","75","66.86","71.21","B","LULUS"
+        "103","G1A025089","IKA WIDIASTUTI","56.25","90","11.25","41","78","68.00","67.10","B","LULUS"
+        "104","G1A025091","CLAUDIA ZAR'IN PUTRI JASMINE","81.25","88","16.25","50","92","81.14","78.98","B","LULUS"
+        "105","G1A025092","SIXTEENOVA ARINI RAHMATIKA","95","82.5","19","46","86","75.43","80.0","A","LULUS"
+        "106","G1A025093","AMEERA JASMINE ZAIN","67.5","90","13.5","37","77","65.14","67.46","B","LULUS"
+        "107","G1A025094","NADYANDRA ARETHA MAIRITZA","73.75","87.5","14.75","40","73","64.57","68.83","B","LULUS"
+        "108","G1A025095","NADINE PRAMESTHA ARDHANI","91.25","97.5","18.25","54","91","82.86","84.43","A","LULUS"
+        "109","G1A025096","AMELIA AZZAHRA","77.5","90","15.5","41","78","68.00","70.21","B","LULUS"
+        "110","G1A025097","RIFAT PRAMUDIA NASUTION","62.5","67.5","12.5","37","76","64.57","62.73","C","BOLEH REMED"
+        "111","G1A025098","JAHFAL AL FARISI","81.25","85","16.25","35","61","54.86","60.14","C","BOLEH REMED"
+        "112","G1A025099","ISTAVANIA NADIA MUFID","67.5","82.5","13.5","35","77","64.00","64.79","C","BOLEH REMED"
+        "113","G1A025100","RISTY PUTERI KUSUMA MAHARDIKANINGSIH","75","90","15","46","89","77.14","75.60","B","LULUS"
+        "114","G1A025101","CHELSEA ICHA PUTRI ANZANI","60","77.5","12","27","72","56.57","55.27","D","WAJIB REMED"
+        "115","G1A025102","DZAKWAN HAMMAM NAWAWI","87.5","80","17.5","36","84","68.57","69.96","B","LULUS"
+        "116","G1A025103","YAZMINE","52.5","77.5","10.5","45","70","65.71","62.12","C","BOLEH REMED"
+        "117","G1A025104","MAULIDIA ZULFA KARTIKA","55","82.5","11","45","74","68.00","66.34","B","LULUS"
+        "118","G1A025105","SAVANA RIZKY PURNAMA","100","87.5","20","54","92","83.43","86.28","A","LULUS"
+        "119","G1A025106","YASMIN TAQIYAH TAMBUNAN","70","92.5","14","49","87","77.71","77.56","B","LULUS"
+        "120","G1A025107","NACHAYA AROFAHNI WIJAYA","58.75","87.5","11.75","39","62","57.71","59.06","C","BOLEH REMED"
+        "121","G1A025108","FRIDA MULIADEWI CHAERANI","90","79","18","45","88","76.00","77.90","B","LULUS"
+        "122","G1A025109","GHANIY HILDAN RABBANI","93.75","88","18.75","41","83","70.86","76.11","B","LULUS"
+        "123","G1A025110","ALTAF FIAN JUNINDA","97.5","87.5","19.5","51","91","81.14","82.31","A","LULUS"
+        "124","G1A025111","FADELLA AZZAHRA","63.75","82.5","12.75","30","67","55.43","57.31","C","BOLEH REMED"
+        "125","G1A025112","HANINDITA NASTITI AYUNINGTIAS","76.25","95","15.25","39","84","70.29","73.36","B","LULUS"
+        "126","G1A025113","TYANAYA RAHMA","86","85","17.2","43","77","68.57","73.85","B","LULUS"
+        "127","G1A025114","CHINTYA PUTRI NABILAH","56.25","75","11.25","44","80","70.86","68.79","B","LULUS"
+        "128","G1A025115","AISYA NURLANGIT FITRI","81.25","88","16.25","42","89","74.86","75.04","B","LULUS"
+        "129","G1A025116","AVISA ZANDRA CITAGAMI","46.3","85","9.26","42","67","62.29","58.01","C","BOLEH REMED"
+        "130","G1A025117","FIQYA SULISTIANI","28.75","25","5.75","21","52","41.71","33.88","E","WAJIB REMED"
+        "131","G1A025118","RAHMA GRISELDA INDRASTATA","86","65","17.2","38","65","58.86","62.78","C","BOLEH REMED"
+        "132","G1A025119","KHESYIA NAFIA ATMOKO","27.5","50","5.5","25","42","38.29","32.59","E","WAJIB REMED"
+        "133","G1A025120","QAFFAL ZIAN QADSI","62.5","80","12.5","29","61","51.43","53.90","D","WAJIB REMED"
+        "134","G1A025121","KHAIRUNNISA AMIRA AZALIA","66.25","38","13.25","27","64","52.00","54.29","D","WAJIB REMED"
+        "135","G1A025122","MUHAMMAD RASYID SURYA WICAKSONO","32.5","0","6.5","0","0","0.00","49.95","E","WAJIB REMED"
+        "136","G1A025123","NAURA ALYA FASHIHА","57.5","62.5","11.5","30","52","46.86","49.95","D","WAJIB REMED"
+        "137","G1A025124","BUNGA PUTRI ANGGINA","57.5","68.5","11.5","32","59","52.00","48.53","D","WAJIB REMED"
+        "138","G1A025125","M. ANDHIKA PUTRA PRATAMA","82.5","90","16.5","44","81","71.43","72.43","B","LULUS"
+        "139","G1A025126","HANENDI FAREL SANTAUSO","50","68","10","33","46","45.14","49.12","D","WAJIB REMED"
+        "140","G1A025127","JOVITA BERNADINE AZALIA DWIASTHI","78.75","80.5","15.75","33","52","48.57","56.27","C","BOLEH REMED"
+        "141","G1A025128","RAISHA AQILA ARDANU","56.25","82.5","11.25","35","72","61.14","61.58","C","BOLEH REMED"
+        "142","G1A025129","NAZLA RIFDA AQILLAH","97.5","79","19.5","39","73","64.00","70.42","B","LULUS"
+        "143","G1A025130","SYAFIQ ATAULLAH GHAFFAR","62.5","78","12.5","34","65","56.57","57.51","C","BOLEH REMED"
+        "144","G1A025131","ZIDAN ADI HENDRIK TRI PUTRA","77.5","90","15.5","42","73","65.71","68.69","B","LULUS"
+        "145","G1A025132","FADHEL MUHAMMAD AIHAM","28.75","71.5","5.75","30","48","44.57","39.00","E","WAJIB REMED"
+        "146","G1A025133","AISYAH LOVIA ZAHRA ROCHMANA","42.5","97.5","8.5","36","65","57.71","56","C","BOLEH REMED"
+        "147","G1A025134","BAGAS ARIEF SETYA WARDANA","78.75","97.5","15.75","40","86","72.00","74.15","B","LULUS"
+        "148","G1A025135","KHAMIDYA SAFIRA","96","89","19.2","45","83","73.14","76.70","B","LULUS"
+        "149","G1A025136","RIKO RAHARDIAN PUTRA WARDANA","66.25","78","13.25","43","70","64.57","66","B","LULUS"
+        "150","G1A025138","TITEN WIGUNA","65","95","13","30","74","59.43","61.11","C","BOLEH REMED"
+        "151","G1A025139","FANISA MAULIDA RAHARJA","92.5","77.5","18.5","47","81","73.14","74.86","B","LULUS"
+        "152","G1A025140","DWINANDA FITRIANA PUTRI","48.75","50","9.75","33","49","46.86","43.30","E","WAJIB REMED"
+        "153","G1A025141","BERMASAUT ADIPUTRA TAMPUBOLON","76","42.5","15.2","29","60","50.86","53.09","D","WAJIB REMED"
+        "154","G1A025142","ZASKIA YUFLIHA ALYA NISA","72.5","85","14.5","39","66","60.00","62.44","C","BOLEH REMED"
+        "155","G1A025143","SYAHRU SYABANA SETIYANTO","92.5","95","18.5","32","74","60.57","69.93","B","LULUS"
+        "156","G1A025144","NISRINA ATIRA AFLAH GUNNARTO","47.5","65","9.5","28","36","36.57","41.28","E","WAJIB REMED"
+        "157","G1A025145","HASAN TRI GUNAWAN","80","81","16","44","83","72.57","72.48","B","LULUS"
+        "158","G1A025146","NADHIRA YUSTRINA","50","85","10","31","69","57.14","58.30","C","BOLEH REMED"
+        "159","G1A025147","WAHYU CAN ARUM PUTRI RAMBIATI","73.75","95","14.75","38","73","63.43","68.92","R","LULUS"
+        "160","G1A025148","ARSELAN RIZQY DARMAWAN","77.5","81","15.5","43","87","74.29","74.05","B","LULUS"
+        "161","G1A025149","NARDIIN FATHIYYAH SUNYOTO","100","90","20","32","61","53.14","62.28","C","BOLEH REMED"
+        "162","G1A025150","AQBIL REZKY BUNAYYA","65","82.5","13","34","55","50.86","58.35","C","BOLEH REMED"
+        "163","G1A025151","MUHAMMAD THORIQ AL ROSYID","83.75","86","16.75","49","78","72.57","75.42","B","LULUS"
+        "164","G1A025152","RAFI DINAN AL FARISI","60","72","12","36","61","55.43","59.08","C","BOLEH REMED"
+        "165","G1A025153","MUHAMMAD FARRELL ARCHARD ZHAFIF SUCIPTO","45","82","9","29","57","49.14","47.99","D","WAJIB REMED"
+        "166","G1A025154","JOSEPHINE MELYNA EVANY ESTAFANA","73.75","90","14.75","43","78","69.14","71.61","B","LULUS"
+        "167","G1A025155","GAFIN AULIA RAHARJO","86.25","85","17.25","43","78","69.14","73.73","B","LULUS"
+        "168","G1A025156","CLEARY SHAYNA HANIN","82.5","82.5","16.5","30","54","48.00","56.06","C","BOLEH REMED"
+        "169","G1A025157","RAZZA RASENDRIYA NANDANA ARDI","46.25","62.5","9.25","29","35","36.57","40.85","E","WAJIB REMED"
+        "170","G1A025159","KEYSHA FAUSTA ZAINI","48.75","55.5","9.75","25","52","44.00","43.02","E","WAJIB REMED"
+        "171","G1A025160","NADIYA BINTANG RAZIΑ ΝΙΚΟ","60","90","12","37","67","59.43","62.07","C","BOLEH REMED"
+        "172","G1A025161","MOH. ILHAM ARDIATSYAH","40","52.5","8","23","40","36.00","31.54","E","WAJIB REMED"
+        "174","G1A025163","ASTRELLA AIMEE KHOIRUNNISA","86","87.5","17.2","42","81","70.29","71.84","B","LULUS"
+        "175","G1A025164","ATHIFATUL JANNAH","53.75","65","10.75","19","51","40.00","39.09","E","WAJIB REMED"
+        "176","G1A025165","MUHAMMAD SYAFIEQ ADZKA","66.25","82.5","13.25","38","71","62.29","64.75","C","BOLEH REMED"
+        "177","G1A025166","SYIFA NURJANAH","51.25","71.5","10.25","30","53","47.43","49.83","D","WAJIB REMED"
+        "178","G1A025167","DIMAS ZAHRAN HERDYASSAGAF","63.75","32.5","12.75","20","39","33.71","36.42","E","WAJIB REMED"
+        "179","G1A025168","FARREL MOZA DHIYAUL HAQ","0","65.5","0","40","68","61.71","48.70","D","WAJIB REMED"
+        "180","G1A025169","REECHARD BURHANUDIN FUADY","56.25","62.5","11.25","28","70","56.00","56.76","C","BOLEH REMED"
+        "181","G1A025170","ADDINI FATMA ARINI","38.75","68.5","7.75","24","40","36.57","34.95","E","REMED WAJIB"
+        "182","G1A025171","HANIN NAURA FARIHA","47.5","42.5","9.5","34","55","50.86","48.02","D","REMED WAJIB"
+        "183","G1A025172","AHMAD ABDUL HAQQI","78","55","15.6","21","40","34.86","43.80","E","WAJIB REMED"
+        "184","G1A025173","FASYA AULIA FAUSTINA","68.75","88","13.75","31","65","54.86","59.87","C","BOLEH REMED"
+        "185","G1A025174","AHMAD MUQORROBIN","52.5","79.5","10.5","34","73","61.14","58.87","C","BOLEH REMED"
+        "186","G1A025175","AKBAR BAGUS SRI ZENA","60","80","12","29","72","57.71","58.19","C","BOLEH REMED"
+        "187","G1A025176","RAFID NAUFAL NURIMANUZAKI","76.25","62.5","15.25","31","59","51.43","54.96","D","WAJIB REMED"
+        `;
 
         // --- PROCESSING LOGIC ---
         
         let processedData = [];
+        let oldDataMap = {};
 
-        function calculateRankAndStats() {
-            // 1. Sort by Nilai Akhir Descending to get New Rank
+        function parseCSV(csvText) {
+            const lines = csvText.trim().split('\n');
+            return lines.map(line => {
+                // Regex to handle CSV format "value","value","value"
+                const match = line.match(/"([^"]*)"/g);
+                if (!match) return null;
+                const cols = match.map(val => val.replace(/"/g, ''));
+                
+                // Safe parsing helper
+                const pFloat = (v) => parseFloat(v) || 0;
+
+                return {
+                    nim: cols[1],
+                    nama: cols[2],
+                    soca: pFloat(cols[3]),
+                    fisio: pFloat(cols[4]),
+                    histo: pFloat(cols[5]),
+                    anat: pFloat(cols[6]),
+                    cbt1: pFloat(cols[7]),
+                    cbt2: pFloat(cols[8]), // Actually CBT Avg in some contexts, but let's map to col 8
+                    nilai: pFloat(cols[9]),
+                    grade: cols[10],
+                    ket: cols[11]
+                };
+            }).filter(item => item !== null);
+        }
+
+        function calculateRanksAndStats() {
+            // 1. Process Old Data (Calculate Ranks dynamically)
+            // Sort old data by nilaiAkhir descending
+            rawOldDataList.sort((a, b) => b.nilaiAkhir - a.nilaiAkhir);
+            
+            // Assign Ranks and build Map
+            rawOldDataList.forEach((student, index) => {
+                oldDataMap[student.nim] = {
+                    rank: index + 1,
+                    nilai: student.nilaiAkhir,
+                    anat: student.anatomi,
+                    histo: student.histologi, // Old Histo (Full Score)
+                    cbt: student.rataCBT
+                };
+            });
+
+            // 2. Process New Data
+            const rawData13 = parseCSV(csv1_3);
+            
+            // Sort new data by Nilai Akhir Descending
             rawData13.sort((a, b) => b.nilai - a.nilai);
 
-            // 2. Assign Rank and Compare
+            // 3. Compare and Build Final List
             rawData13.forEach((student, index) => {
                 const currentRank = index + 1;
-                const oldStats = oldDataMap[student.nim] || { rank: 999, nilai: 50, anat: 50, histo: 50, cbt: 50 };
+                // Fallback if student didn't exist in 1.2 (New student or data error)
+                const oldStats = oldDataMap[student.nim] || { rank: 999, nilai: 0, anat: 0, histo: 0, cbt: 0 };
+                
                 const oldRank = oldStats.rank;
                 const oldNilai = oldStats.nilai;
 
                 // Difference Calculation
-                const rankDiff = oldRank - currentRank; // Positive means improved (e.g. 100 -> 50 = +50)
+                // Rank diff: Positive means improved (e.g. Rank 100 -> Rank 50 = +50)
+                // If old rank was 999 (unknown), we don't show diff or show new entry
+                let rankDiff = 0;
+                if (oldRank !== 999) {
+                    rankDiff = oldRank - currentRank;
+                }
+
                 const scoreDiff = student.nilai - oldNilai;
 
                 // Determine Titles
@@ -576,7 +630,7 @@
                 else if (currentRank <= 10) { title = "Elite Knight"; titleColor = "text-purple-300"; }
                 
                 if (rankDiff > 50) { title = "Comeback King"; titleColor = "text-emerald-400"; }
-                else if (rankDiff < -50) { title = "Fallen Angel"; titleColor = "text-red-400"; }
+                else if (rankDiff < -50 && oldRank !== 999) { title = "Fallen Angel"; titleColor = "text-red-400"; }
                 
                 if (student.soca === 100 || student.fisio === 100) { title = "Perfect Score"; titleColor = "text-cyan-300"; }
 
@@ -588,12 +642,13 @@
                     oldStats: oldStats,
                     title: title,
                     titleColor: titleColor,
-                    cbtAvg: (student.cbt1 + student.cbt2) / 2
+                    cbtAvg: (student.cbt1 + student.cbt2) / 2 // Recalculate roughly for display
                 });
             });
         }
 
         function getCardStyle(keterangan) {
+            if (!keterangan) return { border: 'border-gray-500/30', bg: 'bg-gray-900/10', text: 'text-gray-400' };
             if (keterangan.includes('LULUS')) return { border: 'border-emerald-500/30', bg: 'bg-emerald-900/10', text: 'text-emerald-400' };
             if (keterangan.includes('BOLEH')) return { border: 'border-blue-500/30', bg: 'bg-blue-900/10', text: 'text-blue-400' };
             return { border: 'border-red-500/30', bg: 'bg-red-900/10', text: 'text-red-400' };
@@ -607,9 +662,16 @@
                 const style = getCardStyle(student.ket);
                 
                 // Arrow Logic
-                const rankArrow = student.rankDiff > 0 
-                    ? `<span class="text-emerald-400 text-xs flex items-center">▲ ${student.rankDiff}</span>` 
-                    : (student.rankDiff < 0 ? `<span class="text-red-400 text-xs flex items-center">▼ ${Math.abs(student.rankDiff)}</span>` : '<span class="text-gray-500 text-xs">-</span>');
+                let rankArrow = '<span class="text-gray-500 text-xs">-</span>';
+                if (student.oldStats.rank !== 999) {
+                    if (student.rankDiff > 0) {
+                        rankArrow = `<span class="text-emerald-400 text-xs flex items-center">▲ ${student.rankDiff}</span>`;
+                    } else if (student.rankDiff < 0) {
+                        rankArrow = `<span class="text-red-400 text-xs flex items-center">▼ ${Math.abs(student.rankDiff)}</span>`;
+                    }
+                } else {
+                    rankArrow = `<span class="text-purple-400 text-[10px]">NEW</span>`;
+                }
 
                 const scoreArrow = student.scoreDiff > 0 
                     ? `<span class="text-emerald-400 text-[10px] ml-1">(+${student.scoreDiff.toFixed(1)})</span>` 
@@ -658,21 +720,21 @@
                         <div class="flex justify-between text-xs">
                             <span class="text-gray-400">Fisiologi</span>
                             <div class="flex-1 mx-2 h-1.5 bg-gray-700 rounded-full self-center overflow-hidden">
-                                <div class="h-full bg-purple-500" style="width: ${student.fisio}%"></div>
+                                <div class="h-full bg-purple-500" style="width: ${Math.min(student.fisio, 100)}%"></div>
                             </div>
                             <span class="font-mono text-white w-8 text-right">${student.fisio}</span>
                         </div>
                         <div class="flex justify-between text-xs">
                             <span class="text-gray-400">SOCA</span>
                             <div class="flex-1 mx-2 h-1.5 bg-gray-700 rounded-full self-center overflow-hidden">
-                                <div class="h-full bg-pink-500" style="width: ${student.soca}%"></div>
+                                <div class="h-full bg-pink-500" style="width: ${Math.min(student.soca, 100)}%"></div>
                             </div>
                             <span class="font-mono text-white w-8 text-right">${student.soca}</span>
                         </div>
                         <div class="flex justify-between text-xs">
                             <span class="text-gray-400">CBT Avg</span>
                             <div class="flex-1 mx-2 h-1.5 bg-gray-700 rounded-full self-center overflow-hidden">
-                                <div class="h-full bg-blue-500" style="width: ${student.cbtAvg}%"></div>
+                                <div class="h-full bg-blue-500" style="width: ${Math.min(student.cbtAvg, 100)}%"></div>
                             </div>
                             <span class="font-mono text-white w-8 text-right">${student.cbtAvg.toFixed(1)}</span>
                         </div>
@@ -711,20 +773,27 @@
             const arrowContainer = document.getElementById('modal-arrow-container');
             const diffText = document.getElementById('modal-rank-diff');
             
-            if (student.rankDiff > 0) {
-                arrowContainer.innerHTML = '<span class="text-emerald-400 text-xl">▲</span>';
-                arrowContainer.className = 'p-3 rounded-full bg-emerald-900/30 border border-emerald-500/30 mb-2';
-                diffText.textContent = `+${student.rankDiff} Positions`;
-                diffText.className = 'text-sm font-bold font-mono text-emerald-400';
-            } else if (student.rankDiff < 0) {
-                arrowContainer.innerHTML = '<span class="text-red-400 text-xl">▼</span>';
-                arrowContainer.className = 'p-3 rounded-full bg-red-900/30 border border-red-500/30 mb-2';
-                diffText.textContent = `${student.rankDiff} Positions`;
-                diffText.className = 'text-sm font-bold font-mono text-red-400';
+            if (student.oldStats.rank !== 999) {
+                if (student.rankDiff > 0) {
+                    arrowContainer.innerHTML = '<span class="text-emerald-400 text-xl">▲</span>';
+                    arrowContainer.className = 'p-3 rounded-full bg-emerald-900/30 border border-emerald-500/30 mb-2';
+                    diffText.textContent = `+${student.rankDiff} Positions`;
+                    diffText.className = 'text-sm font-bold font-mono text-emerald-400';
+                } else if (student.rankDiff < 0) {
+                    arrowContainer.innerHTML = '<span class="text-red-400 text-xl">▼</span>';
+                    arrowContainer.className = 'p-3 rounded-full bg-red-900/30 border border-red-500/30 mb-2';
+                    diffText.textContent = `${student.rankDiff} Positions`;
+                    diffText.className = 'text-sm font-bold font-mono text-red-400';
+                } else {
+                    arrowContainer.innerHTML = '<span class="text-gray-400 text-xl">=</span>';
+                    diffText.textContent = 'Stable';
+                    diffText.className = 'text-sm font-bold font-mono text-gray-400';
+                }
             } else {
-                arrowContainer.innerHTML = '<span class="text-gray-400 text-xl">=</span>';
-                diffText.textContent = 'Stable';
-                diffText.className = 'text-sm font-bold font-mono text-gray-400';
+                arrowContainer.innerHTML = '<span class="text-purple-400 text-xl">★</span>';
+                arrowContainer.className = 'p-3 rounded-full bg-purple-900/30 border border-purple-500/30 mb-2';
+                diffText.textContent = 'New Entry';
+                diffText.className = 'text-sm font-bold font-mono text-purple-400';
             }
 
             // Scores
@@ -849,7 +918,7 @@
         });
 
         // Initialize
-        calculateRankAndStats();
+        calculateRanksAndStats();
         setTimeout(() => renderGrid(processedData), 800); // Small delay for "Processing" effect
 
     </script>
