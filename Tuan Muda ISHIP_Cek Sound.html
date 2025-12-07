@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTS Klien Sisi Browser</title>
+    <!-- Memuat Tailwind CSS untuk styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Menggunakan font Inter */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .action-button {
+            transition: all 0.2s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="w-full max-w-xl bg-white p-8 rounded-xl shadow-2xl border border-gray-100">
+        <h1 class="text-3xl font-bold text-gray-800 mb-4 text-center">
+            🗣️ Konverter Teks ke Suara (Client-Side)
+        </h1>
+        <p class="text-gray-600 mb-6 text-center">
+            Menggunakan Web Speech API bawaan browser. Tidak memerlukan API eksternal.
+        </p>
+
+        <!-- Area Input Teks -->
+        <textarea
+            id="textInput"
+            rows="5"
+            maxlength="1000"
+            placeholder="Masukkan teks Anda di sini. Suara akan dimainkan langsung oleh browser Anda."
+            class="w-full p-4 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition duration-150 resize-none text-gray-700 shadow-sm"
+        ></textarea>
+
+        <div class="flex flex-col sm:flex-row justify-between items-center mt-3 mb-6 space-y-3 sm:space-y-0 sm:space-x-3">
+            <span id="charCount" class="text-sm text-gray-500">0/1000 karakter</span>
+            <div class="flex space-x-3 w-full sm:w-auto">
+                <!-- Tombol Bicara -->
+                <button
+                    id="speakButton"
+                    onclick="toggleSpeech()"
+                    class="action-button bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-lg shadow-blue-500/50 disabled:bg-gray-400 disabled:shadow-none w-1/2 sm:w-auto"
+                >
+                    Ubah ke Suara
+                </button>
+                <!-- Tombol Hentikan -->
+                <button
+                    id="stopButton"
+                    onclick="stopSpeech()"
+                    disabled
+                    class="action-button bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-lg shadow-lg shadow-red-500/50 disabled:bg-gray-400 disabled:shadow-none w-1/2 sm:w-auto"
+                >
+                    Hentikan
+                </button>
+            </div>
+        </div>
+
+        <!-- Area Status -->
+        <div id="statusMessage" class="text-center p-3 rounded-lg text-sm transition duration-300" style="display: none;"></div>
+
+    </div>
+
+    <script>
+        const textInput = document.getElementById('textInput');
+        const speakButton = document.getElementById('speakButton');
+        const stopButton = document.getElementById('stopButton');
+        const statusMessage = document.getElementById('statusMessage');
+        const charCount = document.getElementById('charCount');
+
+        const synth = window.speechSynthesis;
+        let utterance = null;
+        let preferredVoice = null;
+        
+        /**
+         * Menampilkan pesan status di UI.
+         * @param {string} message - Pesan yang akan ditampilkan.
+         * @param {'info'|'error'|'success'} type - Tipe pesan.
+         */
+        function setStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.style.display = 'block';
+            statusMessage.className = 'text-center p-3 rounded-lg text-sm transition duration-300 mt-4';
+
+            switch (type) {
+                case 'info':
+                    statusMessage.classList.add('bg-blue-100', 'text-blue-800');
+                    break;
+                case 'error':
+                    statusMessage.classList.add('bg-red-100', 'text-red-800');
+                    break;
+                case 'success':
+                    statusMessage.classList.add('bg-green-100', 'text-green-800');
+                    break;
+            }
+        }
+        
+        /**
+         * Mengidentifikasi suara bahasa Indonesia terbaik setelah suara dimuat.
+         */
+        function populateVoices() {
+            // Suara mungkin belum dimuat pada saat pertama kali dipanggil
+            const voices = synth.getVoices();
+            preferredVoice = voices.find(voice => voice.lang === 'id-ID') || voices.find(voice => voice.lang.startsWith('id'));
+
+            if (!preferredVoice) {
+                console.warn("Suara bahasa Indonesia tidak ditemukan. Akan menggunakan suara default.");
+            }
+        }
+
+        // Memuat suara. Memanggilnya di awal dan setelah event voiceschanged.
+        populateVoices();
+        if (synth.onvoiceschanged !== undefined) {
+            synth.onvoiceschanged = populateVoices;
+        }
+
+        /**
+         * Mengubah teks menjadi suara menggunakan Web Speech API.
+         */
+        function generateSpeech() {
+            const userText = textInput.value.trim();
+            if (!userText) {
+                setStatus("Mohon masukkan teks yang ingin diubah menjadi suara.", 'error');
+                return;
+            }
+            
+            // Hentikan pembicaraan yang sedang berlangsung
+            if (synth.speaking) {
+                synth.cancel();
+            }
+
+            utterance = new SpeechSynthesisUtterance(userText);
+            
+            // Atur bahasa dan suara
+            if (preferredVoice) {
+                utterance.voice = preferredVoice;
+            } else {
+                // Default ke bahasa Indonesia jika suara tidak ditemukan, agar browser mencoba mencocokkan.
+                utterance.lang = 'id-ID'; 
+            }
+
+            // Event listener untuk status
+            utterance.onstart = () => {
+                setStatus("Berbicara... (Tergantung kecepatan sistem Anda)", 'info');
+                speakButton.textContent = "Berbicara...";
+                speakButton.disabled = true;
+                stopButton.disabled = false;
+            };
+
+            utterance.onend = () => {
+                setStatus("Selesai berbicara.", 'success');
+                speakButton.textContent = "Ubah ke Suara";
+                speakButton.disabled = textInput.value.length === 0;
+                stopButton.disabled = true;
+            };
+
+            utterance.onerror = (event) => {
+                console.error('SpeechSynthesisUtterance.onerror', event);
+                setStatus(`Kesalahan suara: ${event.error}. Mungkin teks terlalu panjang atau bahasa tidak didukung.`, 'error');
+                speakButton.textContent = "Ubah ke Suara";
+                speakButton.disabled = textInput.value.length === 0;
+                stopButton.disabled = true;
+            };
+
+            synth.speak(utterance);
+        }
+
+        /**
+         * Menghentikan pembicaraan.
+         */
+        function stopSpeech() {
+            if (synth.speaking) {
+                synth.cancel();
+            }
+            // Karena synth.cancel() akan memicu onend, status akan diatur di sana.
+            // Atur ulang tombol secara langsung jika onend tidak terpanggil.
+            speakButton.textContent = "Ubah ke Suara";
+            speakButton.disabled = textInput.value.length === 0;
+            stopButton.disabled = true;
+            setStatus("Pembicaraan dihentikan.", 'info');
+        }
+
+        /**
+         * Mengaktifkan/menonaktifkan tombol bicara.
+         */
+        function toggleSpeech() {
+            if (synth.speaking && !synth.paused) {
+                synth.pause();
+                speakButton.textContent = "Lanjutkan";
+                stopButton.disabled = false;
+            } else if (synth.paused) {
+                synth.resume();
+                speakButton.textContent = "Berbicara...";
+                stopButton.disabled = false;
+            } else {
+                generateSpeech();
+            }
+        }
+
+        /**
+         * Memperbarui hitungan karakter dan status tombol.
+         */
+        textInput.addEventListener('input', () => {
+            const currentLength = textInput.value.length;
+            charCount.textContent = `${currentLength}/1000 karakter`;
+            speakButton.disabled = currentLength === 0 || synth.speaking;
+        });
+
+        // Inisialisasi hitungan dan tombol saat memuat
+        textInput.dispatchEvent(new Event('input'));
+
+        // Peringatan jika API tidak didukung
+        if (!('speechSynthesis' in window)) {
+            setStatus("PERINGATAN: Browser Anda tidak mendukung Web Speech API (Text-to-Speech). Aplikasi ini tidak akan berfungsi.", 'error');
+            speakButton.disabled = true;
+            stopButton.disabled = true;
+        }
+    </script>
+</body>
+</html>
