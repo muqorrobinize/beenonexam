@@ -58,20 +58,61 @@
         /* Warna Feedback */
         .correct-bg { background-color: var(--correct-color); color: white; border-color: var(--correct-color); }
         .incorrect-bg { background-color: var(--incorrect-color); color: white; border-color: var(--incorrect-color); }
+
+        /* Gaya Flip Card */
+        .flip-container {
+            perspective: 1000px;
+            height: auto;
+            min-height: 350px;
+            width: 100%;
+        }
+        .flipper {
+            transition: 0.6s;
+            transform-style: preserve-3d;
+            position: relative;
+            height: 100%;
+        }
+        .flip-container.flipped .flipper {
+            transform: rotateY(180deg);
+        }
+        .front, .back {
+            backface-visibility: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .front {
+            z-index: 2;
+            transform: rotateY(0deg);
+        }
+        .back {
+            transform: rotateY(180deg);
+        }
+        .full-card-height {
+            min-height: 300px; /* Memastikan kartu memiliki tinggi minimum */
+        }
     </style>
 </head>
 <body class="p-4 sm:p-8">
 
     <div id="quiz-container" class="glass-card w-full max-w-2xl p-6 sm:p-10 mx-auto transition-all duration-300">
         <!-- Header dan Pemilihan Mode -->
-        <header class="text-center mb-6">
+        <header class="text-center mb-6 relative">
+            <!-- Tombol Kembali (Return) di Pojok Kiri Atas -->
+            <button id="return-mode-btn" onclick="resetQuiz()" class="absolute left-0 top-0 p-2 px-3 text-sm rounded-lg text-white font-semibold hover:bg-white/10 transition hidden" style="background-color: rgba(74, 85, 104, 0.8);">
+                &larr; Kembali
+            </button>
             <h1 class="text-3xl sm:text-4xl font-extrabold text-white custom-shadow inline-block p-2 rounded-lg" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Hulk 1.4</h1>
             <p class="text-white text-lg mt-2 font-medium">Kuis: Basic Science of Support & Movement System</p>
-            <p class="text-gray-200 text-sm mt-1">Total Soal: 47</p>
         </header>
 
         <div id="mode-selection" class="space-y-4">
-            <button onclick="startQuiz('flashcard')" class="w-full p-4 glass-card text-white text-xl font-semibold rounded-xl hover:bg-opacity-30" style="background-color: var(--primary-green); border-color: white;">Mode Flashcard</button>
+            <button onclick="startQuiz('flashcard')" class="w-full p-4 glass-card text-white text-xl font-semibold rounded-xl hover:bg-opacity-30" style="background-color: var(--primary-green); border-color: white;">Mode Flashcard (Flipcard)</button>
             <button onclick="startQuiz('latihan')" class="w-full p-4 glass-card text-white text-xl font-semibold rounded-xl hover:bg-opacity-30" style="background-color: var(--primary-green); border-color: white;">Mode Latihan (Feedback Instan)</button>
             <button onclick="startQuiz('ujian')" class="w-full p-4 glass-card text-white text-xl font-semibold rounded-xl hover:bg-opacity-30" style="background-color: var(--primary-green); border-color: white;">Mode Ujian (Nilai Akhir)</button>
         </div>
@@ -80,37 +121,85 @@
         <div id="quiz-content" class="hidden">
             <!-- Progress Bar -->
             <div class="mb-4">
-                <div class="text-white text-sm mb-1" id="progress-text">Soal 1 dari 47</div>
+                <!-- Progress text akan diinisialisasi oleh JS -->
+                <div class="text-white text-sm mb-1" id="progress-text"></div>
                 <div class="w-full bg-gray-700 rounded-full h-2.5">
                     <div id="progress-bar" class="h-2.5 rounded-full" style="width: 0%; background-color: var(--correct-color);"></div>
                 </div>
             </div>
 
-            <!-- Question Card -->
-            <div class="glass-card p-6 mb-6" style="background: rgba(255, 255, 255, 0.3);">
-                <p id="question-text" class="text-xl font-semibold text-gray-800 mb-4"></p>
-                <div id="options-container" class="space-y-3">
-                    <!-- Options will be inserted here -->
+            <!-- CARD CONTAINER (Flip for Flashcard) -->
+            <div id="card-mode-container" class="w-full">
+                 
+                <!-- Flashcard Mode: Flip Card Implementation -->
+                <div id="flip-flashcard" class="flip-container hidden">
+                    <div class="flipper">
+                        <!-- FRONT: QUESTION ONLY (No options A, B, C...) -->
+                        <div class="front glass-card p-6 full-card-height" style="background: rgba(255, 255, 255, 0.4);">
+                            <div class="content-wrapper flex-grow flex items-center justify-center">
+                                 <p id="flashcard-question-text" class="text-2xl font-bold text-gray-900 text-center"></p>
+                            </div>
+                            <div class="mt-6 flex justify-between">
+                                <button id="flashcard-prev-btn-front" onclick="prevQuestion()" class="p-3 px-4 rounded-xl text-white font-semibold" style="background-color: #4A5568;" disabled>
+                                    &larr; Sebelumnya
+                                </button>
+                                <button id="flip-btn" onclick="flipCard()" class="p-3 px-6 rounded-xl text-white font-semibold" style="background-color: var(--primary-green);">
+                                    Lihat Jawaban
+                                </button>
+                                <button class="p-3 px-4 rounded-xl text-white font-semibold invisible" style="background-color: #4A5568;">
+                                    &rarr;
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- BACK: ANSWER & EXPLANATION -->
+                        <div class="back glass-card p-6 full-card-height" style="background: rgba(255, 255, 255, 0.6); border-left: 5px solid var(--correct-color);">
+                            <div class="content-wrapper flex-grow overflow-y-auto">
+                                <h3 class="text-xl font-bold mb-2 text-gray-800">Jawaban Benar: <span id="answer-key" style="color: var(--primary-green);"></span></h3>
+                                <p id="flashcard-answer-text" class="text-lg font-extrabold mb-4" style="color: var(--primary-green);"></p>
+                                <h4 class="text-md font-bold mt-4 mb-1 text-gray-800">Penjelasan:</h4>
+                                <p id="flashcard-explanation-text" class="text-gray-700 text-sm"></p>
+                            </div>
+                            <div class="mt-6 flex justify-between">
+                                <button id="flashcard-prev-btn-back" onclick="prevQuestion()" class="p-3 px-4 rounded-xl text-white font-semibold" style="background-color: #4A5568;" disabled>
+                                    &larr; Sebelumnya
+                                </button>
+                                 <button id="flip-back-btn" onclick="nextCard()" class="p-3 px-6 rounded-xl text-white font-semibold" style="background-color: var(--primary-green);">
+                                    Soal Berikutnya &rarr;
+                                 </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Feedback & Explanation (Hidden by default) -->
-            <div id="feedback-box" class="glass-card p-4 mb-6 hidden" style="background: rgba(255, 255, 255, 0.5); border-left: 5px solid var(--primary-green);">
-                <p id="feedback-status" class="font-bold text-lg mb-2"></p>
-                <p id="feedback-explanation" class="text-gray-800 text-sm"></p>
-            </div>
+                <!-- Latihan & Ujian Mode: Standard Question Card -->
+                <div id="standard-quiz" class="block">
+                     <div class="glass-card p-6 mb-6" style="background: rgba(255, 255, 255, 0.3);">
+                        <p id="question-text" class="text-xl font-semibold text-gray-800 mb-4"></p>
+                        <div id="options-container" class="space-y-3">
+                            <!-- Options will be inserted here -->
+                        </div>
+                    </div>
 
-            <!-- Navigation Buttons -->
-            <div id="navigation-buttons" class="flex justify-between space-x-4">
-                <button id="prev-btn" onclick="prevQuestion()" class="flex-1 p-3 rounded-xl text-white font-semibold" style="background-color: #4A5568;" disabled>
-                    &larr; Sebelumnya
-                </button>
-                <button id="submit-btn" onclick="handleSubmit()" class="flex-1 p-3 rounded-xl text-white font-semibold" style="background-color: var(--primary-green);">
-                    Jawab
-                </button>
-                <button id="next-btn" onclick="nextQuestion()" class="flex-1 p-3 rounded-xl text-white font-semibold" style="background-color: #4A5568;" disabled>
-                    Selanjutnya &rarr;
-                </button>
+                    <!-- Feedback & Explanation (Hidden by default) -->
+                    <div id="feedback-box" class="glass-card p-4 mb-6 hidden" style="background: rgba(255, 255, 255, 0.5);">
+                        <p id="feedback-status" class="font-bold text-lg mb-2"></p>
+                        <p id="feedback-explanation" class="text-gray-800 text-sm"></p>
+                    </div>
+
+                    <!-- Navigation Buttons for Standard Modes -->
+                    <div id="navigation-buttons-standard" class="flex justify-between space-x-4">
+                        <button id="prev-btn" onclick="prevQuestion()" class="flex-1 p-3 rounded-xl text-white font-semibold" style="background-color: #4A5568;" disabled>
+                            &larr; Sebelumnya
+                        </button>
+                        <button id="submit-btn" onclick="handleSubmit()" class="flex-1 p-3 rounded-xl text-white font-semibold" style="background-color: var(--primary-green);">
+                            Jawab
+                        </button>
+                        <button id="next-btn" onclick="nextQuestion()" class="flex-1 p-3 rounded-xl text-white font-semibold" style="background-color: var(--primary-green);" disabled>
+                            Selanjutnya &rarr;
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -338,7 +427,7 @@
             {
                 q: "Otot polos yang bekerja secara Single Unit (*Myogenic*) adalah",
                 a: "C",
-                options: { A: "Iris", B: "Corpus siliaris", C: "Usus halus", D: "Bronkus", E: "Erektor pili" },
+                options: { A: "Iris", B: "Corpus siliaris", C: "Usus halus", D: "Bronkus", D: "Erektor pili" },
                 e: "Otot polos *Single-unit myogenic* ditemukan pada visera. **Usus halus** (intestinal) adalah contohnya. Opsi lain adalah tipe *Multiunit neurogenik*."
             },
             {
@@ -428,7 +517,7 @@
             {
                 q: "Pernyataan yang salah mengenai Articulatio Genu (Sendi Lutut) adalah",
                 a: "E",
-                options: { A: "Ruptur meniscus medial lebih sering karena melekat kuat pada Lig. Collaterale medial", B: "Lig. Cruciatum Anterior mencegah Tibia geser ke anterior", C: "Posisi ekstensi merupakan posisi paling stabil", D: "Lig. Cruciatum Anterior mengencang pada akhir ekstensi", E: "Meniscus medial relatif lebih flexible karena adanya serabut popliteus" },
+                options: { A: "Ruptur meniscus medial lebih sering karena melekat kuat pada Lig. Collaterale medial", B: "Ligamen cruciatum anterior mencegah Tibia geser ke anterior", C: "Posisi ekstensi merupakan posisi paling stabil", D: "Lig. Cruciatum Anterior mengencang pada akhir ekstensi", E: "Meniscus medial relatif lebih flexible karena adanya serabut popliteus" },
                 e: "Pernyataan **salah**. Meniskus medial relatif **kurang fleksibel** karena perlekatan kuatnya pada MCL. Serabut Popliteus menempel pada meniskus **lateral**."
             },
             {
@@ -574,288 +663,376 @@
                 a: "D",
                 options: { A: "Labrum acetabuli berperan memperdalam cekung sendi", B: "Ligamentum iliofemorale mampu menahan berat badan", C: "Adduksi dan rotasi internal direstriksi oleh Ligamentum Ischiofemorale", D: "Semua ligamentum articulatio coxae relaksasi saat ekstensi", E: "Coxa Vara adalah sudut inklinasi collum femoris < 125°" },
                 e: "Pernyataan **salah**. Ligamen di *Articulatio Coxae* justru **mengencang (*taut*)** saat posisi ekstensi pinggul (berdiri) untuk memberikan stabilitas."
-            },
-            {
-                q: "Luka bakar tingkat 1 (kemerahan) hanya melibatkan kerusakan kulit sampai...",
-                a: "A",
-                options: { A: "Epidermis", B: "Dermis", C: "Hipodermis", D: "Kelenjar sebasea", E: "Subkutan" },
-                e: "Luka bakar tingkat 1 (*First-degree burn*) hanya melibatkan lapisan terluar kulit, yaitu **Epidermis**."
-            },
-            {
-                q: "Gerakan ibu jari menuju permukaan tangan disebut",
-                a: "B",
-                options: { A: "Elevasi", B: "Oposisi", C: "Retraksi", D: "Inversi", E: "Fleksi" },
-                e: "Gerakan ibu jari menyentuh ujung jari-jari lain pada permukaan tangan disebut **Oposisi (*Opposition*)**."
-            },
-            {
-                q: "Kelenjar yang sekresinya hanya menghasilkan di puncak selnya (Apokrin secara tradisional) adalah",
-                a: "B",
-                options: { A: "Holokrin", B: "Apokrin", C: "Merocrin", D: "Pseudocrin", E: "Endocrin" },
-                e: "Kelenjar yang secara tradisional melepaskan sekresinya bersama fragmen kecil bagian puncak sel disebut kelenjar **Apokrin**."
-            },
-            {
-                q: "Protein struktural utama yang bertanggung jawab untuk Pembentukan Caveolae pada otot polos adalah",
-                a: "A",
-                options: { A: "Caveolin", B: "Calmodulin", C: "Tropomiosin", D: "Aktin", E: "MLCK" },
-                e: "**Caveolin** adalah protein struktural utama yang diperlukan untuk **Pembentukan Caveolae**, yaitu invaginasi kecil pada membran plasma sel, terutama pada otot polos."
-            },
-            {
-                q: "Dampak langsung kondisi autoimun yang menyerang reseptor asetilkolin pada neuromuskular junction adalah",
-                a: "C",
-                options: { A: "Depolarisasi cepat", B: "Hilangnya interaksi filamen aktin dan myosin", C: "Tidak cukup stimulus yang diteruskan ke SR untuk pelepasan kalsium", D: "Akumulasi asetilkolin di terminal sinaps", E: "Gangguan neurotrasmitter" },
-                e: "Serangan pada Reseptor Asetilkolin (AChR) mencegah sinyal saraf diterima dengan baik, mengakibatkan kegagalan potensial aksi untuk menyebar dan memicu **pelepasan ion kalsium (Ca²⁺) dari SR**, yang diperlukan untuk kontraksi."
-            },
-            {
-                q: "Otot jantung dicegah mengalami tetanus melalui mekanisme",
-                a: "E",
-                options: { A: "Aktivitas calmodulin", B: "Waktu kontraksi yang lebih lama", C: "Waktu relaksasi yang lebih lama", D: "Waktu eksitasi yang lebih singkat", E: "Periode refrakter yang lebih lama" },
-                e: "Otot jantung memiliki **Periode Refrakter Absolut yang lebih lama** yang berlangsung hampir selama kontraksi, mencegah stimulasi ulang dan terjadinya tetanus."
-            },
+            }
         ];
-
-        let currentMode = null;
+        
+        let currentMode = '';
         let currentQuestionIndex = 0;
         let userAnswers = {};
         let score = 0;
-        const totalQuestions = quizData.length;
 
-        const modeSelectionEl = document.getElementById('mode-selection');
-        const quizContentEl = document.getElementById('quiz-content');
-        const scoreDisplayEl = document.getElementById('score-display');
-        const questionTextEl = document.getElementById('question-text');
-        const optionsContainerEl = document.getElementById('options-container');
-        const progressTextEl = document.getElementById('progress-text');
-        const progressBarEl = document.getElementById('progress-bar');
-        const feedbackBoxEl = document.getElementById('feedback-box');
-        const feedbackStatusEl = document.getElementById('feedback-status');
-        const feedbackExplanationEl = document.getElementById('feedback-explanation');
-        const submitBtnEl = document.getElementById('submit-btn');
-        const nextBtnEl = document.getElementById('next-btn');
-        const prevBtnEl = document.getElementById('prev-btn');
+        // Mendapatkan elemen DOM
+        const modeSelection = document.getElementById('mode-selection');
+        const quizContent = document.getElementById('quiz-content');
+        const scoreDisplay = document.getElementById('score-display');
+        const returnModeBtn = document.getElementById('return-mode-btn');
+        const standardQuiz = document.getElementById('standard-quiz');
+        const flipFlashcard = document.getElementById('flip-flashcard');
+        const feedbackBox = document.getElementById('feedback-box');
+        const optionsContainer = document.getElementById('options-container');
 
+        // --- Core Quiz Logic Functions ---
+
+        /**
+         * Memulai kuis dengan mode yang dipilih.
+         * @param {string} mode - 'flashcard', 'latihan', atau 'ujian'
+         */
         function startQuiz(mode) {
             currentMode = mode;
             currentQuestionIndex = 0;
             userAnswers = {};
             score = 0;
 
-            modeSelectionEl.classList.add('hidden');
-            quizContentEl.classList.remove('hidden');
-            scoreDisplayEl.classList.add('hidden');
+            modeSelection.classList.add('hidden');
+            quizContent.classList.remove('hidden');
+            returnModeBtn.classList.remove('hidden');
+            scoreDisplay.classList.add('hidden');
 
-            // Initialize userAnswers for the total questions
-            for (let i = 0; i < totalQuestions; i++) {
-                userAnswers[i] = { answer: null, correct: null };
+            // Tentukan tampilan berdasarkan mode
+            if (mode === 'flashcard') {
+                standardQuiz.classList.add('hidden');
+                flipFlashcard.classList.remove('hidden');
+                document.getElementById('flip-flashcard').classList.remove('flipped'); // Reset flip
+            } else {
+                standardQuiz.classList.remove('hidden');
+                flipFlashcard.classList.add('hidden');
+                feedbackBox.classList.add('hidden');
             }
 
-            renderQuestion();
+            loadQuestion();
         }
 
-        function renderQuestion() {
-            const data = quizData[currentQuestionIndex];
-            
-            // Update Progress
-            progressTextEl.textContent = `Soal ${currentQuestionIndex + 1} dari ${totalQuestions}`;
-            progressBarEl.style.width = `${((currentQuestionIndex + 1) / totalQuestions) * 100}%`;
-            
-            // Update Question
-            questionTextEl.innerHTML = `${currentQuestionIndex + 1}. ${data.q}`;
-            optionsContainerEl.innerHTML = '';
-            
-            // Render Options
-            const isAnswered = userAnswers[currentQuestionIndex].answer !== null;
-            const isCorrect = userAnswers[currentQuestionIndex].correct;
-
-            Object.entries(data.options).forEach(([key, value]) => {
-                const button = document.createElement('button');
-                button.setAttribute('data-option', key);
-                button.className = 'option-button w-full text-left p-3 rounded-xl border-2 border-gray-400 text-gray-800 transition-all duration-150';
-                button.innerHTML = `<span class="font-semibold">${key}.</span> ${value}`;
-
-                if (isAnswered) {
-                    // Display results if already answered (Flashcard/Latihan mode)
-                    button.disabled = true;
-                    if (key === data.a) {
-                        // Correct answer
-                        button.classList.add('correct-bg');
-                        button.style.borderColor = 'var(--correct-color)';
-                    } else if (key === userAnswers[currentQuestionIndex].answer) {
-                        // User's incorrect answer
-                        button.classList.add('incorrect-bg');
-                        button.style.borderColor = 'var(--incorrect-color)';
-                    } else {
-                        // Unselected option
-                        button.classList.add('bg-white', 'hover:bg-gray-100');
-                    }
+        /**
+         * Memuat pertanyaan saat ini ke dalam tampilan kuis.
+         */
+        function loadQuestion() {
+            if (currentQuestionIndex >= quizData.length) {
+                if (currentMode === 'ujian') {
+                    showScore();
                 } else {
-                    // Quiz not answered yet
-                    if (key === userAnswers[currentQuestionIndex].answer) {
-                        button.classList.add('selected');
-                    }
-                    button.onclick = () => selectOption(key);
-                    button.classList.add('bg-white', 'hover:bg-gray-100');
+                    // Jika di mode latihan/flashcard dan selesai, kembali ke mode selection
+                    showCompletionMessage();
                 }
-                optionsContainerEl.appendChild(button);
-            });
-
-            // Update Feedback Box and Buttons
-            updateNavigationAndFeedback(isAnswered, isCorrect, data);
-        }
-
-        function selectOption(selectedKey) {
-            // Deselect all options
-            document.querySelectorAll('.option-button').forEach(btn => btn.classList.remove('selected'));
-            
-            // Select the clicked option visually
-            document.querySelector(`[data-option="${selectedKey}"]`).classList.add('selected');
-
-            // Store temporary answer
-            userAnswers[currentQuestionIndex].answer = selectedKey;
-        }
-
-        function handleSubmit() {
-            const data = quizData[currentQuestionIndex];
-            const userAnswer = userAnswers[currentQuestionIndex].answer;
-
-            if (!userAnswer) {
-                alert('Silakan pilih salah satu jawaban terlebih dahulu.');
                 return;
             }
 
-            const isCorrect = userAnswer === data.a;
-            userAnswers[currentQuestionIndex].correct = isCorrect;
-
-            // Update Score (for Ujian mode, score is finalized at the end)
-            if (currentMode !== 'ujian' && isCorrect && !quizData[currentQuestionIndex].scored) {
-                score++;
-                quizData[currentQuestionIndex].scored = true; // Prevent scoring multiple times in Latihan mode
-            }
+            const question = quizData[currentQuestionIndex];
+            updateProgressBar();
             
-            // Disable all options and show feedback (Flashcard/Latihan mode)
-            document.querySelectorAll('.option-button').forEach(btn => {
-                const key = btn.getAttribute('data-option');
-                btn.disabled = true;
-
-                if (key === data.a) {
-                    btn.classList.add('correct-bg');
-                    btn.style.borderColor = 'var(--correct-color)';
-                } else if (key === userAnswer) {
-                    btn.classList.add('incorrect-bg');
-                    btn.style.borderColor = 'var(--incorrect-color)';
-                } else {
-                    btn.classList.remove('selected');
-                    btn.classList.add('bg-white', 'hover:bg-gray-100');
-                }
-            });
-
-            updateNavigationAndFeedback(true, isCorrect, data);
-
-            // In Flashcard mode, allow immediate navigation
             if (currentMode === 'flashcard') {
-                nextBtnEl.disabled = false;
-                prevBtnEl.disabled = false;
-            }
-        }
-
-        function updateNavigationAndFeedback(isAnswered, isCorrect, data) {
-            
-            // Update Feedback Box visibility and content
-            if (currentMode === 'flashcard' || currentMode === 'latihan') {
-                if (isAnswered) {
-                    feedbackBoxEl.classList.remove('hidden');
-                    feedbackBoxEl.style.borderLeftColor = isCorrect ? 'var(--correct-color)' : 'var(--incorrect-color)';
-                    feedbackStatusEl.style.color = isCorrect ? 'var(--correct-color)' : 'var(--incorrect-color)';
-                    feedbackStatusEl.textContent = isCorrect ? 'Jawaban Anda BENAR!' : 'Jawaban Anda SALAH.';
-                    feedbackExplanationEl.innerHTML = `**Jawaban yang benar: ${data.a}**<br>${data.e.replace(/\*/g, '<strong>').replace(/\*\*/g, '</strong>')}`;
-                    submitBtnEl.classList.add('hidden');
-                    nextBtnEl.classList.remove('hidden');
-                } else {
-                    feedbackBoxEl.classList.add('hidden');
-                    submitBtnEl.classList.remove('hidden');
-                    nextBtnEl.classList.add('hidden');
-                }
-            } else if (currentMode === 'ujian') {
-                // Ujian mode hides feedback until the end
-                feedbackBoxEl.classList.add('hidden');
-                submitBtnEl.classList.remove('hidden');
-                submitBtnEl.textContent = currentQuestionIndex === totalQuestions - 1 ? 'Selesaikan Ujian' : 'Jawab';
-            }
-
-            // Update navigation button status
-            prevBtnEl.disabled = currentQuestionIndex === 0;
-            
-            if (currentMode === 'ujian') {
-                nextBtnEl.disabled = userAnswers[currentQuestionIndex].answer === null || currentQuestionIndex === totalQuestions - 1;
-            } else { // Flashcard or Latihan
-                nextBtnEl.disabled = !isAnswered || currentQuestionIndex === totalQuestions - 1;
-            }
-            
-            // Special case for Ujian last question
-            if (currentMode === 'ujian' && currentQuestionIndex === totalQuestions - 1 && userAnswers[currentQuestionIndex].answer !== null) {
-                submitBtnEl.textContent = 'Selesaikan Ujian';
-            } else if (currentMode === 'ujian' && currentQuestionIndex === totalQuestions - 1 && userAnswers[currentQuestionIndex].answer === null) {
-                submitBtnEl.textContent = 'Jawab';
-            }
-        }
-
-        function nextQuestion() {
-            if (currentQuestionIndex < totalQuestions - 1) {
-                currentQuestionIndex++;
-                renderQuestion();
+                loadFlashcard(question);
             } else {
-                showScore();
+                loadStandardQuiz(question);
             }
+
+            updateNavigationButtons();
+        }
+        
+        /**
+         * Memuat pertanyaan untuk Mode Flashcard.
+         * @param {object} question - Objek pertanyaan.
+         */
+        function loadFlashcard(question) {
+            // Depan Kartu
+            document.getElementById('flashcard-question-text').innerHTML = `Q${currentQuestionIndex + 1}: ${question.q}`;
+            document.getElementById('flip-flashcard').classList.remove('flipped');
+
+            // Belakang Kartu
+            document.getElementById('answer-key').textContent = question.a;
+            document.getElementById('flashcard-answer-text').textContent = question.options[question.a];
+            document.getElementById('flashcard-explanation-text').innerHTML = question.e;
         }
 
-        function prevQuestion() {
-            if (currentQuestionIndex > 0) {
-                currentQuestionIndex--;
-                renderQuestion();
-            }
-        }
+        /**
+         * Memuat pertanyaan untuk Mode Latihan/Ujian.
+         * @param {object} question - Objek pertanyaan.
+         */
+        function loadStandardQuiz(question) {
+            // Perbaikan: Hapus penomoran ganda, hanya tampilkan teks soal (nomor sudah ada di progress bar)
+            document.getElementById('question-text').innerHTML = `${question.q}`; 
+            optionsContainer.innerHTML = '';
+            feedbackBox.classList.remove('correct-bg', 'incorrect-bg'); // Reset warna feedback box
+            feedbackBox.classList.add('hidden');
+            document.getElementById('submit-btn').disabled = false;
+            document.getElementById('next-btn').disabled = true;
 
-        function showScore() {
-            quizContentEl.classList.add('hidden');
-            scoreDisplayEl.classList.remove('hidden');
-
-            let finalScore = 0;
-            let answeredCount = 0;
-
-            quizData.forEach((qData, index) => {
-                const userAnswer = userAnswers[index].answer;
-                if (userAnswer !== null) {
-                    answeredCount++;
-                    if (userAnswer === qData.a) {
-                        finalScore++;
-                    }
-                }
+            const optionsKeys = Object.keys(question.options);
+            optionsKeys.forEach(key => {
+                const optionText = question.options[key];
+                const button = document.createElement('button');
+                button.className = 'option-button w-full text-left p-3 rounded-xl border border-gray-300 text-gray-800 hover:border-blue-500 bg-white/50 transition duration-150';
+                button.innerHTML = `<span class="font-bold mr-2">${key}.</span> ${optionText}`;
+                button.setAttribute('data-key', key);
+                button.onclick = () => selectOption(key, button);
+                optionsContainer.appendChild(button);
             });
 
-            const percentage = (finalScore / totalQuestions) * 100;
-            const scoreText = `${finalScore}/${totalQuestions}`;
-            const summaryText = `Anda menjawab ${answeredCount} dari ${totalQuestions} soal dan memperoleh persentase **${percentage.toFixed(1)}%**.`;
+            // Tampilkan jawaban yang tersimpan jika ada (hanya untuk mode Ujian)
+            if (currentMode === 'ujian' && userAnswers[currentQuestionIndex]) {
+                const selectedKey = userAnswers[currentQuestionIndex].selected;
+                const selectedBtn = document.querySelector(`[data-key="${selectedKey}"]`);
+                if (selectedBtn) selectedBtn.classList.add('selected');
+            }
+        }
+
+        /**
+         * Menandai opsi yang dipilih.
+         * @param {string} key - Kunci opsi yang dipilih (A, B, C, D, E).
+         * @param {HTMLElement} button - Tombol opsi yang diklik.
+         */
+        function selectOption(key, button) {
+            // Cek apakah mode Latihan dan sudah dijawab
+            if (currentMode === 'latihan' && !feedbackBox.classList.contains('hidden')) {
+                return;
+            }
+
+            // Hapus kelas 'selected' dari semua tombol opsi
+            document.querySelectorAll('.option-button').forEach(btn => btn.classList.remove('selected'));
             
-            document.getElementById('final-score').textContent = scoreText;
-            document.getElementById('score-summary').innerHTML = summaryText;
+            // Tambahkan kelas 'selected' ke tombol yang diklik
+            button.classList.add('selected');
+
+            // Simpan jawaban
+            userAnswers[currentQuestionIndex] = { selected: key };
         }
 
-        function resetQuiz() {
-            quizContentEl.classList.add('hidden');
-            scoreDisplayEl.classList.add('hidden');
-            modeSelectionEl.classList.remove('hidden');
-            currentMode = null;
-            currentQuestionIndex = 0;
-            userAnswers = {};
+        /**
+         * Menangani pengiriman jawaban (hanya di mode Latihan dan Ujian).
+         */
+        function handleSubmit() {
+            const selectedAnswer = userAnswers[currentQuestionIndex]?.selected;
+
+            if (!selectedAnswer) {
+                console.log("Pilih jawaban terlebih dahulu.");
+                return;
+            }
+
+            const correctAnswer = quizData[currentQuestionIndex].a;
+            const isCorrect = selectedAnswer === correctAnswer;
+
+            // Simpan hasil (penting untuk mode Ujian)
+            if (userAnswers[currentQuestionIndex]) {
+                userAnswers[currentQuestionIndex].isCorrect = isCorrect;
+            } else {
+                 userAnswers[currentQuestionIndex] = { selected: selectedAnswer, isCorrect: isCorrect };
+            }
+
+
+            if (currentMode === 'latihan') {
+                showInstantFeedback(isCorrect, selectedAnswer, correctAnswer, quizData[currentQuestionIndex].e);
+            } else if (currentMode === 'ujian') {
+                // Di mode Ujian, tombol Jawab hanya berfungsi untuk menyimpan jawaban
+                document.getElementById('next-btn').disabled = false;
+                // Jika ini bukan soal terakhir, pindah ke soal berikutnya
+                if (currentQuestionIndex < quizData.length - 1) {
+                    nextQuestion();
+                }
+            }
         }
 
-        // Add event listeners for Ujian mode to proceed automatically
-        if (currentMode === 'ujian') {
-            submitBtnEl.addEventListener('click', () => {
-                if (userAnswers[currentQuestionIndex].answer !== null) {
-                    setTimeout(() => nextQuestion(), 100);
+        /**
+         * Menampilkan feedback instan (hanya di mode Latihan).
+         * @param {boolean} isCorrect - Apakah jawaban benar.
+         * @param {string} selectedKey - Kunci jawaban yang dipilih.
+         * @param {string} correctKey - Kunci jawaban yang benar.
+         * @param {string} explanation - Penjelasan jawaban.
+         */
+        function showInstantFeedback(isCorrect, selectedKey, correctKey, explanation) {
+            document.getElementById('submit-btn').disabled = true;
+            document.getElementById('next-btn').disabled = false;
+            
+            const selectedButton = document.querySelector(`[data-key="${selectedKey}"]`);
+            const correctButton = document.querySelector(`[data-key="${correctKey}"]`);
+
+            // Disable semua opsi dan hapus kelas 'selected' dari yang lain
+            document.querySelectorAll('.option-button').forEach(btn => {
+                btn.classList.remove('selected');
+                btn.disabled = true;
+            });
+            
+            // Beri warna feedback
+            if (isCorrect) {
+                selectedButton.classList.remove('selected');
+                selectedButton.classList.add('correct-bg');
+                document.getElementById('feedback-status').textContent = "BENAR!";
+                feedbackBox.classList.remove('incorrect-bg');
+                feedbackBox.classList.add('correct-bg');
+            } else {
+                selectedButton.classList.remove('selected');
+                selectedButton.classList.add('incorrect-bg');
+                
+                // Highlight jawaban benar dengan hijau
+                if (correctButton) {
+                    correctButton.classList.add('correct-bg');
+                }
+                
+                document.getElementById('feedback-status').textContent = "SALAH!";
+                feedbackBox.classList.remove('correct-bg');
+                feedbackBox.classList.add('incorrect-bg');
+            }
+
+            document.getElementById('feedback-explanation').innerHTML = `Jawaban yang benar adalah **${correctKey}** (${quizData[currentQuestionIndex].options[correctKey]}).<br><br> ${explanation}`;
+            feedbackBox.classList.remove('hidden');
+        }
+
+
+        /**
+         * Pindah ke pertanyaan berikutnya.
+         */
+        function nextQuestion() {
+            currentQuestionIndex++;
+            loadQuestion();
+        }
+
+        /**
+         * Pindah ke pertanyaan sebelumnya.
+         */
+        function prevQuestion() {
+            currentQuestionIndex = Math.max(0, currentQuestionIndex - 1);
+            loadQuestion();
+        }
+
+        /**
+         * Mengupdate tampilan tombol navigasi.
+         */
+        function updateNavigationButtons() {
+            const isFirst = currentQuestionIndex === 0;
+            const isLast = currentQuestionIndex === quizData.length - 1;
+
+            if (currentMode === 'flashcard') {
+                 // Update tombol pada kedua sisi kartu
+                document.getElementById('flashcard-prev-btn-front').disabled = isFirst;
+                document.getElementById('flashcard-prev-btn-back').disabled = isFirst;
+                document.getElementById('flip-back-btn').disabled = false; // Selalu aktifkan next/flip back
+            } else {
+                document.getElementById('prev-btn').disabled = isFirst;
+                
+                // Pada soal terakhir, tombol "Selanjutnya" berubah fungsi menjadi "Selesai"
+                const nextBtn = document.getElementById('next-btn');
+                const submitBtn = document.getElementById('submit-btn');
+                
+                if (isLast) {
+                    nextBtn.textContent = 'Selesai & Lihat Hasil';
+                    nextBtn.onclick = showScore; // Ganti fungsi ke showScore
+                    
+                    if (currentMode === 'ujian') {
+                        submitBtn.textContent = 'Simpan Jawaban';
+                        submitBtn.onclick = handleSubmit;
+                        // Tombol submit selalu aktif di soal terakhir mode ujian
+                        submitBtn.disabled = false; 
+                    } else { // Mode Latihan
+                        submitBtn.textContent = 'Jawab';
+                        submitBtn.onclick = handleSubmit;
+                        // Dalam mode Latihan, tombol "Selanjutnya" harus dinonaktifkan sebelum dijawab.
+                        nextBtn.disabled = true;
+                    }
+                } else {
+                    nextBtn.textContent = 'Selanjutnya \u2192'; // \u2192 adalah panah kanan
+                    nextBtn.onclick = nextQuestion;
+                    submitBtn.textContent = (currentMode === 'ujian') ? 'Simpan Jawaban' : 'Jawab';
+                    submitBtn.onclick = handleSubmit;
+                }
+                
+                // Pastikan tombol Next dinonaktifkan di mode Latihan jika belum dijawab
+                if (currentMode === 'latihan' && feedbackBox.classList.contains('hidden')) {
+                     nextBtn.disabled = true;
+                }
+            }
+        }
+
+        /**
+         * Memperbarui progress bar dan teks.
+         */
+        function updateProgressBar() {
+            const total = quizData.length;
+            const current = currentQuestionIndex + 1;
+            const progress = (current / total) * 100;
+
+            document.getElementById('progress-text').textContent = `Soal ${current} dari ${total}`;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+        }
+
+        /**
+         * Menampilkan pesan selesai (hanya untuk mode Latihan/Flashcard).
+         */
+        function showCompletionMessage() {
+             quizContent.classList.add('hidden');
+             returnModeBtn.classList.add('hidden');
+             scoreDisplay.classList.remove('hidden');
+             
+             document.getElementById('final-score').textContent = 'Selesai!';
+             document.getElementById('score-summary').textContent = `Anda telah menyelesaikan semua ${quizData.length} soal dalam mode ${currentMode}.`;
+        }
+        
+        /**
+         * Menghitung dan menampilkan skor (hanya di mode Ujian).
+         */
+        function showScore() {
+            // Hitung skor
+            score = 0;
+            quizData.forEach((_, index) => {
+                if (userAnswers[index] && userAnswers[index].selected === quizData[index].a) {
+                    score++;
                 }
             });
+
+            const totalQuestions = quizData.length;
+            const percentage = (score / totalQuestions) * 100;
+            
+            quizContent.classList.add('hidden');
+            returnModeBtn.classList.add('hidden');
+            scoreDisplay.classList.remove('hidden');
+
+            document.getElementById('final-score').textContent = `${percentage.toFixed(0)}%`;
+            document.getElementById('score-summary').textContent = `Anda menjawab benar ${score} dari ${totalQuestions} soal.`;
         }
+        
+        /**
+         * Membalik kartu (hanya mode Flashcard).
+         */
+        function flipCard() {
+            document.getElementById('flip-flashcard').classList.add('flipped');
+        }
+
+        /**
+         * Pindah ke kartu berikutnya setelah membalik kartu (hanya mode Flashcard).
+         */
+        function nextCard() {
+            document.getElementById('flip-flashcard').classList.remove('flipped');
+            // Timeout untuk memberi waktu transisi sebelum memuat soal baru
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < quizData.length) {
+                    loadQuestion();
+                } else {
+                    showCompletionMessage();
+                }
+            }, 300); 
+        }
+
+        /**
+         * Mereset seluruh kuis dan kembali ke pemilihan mode.
+         */
+        function resetQuiz() {
+            modeSelection.classList.remove('hidden');
+            quizContent.classList.add('hidden');
+            scoreDisplay.classList.add('hidden');
+            returnModeBtn.classList.add('hidden');
+        }
+
+        // Initialize quiz on load (start at mode selection)
+        document.addEventListener('DOMContentLoaded', resetQuiz);
+
     </script>
 </body>
 </html>
