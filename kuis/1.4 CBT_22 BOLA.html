@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blok 1.5: Support & Movement System</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts: Playfair Display (Titles) & Quicksand (Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        coquette: {
+                            light: '#fff0f5',   /* Lavender Blush */
+                            soft: '#fbcfe8',    /* Pink 200 */
+                            medium: '#f472b6',  /* Pink 400 */
+                            deep: '#be185d',    /* Pink 700 */
+                            dark: '#831843',    /* Pink 900 */
+                            accent: '#fdf2f8',  /* Pink 50 */
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Quicksand', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #fdf2f8;
+            background-image: radial-gradient(#fbcfe8 1px, transparent 1px);
+            background-size: 20px 20px;
+            font-family: 'Quicksand', sans-serif;
+            color: #831843;
+        }
+
+        /* Scrollbar cantik */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #fff0f5; }
+        ::-webkit-scrollbar-thumb { background: #f472b6; border-radius: 10px; }
+
+        /* Container Card dengan efek Glass/Paper */
+        .quiz-card {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid #fbcfe8;
+            box-shadow: 0 10px 40px -10px rgba(244, 114, 182, 0.3);
+            border-radius: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Pita Dekoratif CSS */
+        .ribbon-decoration::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 8px;
+            background: #f472b6;
+            border-radius: 0 0 10px 10px;
+        }
+
+        /* Button Styles */
+        .btn-elegant {
+            background: #fff;
+            border: 2px solid #fbcfe8;
+            color: #be185d;
+            border-radius: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 700;
+        }
+
+        .btn-elegant:hover {
+            background: #fff0f5;
+            border-color: #be185d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(190, 24, 93, 0.15);
+        }
+
+        .btn-option {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s;
+            text-align: left;
+            position: relative;
+        }
+        
+        .btn-option:hover:not(:disabled) {
+            background: #fff1f2;
+            border-color: #f472b6;
+            padding-left: 1.5rem; /* Slight slide effect */
+        }
+
+        .btn-option.selected {
+            background: #fdf2f8;
+            border-color: #be185d;
+        }
+
+        .btn-option.correct {
+            background: #ecfdf5 !important;
+            border-color: #10b981 !important;
+            color: #065f46;
+        }
+
+        .btn-option.incorrect {
+            background: #fff1f2 !important;
+            border-color: #f43f5e !important;
+            color: #881337;
+        }
+
+        .explanation-box {
+            background: #fff0f5;
+            border-left: 4px solid #db2777;
+            border-radius: 0 1rem 1rem 0;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .title-font { font-family: 'Playfair Display', serif; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- START SCREEN -->
+    <div id="start-screen" class="quiz-card w-full max-w-2xl p-8 text-center ribbon-decoration flex flex-col items-center">
+        <div class="mb-6 mt-4">
+            <i class="ph-fill ph-heart-beat text-6xl text-pink-400 animate-pulse"></i>
+        </div>
+        <h1 class="title-font text-4xl md:text-5xl font-bold text-pink-900 mb-2">Musculoskeletal</h1>
+        <h2 class="text-xl text-pink-600 mb-8 font-medium">Basic Science of Support & Movement (Blok 1.5)</h2>
+        
+        <div class="space-y-4 w-full max-w-xs">
+            <button onclick="startQuiz('practice')" class="btn-elegant w-full py-4 px-6 flex items-center justify-center gap-2 group">
+                <i class="ph-fill ph-book-open-text text-xl"></i>
+                Mode Latihan
+                <span class="text-xs font-normal opacity-70 group-hover:opacity-100">(Pembahasan)</span>
+            </button>
+            <button onclick="startQuiz('exam')" class="btn-elegant w-full py-4 px-6 flex items-center justify-center gap-2 group">
+                <i class="ph-fill ph-pencil-simple text-xl"></i>
+                Mode Ujian
+                <span class="text-xs font-normal opacity-70 group-hover:opacity-100">(Timer & Skor)</span>
+            </button>
+        </div>
+        <p class="mt-8 text-sm text-pink-400 italic">67 Soal | Presisi Yoghurt 2022</p>
+    </div>
+
+    <!-- QUIZ SCREEN -->
+    <div id="quiz-screen" class="quiz-card w-full max-w-4xl p-6 hidden min-h-[600px] flex flex-col">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6 border-b border-pink-100 pb-4">
+            <div class="flex items-center gap-2">
+                <span class="bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-sm font-bold">
+                    <span id="curr-q">1</span>/<span id="total-q">67</span>
+                </span>
+            </div>
+            <div class="title-font text-xl text-pink-900 font-bold tracking-wide">Artedium Quiz</div>
+            <div id="score-display" class="bg-pink-50 px-4 py-1 rounded-full text-pink-700 font-semibold border border-pink-200">
+                Score: 0
+            </div>
+        </div>
+
+        <!-- Question Area -->
+        <div class="flex-grow">
+            <div class="mb-6">
+                <p id="question-text" class="text-lg md:text-xl font-medium text-gray-800 leading-relaxed"></p>
+            </div>
+
+            <!-- Options -->
+            <div id="options-container" class="grid gap-3">
+                <!-- Buttons injected via JS -->
+            </div>
+
+            <!-- Feedback / Explanation -->
+            <div id="feedback-area" class="hidden mt-6 explanation-box p-4 text-sm text-gray-700 leading-relaxed">
+                <!-- Content injected via JS -->
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="flex justify-between mt-8 pt-4 border-t border-pink-100">
+            <button onclick="prevQuestion()" id="btn-prev" class="btn-elegant px-4 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="ph-bold ph-caret-left"></i> Sebelumnya
+            </button>
+            <button onclick="backToHome()" class="text-pink-400 hover:text-pink-600 text-sm font-semibold">
+                Menu Utama
+            </button>
+            <button onclick="nextQuestion()" id="btn-next" class="btn-elegant px-4 py-2 text-sm flex items-center gap-2">
+                Selanjutnya <i class="ph-bold ph-caret-right"></i>
+            </button>
+            <button onclick="finishQuiz()" id="btn-finish" class="hidden bg-pink-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-pink-700 transition shadow-lg">
+                Selesai
+            </button>
+        </div>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div id="result-screen" class="quiz-card w-full max-w-2xl p-8 text-center hidden flex flex-col items-center">
+        <div class="mb-4 text-pink-500">
+            <i class="ph-fill ph-crown text-6xl"></i>
+        </div>
+        <h2 class="title-font text-3xl font-bold text-gray-800 mb-2">Hasil Evaluasi</h2>
+        <p class="text-pink-400 mb-8">Blok 1.5 Support & Movement</p>
+
+        <div class="relative w-40 h-40 flex items-center justify-center mb-8">
+            <div class="absolute inset-0 border-8 border-pink-100 rounded-full"></div>
+            <div class="text-5xl font-bold text-pink-700 title-font" id="final-score">0</div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 w-full max-w-sm mb-8">
+            <div class="bg-green-50 p-4 rounded-2xl border border-green-100">
+                <div class="text-green-600 text-sm font-bold uppercase">Benar</div>
+                <div class="text-2xl font-bold text-green-700" id="res-correct">0</div>
+            </div>
+            <div class="bg-red-50 p-4 rounded-2xl border border-red-100">
+                <div class="text-red-600 text-sm font-bold uppercase">Salah</div>
+                <div class="text-2xl font-bold text-red-700" id="res-wrong">0</div>
+            </div>
+        </div>
+
+        <button onclick="location.reload()" class="btn-elegant px-8 py-3 w-full max-w-xs">
+            Ulangi Kuis
+        </button>
+    </div>
+
+    <script>
+        // --- DATABASE SOAL (67 Soal - Presisi Dokumen PDF) ---
+        const questions = [
+            {
+                q: "Hormon yang TIDAK menstimulasi terjadinya osteogenesis (pembentukan tulang) adalah...",
+                o: ["Growth Hormone", "Tiroksin", "Estrogen", "Parathyroid Hormone (PTH)", "Insulin"],
+                a: "Parathyroid Hormone (PTH)",
+                exp: "<b>Jawaban: PTH</b><br>PTH berfungsi meningkatkan kadar kalsium darah dengan cara meningkatkan aktivitas <b>osteoklas</b> (resorpsi tulang), bukan osteogenesis. Hormon lain seperti GH, Tiroksin (pada kadar fisiologis), dan Estrogen bersifat anabolik terhadap tulang."
+            },
+            {
+                q: "Tulang sebagai pengungkit dapat merubah jarak dan arah kekuatan sehingga menimbulkan gerakan yang diinginkan. Ini adalah fungsi tulang sebagai...",
+                o: ["Pendukung (Support)", "Penyimpan mineral", "Hematopoesis", "Pelindung (Proteksi)", "Pengumpil (Leverage)"],
+                a: "Pengumpil (Leverage)",
+                exp: "<b>Jawaban: Pengumpil (Leverage)</b><br>Tulang bekerja bersama otot sebagai sistem tuas (lever) untuk menghasilkan gerakan biomekanik."
+            },
+            {
+                q: "Protein manakah yang paling mungkin mengikat ion Kalsium (Ca2+) pada proses kontraksi otot skelet di dalam sarkomer?",
+                o: ["Troponin I", "Troponin C", "Troponin T", "Aktin", "Tropomiosin"],
+                a: "Troponin C",
+                exp: "<b>Jawaban: Troponin C</b><br>Troponin C memiliki sisi aktif (binding site) untuk Kalsium. Saat Ca2+ terikat, ia mengubah konformasi kompleks troponin-tropomiosin sehingga sisi aktif aktin terbuka."
+            },
+            {
+                q: "Pada proses pembuangan panas/kalor tubuh (termoregulasi), mekanisme fisiologis yang terjadi adalah...",
+                o: ["Kontraksi otot arektor pili (piloereksi)", "Relaksasi otot polos vaskuler kulit (Vasodilatasi)", "Relaksasi otot sphincter ani", "Kontraksi otot sphincter urethra", "Vasokonstriksi pembuluh darah perifer"],
+                a: "Relaksasi otot polos vaskuler kulit (Vasodilatasi)",
+                exp: "<b>Jawaban: Relaksasi otot vaskuler kulit</b><br>Untuk membuang panas, pembuluh darah kulit melebar (vasodilatasi/relaksasi otot polos vaskuler) agar darah panas mengalir ke permukaan dan panas terbuang secara radiasi/konveksi."
+            },
+            {
+                q: "Pada remodeling tulang, sel yang berfungsi untuk mensekresikan matriks organik (osteoid) dan serat kolagen adalah...",
+                o: ["Osteoklas", "Osteoblas", "Osteosit", "Osteoprogenitor", "Makrofag"],
+                a: "Osteoblas",
+                exp: "<b>Jawaban: Osteoblas</b><br>Osteoblas adalah sel pembangun tulang yang mensintesis komponen organik matriks (kolagen tipe I, proteoglikan) sebelum mengalami mineralisasi."
+            },
+            {
+                q: "Lapisan jaringan ikat tipis yang membungkus setiap satu serat otot (muscle fiber) disebut...",
+                o: ["Epimisium", "Endomisium", "Perimisium", "Fascia", "Sarkolema"],
+                a: "Endomisium",
+                exp: "<b>Jawaban: Endomisium</b><br>Urutan pembungkus: Epimisium (seluruh otot) -> Perimisium (fasikula) -> Endomisium (serat tunggal/sel)."
+            },
+            {
+                q: "Albinisme disebabkan oleh defek genetik pada enzim...",
+                o: ["Tyrosinase", "TYRP1", "Dopachrome tautomerase", "Acetylase", "Melaninase"],
+                a: "Tyrosinase",
+                exp: "<b>Jawaban: Tyrosinase</b><br>Albinisme terjadi karena ketidakmampuan melanosit memproduksi melanin akibat defisiensi enzim Tirosinase (kunci sintesis melanin)."
+            },
+            {
+                q: "Gerak khusus pada mandibula saat membuka mulut (rahang turun) disebut...",
+                o: ["Depresi", "Oposisi", "Elevasi", "Inversi", "Eversi"],
+                a: "Depresi",
+                exp: "<b>Jawaban: Depresi</b><br>Depresi = gerakan menurunkan (membuka mulut). Elevasi = gerakan menaikkan (menutup mulut)."
+            },
+            {
+                q: "Gerakan pronasi (memutar telapak tangan ke bawah) termasuk dalam jenis gerakan...",
+                o: ["Menggelinding", "Menyudut", "Sirkumduksi", "Rotasi", "Fleksi"],
+                a: "Rotasi",
+                exp: "<b>Jawaban: Rotasi</b><br>Pronasi dan Supinasi adalah bentuk gerakan rotasi pada sumbu panjang tulang radius-ulna."
+            },
+            {
+                q: "Gadis 16 tahun tumbuh 10 cm setahun terakhir. Sel apakah pada lempeng pertumbuhan epifisis yang bertanggung jawab utama dalam pertumbuhan panjang longitudinal tulang (interstitial growth)?",
+                o: ["Kondrosit pada zona proliferasi", "Kondrosit pada zona hipertrofi", "Osteoblas zona osifikasi", "Osteosit", "Sel mesenkim"],
+                a: "Kondrosit pada zona proliferasi",
+                exp: "<b>Jawaban: Kondrosit pada zona proliferasi</b><br>Pertumbuhan panjang terjadi karena pembelahan aktif (proliferasi) kondrosit di lempeng epifisis."
+            },
+            {
+                q: "Zat/Komponen yang TIDAK diperlukan secara langsung dalam proses biokimia kontraksi otot itu sendiri adalah...",
+                o: ["ATP", "Asetilkolin (Ach)", "Kalium (K+) intraseluler sarkomer", "Kalsium (Ca2+)", "Enzim Myosin ATPase"],
+                a: "Kalium (K+) intraseluler sarkomer",
+                exp: "<b>Jawaban: Kalium</b><br>Kalium berperan dalam potensial membran (repolarisasi saraf/otot), tetapi *di dalam sarkomer* untuk mekanisme *sliding filament* (pergeseran aktin-miosin), yang dibutuhkan adalah Ca2+ dan ATP. Ach memicu potensial aksi di awal."
+            },
+            {
+                q: "Jaringan fibrosa padat yang menghubungkan/melekatkan otot ke tulang disebut...",
+                o: ["Venter", "Origo", "Tendo", "Aponeurosis", "Raphe"],
+                a: "Tendo",
+                exp: "<b>Jawaban: Tendo</b><br>Tendo (tendon) menghubungkan otot ke tulang. Ligamen menghubungkan tulang ke tulang. Aponeurosis adalah tendon berbentuk lembaran gepeng."
+            },
+            {
+                q: "Manakah yang BUKAN karakteristik umum jaringan tulang?",
+                o: ["Matriks sangat padat berisi garam kalsium", "Matriks berisi sel tulang (osteosit) di dalam lakuna", "Tidak memiliki suplai pembuluh darah (Avaskular)", "Tulang dibungkus periosteum (kecuali sendi)", "Kanalikuli menghubungkan antar lakuna"],
+                a: "Tidak memiliki suplai pembuluh darah (Avaskular)",
+                exp: "<b>Jawaban: Tidak memiliki suplai darah</b><br>Tulang adalah jaringan yang SANGAT vaskular (banyak pembuluh darah). Tulang rawan (kartilago) yang avaskular."
+            },
+            {
+                q: "Rambut mendapatkan nutrisi secara difusi dari pembuluh darah yang terletak di...",
+                o: ["Akar rambut", "Korteks rambut", "Papilla rambut", "Batang rambut (Shaft)", "Kutikula"],
+                a: "Papilla rambut",
+                exp: "<b>Jawaban: Papilla rambut</b><br>Papilla dermis di dasar folikel rambut mengandung kapiler darah yang memberi nutrisi ke matriks rambut yang sedang membelah."
+            },
+            {
+                q: "Gerakan menjauhi pusat tubuh pada bidang frontal adalah...",
+                o: ["Adduksi", "Abduksi", "Fleksi", "Ekstensi", "Sirkumduksi"],
+                a: "Abduksi",
+                exp: "<b>Jawaban: Abduksi</b><br>Abduksi (Abduct = culik/jauhkan) adalah gerakan menjauhi garis tengah tubuh."
+            },
+            {
+                q: "Aktivasi Pro-Vitamin D (7-dehydrocholesterol) menjadi Pre-Vitamin D3 di kulit dibantu oleh...",
+                o: ["Sinar UV-B", "Panas tubuh", "Enzim hepar", "Enzim ginjal", "Cahaya tampak"],
+                a: "Sinar UV-B",
+                exp: "<b>Jawaban: Sinar UV-B</b><br>Sinar matahari (UV-B) memecah cincin B pada 7-dehydrocholesterol di epidermis membentuk pre-vitamin D3."
+            },
+            {
+                q: "Terkait anatomi ekstremitas atas: Mengangkat lengan anak kecil ke atas dengan sentakan kuat dapat menyebabkan dislokasi caput radii (Nursemaid's elbow). Struktur apa yang ruptur/terlepas?",
+                o: ["Ligamentum collaterale medial", "Ligamentum anulare radii", "Membrana interossea", "Tendo biceps brachii", "Ligamentum cruciatum"],
+                a: "Ligamentum anulare radii",
+                exp: "<b>Jawaban: Ligamentum anulare radii</b><br>Pada anak, caput radii belum berkembang sempurna, sehingga tarikan keras bisa membuat caput radii lolos dari jepitan Ligamentum anulare."
+            },
+            {
+                q: "Sinkronisasi kontraksi otot polos (single-unit) dan otot jantung dimungkinkan karena adanya hubungan antar sel berupa...",
+                o: ["Saraf Simpatis", "Desmosom", "Neuromuscular Junction", "Tight Junction", "Gap Junction"],
+                a: "Gap Junction",
+                exp: "<b>Jawaban: Gap Junction</b><br>Gap junction adalah saluran ion antar sel yang memungkinkan arus listrik menyebar cepat, sehingga sel-sel berkontraksi serentak (sinsitium)."
+            },
+            {
+                q: "Fibrokartilago adalah jaringan tahan beban yang menggabungkan fitur histologi dari...",
+                o: ["Kartilago elastis & jaringan ikat padat", "Kartilago hialin & jaringan ikat padat reguler (kolagen tipe I)", "Kartilago hialin & tulang", "Tulang rawan & saraf", "Kartilago elastis & lemak"],
+                a: "Kartilago hialin & jaringan ikat padat reguler (kolagen tipe I)",
+                exp: "<b>Jawaban: Hialin & Ikat Padat (Kolagen I)</b><br>Fibrokartilago (cth: diskus intervertebralis) sangat kuat karena mengandung kolagen tipe I tebal (seperti tendon) di samping matriks kartilago."
+            },
+            {
+                q: "Pernyataan mengenai radiasi UV berikut benar, KECUALI...",
+                o: ["Bermanfaat untuk sintesis Vitamin D", "Dapat menyebabkan penuaan dini (photoaging)", "Memicu peningkatan produksi melanin", "Mencegah terjadinya mutasi DNA", "Dapat menyebabkan sunburn"],
+                a: "Mencegah terjadinya mutasi DNA",
+                exp: "<b>Jawaban: Mencegah mutasi DNA</b><br>Justru sinar UV adalah mutagen yang MERUSAK DNA (membentuk dimer timin) yang bisa berujung pada kanker kulit."
+            },
+            {
+                q: "Gerakan khusus ibu jari menyentuh ujung jari lain pada tangan yang sama disebut...",
+                o: ["Elevasi", "Oposisi", "Retraksi", "Inversi", "Protraksi"],
+                a: "Oposisi",
+                exp: "<b>Jawaban: Oposisi</b><br>Gerakan khas primata yang memungkinkan menggenggam presisi."
+            },
+            {
+                q: "Kulit tebal (thick skin) memiliki karakteristik khusus dibanding kulit tipis, yaitu...",
+                o: ["Lebih fleksibel", "Epidermal ridge (sidik jari) sedikit", "Tidak memiliki Stratum Lucidum", "Tidak memiliki folikel rambut & kelenjar sebacea", "Reseptor sensoris sangat sedikit"],
+                a: "Tidak memiliki folikel rambut & kelenjar sebacea",
+                exp: "<b>Jawaban: Tidak punya rambut & sebacea</b><br>Kulit tebal (telapak tangan/kaki) punya stratum lucidum, punya epidermal ridge jelas (sidik jari), tapi TIDAK punya rambut dan kelenjar minyak."
+            },
+            {
+                q: "Organel spesifik tempat sintesis melanin di dalam melanosit disebut...",
+                o: ["Lisosom", "Melanosome", "Ribosom", "Keratinosom", "Badan Lamellar"],
+                a: "Melanosome",
+                exp: "<b>Jawaban: Melanosome</b><br>Melanin dibentuk dalam vesikel khusus bernama melanosom, yang kemudian ditransfer ke keratinosit."
+            },
+            {
+                q: "Insersio (tempat melekat yang bergerak) dari Musculus Biceps Brachii adalah pada...",
+                o: ["Processus coracoideus", "Tuberositas supraglenoidale", "Tuberositas Radii", "Olecranon Ulna", "Processus Styloideus"],
+                a: "Tuberositas Radii",
+                exp: "<b>Jawaban: Tuberositas Radii</b><br>Origo biceps ada di scapula (coracoid & supraglenoid), insersio utamanya di Tuberositas Radius (untuk supinasi & fleksi)."
+            },
+            {
+                q: "Aktivitas melanosit dapat meningkat (kulit menggelap) akibat hal berikut, KECUALI...",
+                o: ["Kehamilan (Melasma)", "Paparan Sinar UV", "Penyakit Addison (Peningkatan ACTH/MSH)", "Vitiligo", "Penggunaan obat hormonal"],
+                a: "Vitiligo",
+                exp: "<b>Jawaban: Vitiligo</b><br>Vitiligo adalah kondisi autoimun di mana melanosit MATI atau HILANG, menyebabkan bercak putih (hipopigmentasi), bukan peningkatan aktivitas."
+            },
+            {
+                q: "Tahapan remodeling tulang terdiri dari Aktivasi, Resorpsi, Reversal, dan Formasi. Manakah yang BUKAN istilah baku dalam siklus remodeling tersebut?",
+                o: ["Aktivasi", "Resorpsi", "Regenerasi", "Reversal", "Formasi"],
+                a: "Regenerasi",
+                exp: "<b>Jawaban: Regenerasi</b><br>Siklus ARRF: Activation -> Resorption -> Reversal -> Formation. Regenerasi adalah istilah umum penyembuhan, bukan fase spesifik siklus remodeling fisiologis."
+            },
+            {
+                q: "Gerakan supinasi dan pronasi radius-ulna terjadi pada jenis sendi (articulatio)...",
+                o: ["Ginglymus (Engsel)", "Trochoidea (Pivot/Putar)", "Sellaris (Pelana)", "Globoidea (Peluru)", "Ellipsoidea"],
+                a: "Trochoidea (Pivot/Putar)",
+                exp: "<b>Jawaban: Pivot / Trochoidea</b><br>Articulatio radioulnaris proximal & distal adalah sendi putar yang memungkinkan radius berputar menyilang ulna."
+            },
+            {
+                q: "Fungsi otot rangka (skelet) meliputi hal berikut, KECUALI...",
+                o: ["Alat gerak aktif", "Memproduksi panas tubuh", "Menjaga postur", "Menyimpan cadangan energi (Glikogen)", "Alat gerak pasif"],
+                a: "Alat gerak pasif",
+                exp: "<b>Jawaban: Alat gerak pasif</b><br>Alat gerak pasif adalah TULANG. Otot adalah alat gerak AKTIF."
+            },
+            {
+                q: "Otot dengan susunan serabut sejajar (parallel) contohnya adalah...",
+                o: ["M. Rectus Femoris (Bipennate)", "M. Deltoideus (Multipennate)", "M. Sartorius / M. Sternocleidomastoideus", "M. Extensor Digitorum Longus", "M. Gastrocnemius"],
+                a: "M. Sartorius / M. Sternocleidomastoideus",
+                exp: "<b>Jawaban: Sartorius / SCM</b><br>Otot panjang seperti pita memiliki serat sejajar. Rectus femoris itu bipennate (seperti bulu), Deltoid multipennate."
+            },
+            {
+                q: "Manakah yang paling mungkin terjadi memicu *Power Stroke* (pergeseran kepala miosin) saat kontraksi otot?",
+                o: ["Menempelnya ATP baru", "Pelepasan fosfat anorganik (Pi) dan ADP dari kepala miosin", "Masuknya Kalsium ke retikulum", "Terlepasnya kalsium dari Troponin", "Hidrolisis ATP menjadi ADP+P"],
+                a: "Pelepasan fosfat anorganik (Pi) dan ADP dari kepala miosin",
+                exp: "<b>Jawaban: Pelepasan Pi & ADP</b><br>Hidrolisis ATP membuat kepala miosin 'terkokang' (ready). Power stroke terjadi saat Pi dan ADP lepas. Penempelan ATP *baru* justru melepaskan ikatan aktin-miosin (relaksasi)."
+            },
+            {
+                q: "Seorang remaja berjerawat bertanya penyebabnya. Dokter menjelaskan ada sumbatan pada kelenjar minyak (Sebasea). Berdasarkan cara sekresinya, kelenjar sebasea termasuk tipe...",
+                o: ["Holokrin", "Apokrin", "Merokrin", "Ekrin", "Endokrin"],
+                a: "Holokrin",
+                exp: "<b>Jawaban: Holokrin</b><br>Kelenjar sebasea pecah seluruh selnya untuk mengeluarkan sekret (sebum), disebut sekresi Holokrin (Holo = Whole/Seluruh)."
+            },
+            {
+                q: "Ny. Y menguap lebar lalu rahangnya terkunci (tidak bisa menutup mulut). Diagnosis: Dislokasi TMJ Anterior. Dimana posisi condylus/caput mandibula saat ini?",
+                o: ["Di dalam fossa mandibularis", "Di posterior meatus acusticus", "Di anterior tuberculum articulare", "Di medial processus styloideus", "Di superior arcus zygomaticus"],
+                a: "Di anterior tuberculum articulare",
+                exp: "<b>Jawaban: Di anterior tuberculum articulare</b><br>Saat membuka mulut terlalu lebar, caput mandibula meluncur ke depan melewati tonjolan (tuberculum articulare) dan tersangkut di depannya."
+            },
+            {
+                q: "Jaringan ikat paling luar yang membungkus *seluruh* perut otot (muscle belly) adalah...",
+                o: ["Endomisium", "Perimisium", "Epimisium", "Fascia profunda", "Periosteum"],
+                a: "Epimisium",
+                exp: "<b>Jawaban: Epimisium</b><br>Epimisium membungkus satu otot utuh. Perimisium membungkus fasikula. Endomisium membungkus satu serat."
+            },
+            {
+                q: "Pada fraktur clavicula 1/3 tengah, fragmen medial (bagian dekat sternum) akan terangkat ke atas (superior). Otot apa yang menariknya?",
+                o: ["M. Pectoralis Major", "M. Deltoideus", "M. Sternocleidomastoideus", "M. Trapezius", "M. Subclavius"],
+                a: "M. Sternocleidomastoideus",
+                exp: "<b>Jawaban: M. Sternocleidomastoideus</b><br>SCM melekat pada clavicula medial dan menariknya ke atas. Fragmen lateral ditarik ke bawah oleh gravitasi lengan dan otot Pectoralis."
+            },
+            {
+                q: "Proses patologis penimbunan garam kalsium dalam jaringan lunak (bukan tulang) disebut...",
+                o: ["Osifikasi", "Kalsifikasi (Distrofik/Metastatik)", "Osteogenesis", "Kondrogenesis", "Mineralisasi"],
+                a: "Kalsifikasi (Distrofik/Metastatik)",
+                exp: "<b>Jawaban: Kalsifikasi</b><br>Osifikasi = pembentukan tulang. Kalsifikasi = pengendapan kapur. Jika terjadi di jaringan lunak abnormal, disebut kalsifikasi."
+            },
+            {
+                q: "Sendi yang hanya memungkinkan *sedikit* gerakan (contoh: simfisis pubis, sindesmosis) diklasifikasikan sebagai...",
+                o: ["Sinartrosis (Sendi Mati)", "Amfiartrosis (Sendi Kaku)", "Diartrosis (Sendi Gerak)", "Sinostosis", "Gomphosis"],
+                a: "Amfiartrosis (Sendi Kaku)",
+                exp: "<b>Jawaban: Amfiartrosis</b><br>Sinartrosis = tidak bergerak (sutura). Amfiartrosis = sedikit gerak. Diartrosis = gerak bebas (sinovial)."
+            },
+            {
+                q: "Sianosis (kulit tampak biru) terutama disebabkan oleh...",
+                o: ["Peningkatan melanin", "Kadar Hemoglobin terreduksi (Deoksi-Hb) yang tinggi / Hipoksia", "Vasodilatasi hebat", "Keracunan karoten", "Peningkatan bilirubin"],
+                a: "Kadar Hemoglobin terreduksi (Deoksi-Hb) yang tinggi / Hipoksia",
+                exp: "<b>Jawaban: Deoksi-Hb tinggi / Hipoksia</b><br>Darah yang kurang oksigen berwarna merah gelap/kebiruan, menyebabkan kulit tampak biru (sianosis)."
+            },
+            {
+                q: "Manakah yang BUKAN ciri-ciri otot jantung?",
+                o: ["Memiliki diskus interkalatus", "Bentuk silindris bercabang (Y-shape)", "Inti satu atau dua di tengah", "Bersifat volunter (sadar)", "Dipengaruhi saraf otonom"],
+                a: "Bersifat volunter (sadar)",
+                exp: "<b>Jawaban: Bersifat volunter</b><br>Otot jantung bersifat Involunter (tidak sadar), bekerja otomatis (ritmis)."
+            },
+            {
+                q: "Enzim yang dikeluarkan osteoklas untuk mendegradasi matriks *protein* (kolagen) tulang adalah...",
+                o: ["Alkali Fosfatase", "Cathepsin K", "Asam Klorida (HCl)", "Asetilkolinesterase", "Kreatin Kinase"],
+                a: "Cathepsin K",
+                exp: "<b>Jawaban: Cathepsin K</b><br>Osteoklas mengeluarkan HCl untuk melarutkan mineral, dan enzim protease (Cathepsin K) untuk mencerna kolagen."
+            },
+            {
+                q: "Pernyataan yang benar mengenai Kartilago Elastik adalah...",
+                o: ["Tidak memiliki perikondrium", "Terdapat pada daun telinga (aurikula) dan epiglotis", "Matriksnya bening seperti kaca", "Tersusun atas kolagen tipe I yang tebal", "Mudah mengalami kalsifikasi"],
+                a: "Terdapat pada daun telinga (aurikula) dan epiglotis",
+                exp: "<b>Jawaban: Aurikula & Epiglotis</b><br>Kartilago elastik lentur dan terdapat di telinga luar serta epiglotis. Ia memiliki perikondrium dan kolagen tipe II + serat elastin."
+            },
+            {
+                q: "Fungsi Epidermal Growth Factor (EGF) meliputi hal berikut, KECUALI...",
+                o: ["Meningkatkan pembelahan sel germinatif epidermis", "Mempercepat produksi keratin", "Meningkatkan kepekaan reseptor nyeri", "Merangsang perbaikan epidermis", "Merangsang sekresi kelenjar"],
+                a: "Meningkatkan kepekaan reseptor nyeri",
+                exp: "<b>Jawaban: Meningkatkan kepekaan nyeri</b><br>EGF fokus pada pertumbuhan sel dan penyembuhan luka, bukan modulasi saraf sensorik nyeri."
+            },
+            {
+                q: "Pada mekanisme *Excitation-Contraction Coupling*, potensial aksi di Tubulus T memicu pelepasan Ca2+ dari gudang penyimpanannya di otot, yaitu...",
+                o: ["Mitokondria", "Lisosom", "Retikulum Sarkoplasma (Terminal Sisterna)", "Nukleus", "Sitoplasma"],
+                a: "Retikulum Sarkoplasma (Terminal Sisterna)",
+                exp: "<b>Jawaban: Retikulum Sarkoplasma</b><br>RS adalah gudang kalsium intra-seluler otot."
+            },
+            {
+                q: "Kerusakan luas pada stratum korneum (misal luka bakar luas) dapat menyebabkan kematian akibat...",
+                o: ["Dehidrasi berat (Insensible water loss meningkat)", "Kelebihan cairan", "Penurunan suhu tubuh drastis", "Kulit menjadi terlalu tebal", "Produksi keringat berlebih"],
+                a: "Dehidrasi berat (Insensible water loss meningkat)",
+                exp: "<b>Jawaban: Dehidrasi berat</b><br>Stratum korneum adalah barrier air. Jika rusak, cairan tubuh menguap tak terkendali."
+            },
+            {
+                q: "Fase istirahat pada siklus pertumbuhan rambut, dimana rambut tua lepas dan folikel istirahat, disebut...",
+                o: ["Anagen", "Catagen", "Telogen", "Exogen", "Metagen"],
+                a: "Telogen",
+                exp: "<b>Jawaban: Telogen</b><br>Anagen (Tumbuh) -> Catagen (Transisi/Regresi) -> Telogen (Istirahat)."
+            },
+            {
+                q: "Luka bakar derajat 1 (Sunburn) ditandai dengan eritema (kemerahan) dan nyeri tanpa melepuh. Kerusakan terbatas pada...",
+                o: ["Epidermis saja", "Dermis papilare", "Dermis retikulare", "Subkutan", "Otot"],
+                a: "Epidermis saja",
+                exp: "<b>Jawaban: Epidermis saja</b><br>Derajat 1 hanya mengenai epidermis. Derajat 2 ada bulla/lepuh (kena dermis)."
+            },
+            {
+                q: "Ciri khas otot polos adalah...",
+                o: ["Memiliki garis melintang (striata)", "Berbentuk gelendong (fusiform) dengan satu inti di tengah", "Memiliki Tubulus T yang berkembang baik", "Memiliki Troponin", "Bersifat sadar"],
+                a: "Berbentuk gelendong (fusiform) dengan satu inti di tengah",
+                exp: "<b>Jawaban: Gelendong, 1 inti</b><br>Otot polos TIDAK lurik (non-striated), tidak punya tubulus T, dan menggunakan Calmodulin (bukan Troponin)."
+            },
+            {
+                q: "Neurotransmiter utama yang dilepaskan di Neuromuscular Junction (NMJ) otot rangka adalah...",
+                o: ["Adrenalin", "Asetilkolin (ACh)", "GABA", "Dopamin", "Serotonin"],
+                a: "Asetilkolin (ACh)",
+                exp: "<b>Jawaban: Asetilkolin</b><br>ACh berikatan dengan reseptor Nikotinik di otot untuk memicu kontraksi."
+            },
+            {
+                q: "Manakah karakteristik unik dari otot polos (Smooth Muscle)?",
+                o: ["Filamen tipis melekat pada Dense Bodies", "Memiliki sarkomer yang teratur", "Kalsium berikatan dengan Troponin C", "Selnya multinukleat", "Hanya terdapat di jantung"],
+                a: "Filamen tipis melekat pada Dense Bodies",
+                exp: "<b>Jawaban: Dense Bodies</b><br>Dense bodies pada otot polos adalah analog dari Garis Z pada otot rangka (tempat melekat aktin)."
+            },
+            {
+                q: "Pasien jatuh dengan bahu terbentur. Bahu kanan tampak 'mengempis' (hilang kontur bulat deltoid/Box sign positif). Tidak teraba tonjolan di bawah coracoid. Diagnosis paling mungkin?",
+                o: ["Dislokasi Anterior Humerus", "Dislokasi Posterior Humerus", "Dislokasi Inferior (Luxatio Erecta)", "Fraktur Clavicula", "Fraktur Scapula"],
+                a: "Dislokasi Anterior Humerus",
+                exp: "<b>Jawaban: Dislokasi Anterior</b><br>Ini jenis tersering (95%). Caput humeri keluar dari mangkoknya ke depan, membuat bahu terlihat kotak (epaulette sign)."
+            },
+            {
+                q: "Mengenai Columna Vertebralis: Arteri vertebralis berjalan menembus...",
+                o: ["Foramen transversarium vertebra servikal", "Foramen intervertebralis", "Canalis vertebralis", "Foramen magnum", "Lamina vertebra"],
+                a: "Foramen transversarium vertebra servikal",
+                exp: "<b>Jawaban: Foramen transversarium</b><br>Ciri khas vertebra servikal (C1-C6) adalah adanya lubang di sayap sampingnya (foramen transversarium) untuk lewat arteri vertebralis."
+            },
+            {
+                q: "Slow Wave Potential (gelombang lambat) adalah karakteristik potensial membran pada...",
+                o: ["Otot Rangka", "Otot Polos Viseral (Usus/Lambung)", "Saraf Motorik", "Otot Jantung Ventrikel", "Reseptor Kulit"],
+                a: "Otot Polos Viseral (Usus/Lambung)",
+                exp: "<b>Jawaban: Otot Polos Viseral (Usus)</b><br>Slow waves adalah fluktuasi potensial membran ritmis (BER) di pencernaan yang menentukan frekuensi kontraksi peristaltik."
+            },
+            {
+                q: "Dashboard Injury: Lutut membentur dashboard saat KLL. Tungkai kanan tampak memendek, rotasi internal, dan adduksi. Diagnosis?",
+                o: ["Dislokasi Hip Posterior", "Dislokasi Hip Anterior", "Fraktur Femur Proximal", "Fraktur Pelvis", "Dislokasi Lutut"],
+                a: "Dislokasi Hip Posterior",
+                exp: "<b>Jawaban: Dislokasi Hip Posterior</b><br>Posisi khas 'Shortened, Adducted, Internally Rotated' adalah tanda pasti dislokasi panggul ke belakang (posterior)."
+            },
+            {
+                q: "Mengenai Meniscus lutut: Pernyataan yang BENAR adalah...",
+                o: ["Meniscus medial lebih mudah cedera karena melekat pada ligamen kolateral medial (MCL)", "Meniscus lateral berbentuk huruf C besar", "Meniscus memiliki suplai darah yang sangat baik di seluruh bagian", "Meniscus berfungsi mengurangi area kontak sendi", "Meniscus medial lebih mobile dibanding lateral"],
+                a: "Meniscus medial lebih mudah cedera karena melekat pada ligamen kolateral medial (MCL)",
+                exp: "<b>Jawaban: Meniscus medial mudah cedera</b><br>Meniscus medial melekat erat pada MCL dan kapsul sendi, sehingga kurang mobile dan rawan robek (Unhappy Triad). Bagian dalam meniscus avaskular (sulit sembuh)."
+            },
+            {
+                q: "Kelenjar keringat ekrin (merokrin) yang berfungsi untuk termoregulasi diatur oleh saraf...",
+                o: ["Simpatis (Neurotransmiter Asetilkolin)", "Simpatis (Neurotransmiter Norepinefrin)", "Parasimpatis", "Somatik", "Enterik"],
+                a: "Simpatis (Neurotransmiter Asetilkolin)",
+                exp: "<b>Jawaban: Simpatis (Asetilkolin)</b><br>Pengecualian unik: Kelenjar keringat dipersarafi simpatis tapi neurotransmiternya Asetilkolin (kolinergik), bukan adrenergik."
+            },
+            {
+                q: "Struktur 'Keystone' (batu kunci) pada Arcus Plantaris (lengkung kaki) Medial adalah...",
+                o: ["Os Naviculare", "Os Calcaneus", "Os Cuboid", "Os Talus", "Os Cuneiform"],
+                a: "Os Talus",
+                exp: "<b>Jawaban: Os Talus (Keystone Arcus Medial)</b><br>Talus adalah puncak lengkung medial yang membagi beban tubuh ke tumit dan jari. (Catatan: Beberapa literatur menyebut Navicular sebagai kunci struktur, tapi Talus adalah puncak lengkung/keystone utama)."
+            },
+            {
+                q: "Cedera lutut akibat hantaman dari sisi luar (Lateral blow) sering menyebabkan cedera pada...",
+                o: ["Ligamen Kolateral Medial (MCL)", "Ligamen Kolateral Lateral (LCL)", "Ligamen Cruciatum Posterior (PCL)", "Tendon Patella", "Fibula"],
+                a: "Ligamen Kolateral Medial (MCL)",
+                exp: "<b>Jawaban: MCL</b><br>Gaya dari luar (valgus stress) akan meregangkan dan merobek sisi dalam (medial) lutut."
+            },
+            {
+                q: "Fraktur pada pertengahan humerus (Mid-shaft) berisiko tinggi mencederai saraf apa dan menyebabkan kelainan apa?",
+                o: ["N. Radialis -> Wrist Drop", "N. Ulnaris -> Claw Hand", "N. Medianus -> Ape Hand", "N. Axillaris -> Deltoid lumpuh", "N. Musculocutaneus -> Biceps lumpuh"],
+                a: "N. Radialis -> Wrist Drop",
+                exp: "<b>Jawaban: N. Radialis -> Wrist Drop</b><br>N. Radialis berjalan melingkari humerus di sulcus spiralis, sangat rentan terjepit pada patah tulang batang humerus."
+            },
+            {
+                q: "Sudut inklinasi collum femoris normal adalah 125 derajat. Jika sudut ini MENINGKAT (>135 derajat), kondisi ini disebut...",
+                o: ["Coxa Valga", "Coxa Vara", "Genu Valgum", "Genu Varum", "Pes Planus"],
+                a: "Coxa Valga",
+                exp: "<b>Jawaban: Coxa Valga</b><br>Valga = Distal menjauh dari garis tengah (sudut besar). Vara = Distal mendekat (sudut kecil)."
+            },
+            {
+                q: "Molekul yang diproduksi Osteoblas untuk berikatan dengan reseptor RANK pada pre-osteoklas dan memicu pematangan osteoklas adalah...",
+                o: ["RANKL (RANK Ligand)", "Osteoprotegerin (OPG)", "M-CSF", "Kalsitonin", "IL-6"],
+                a: "RANKL (RANK Ligand)",
+                exp: "<b>Jawaban: RANKL</b><br>Sistem RANK/RANKL/OPG: RANKL memicu osteoklas (tulang keropos). OPG menghambat RANKL (tulang padat)."
+            },
+            {
+                q: "Karakteristik otot polos unit ganda (Multi-unit), contohnya pada iris mata, adalah...",
+                o: ["Setiap serat otot memiliki saraf sendiri (presisi tinggi)", "Bekerja serentak sebagai sinsitium", "Banyak Gap Junction", "Otomatis (Pacemaker)", "Merespon regangan"],
+                a: "Setiap serat otot memiliki saraf sendiri (presisi tinggi)",
+                exp: "<b>Jawaban: Saraf sendiri (Independen)</b><br>Multi-unit (iris, piloerektor) butuh kontrol halus, jadi tiap sel dipersarafi terpisah, beda dengan usus (single unit)."
+            },
+            {
+                q: "Osteopenia adalah kondisi penurunan kepadatan tulang yang belum seberat osteoporosis. Ini bisa disebabkan ketidakseimbangan remodeling berupa...",
+                o: ["Peningkatan aktivitas Osteoklas > Osteoblas", "Peningkatan Osteoblas > Osteoklas", "Kelebihan Kalsitonin", "Beban mekanik berlebih", "Kelebihan Estrogen"],
+                a: "Peningkatan aktivitas Osteoklas > Osteoblas",
+                exp: "<b>Jawaban: Resorpsi > Formasi</b><br>Tulang keropos terjadi jika pembongkaran (klas) lebih cepat daripada pembangunan (blas)."
+            },
+            {
+                q: "Fungsi Articulatio Patellofemoralis (Patella) adalah...",
+                o: ["Meningkatkan leverage (daya ungkit) otot Quadriceps", "Mencegah lutut menekuk", "Menghubungkan femur dan fibula", "Tempat melekat hamstring", "Rotasi lutut"],
+                a: "Meningkatkan leverage (daya ungkit) otot Quadriceps",
+                exp: "<b>Jawaban: Leverage Quadriceps</b><br>Patella menjauhkan tendon quadriceps dari poros sendi lutut, sehingga tarikan otot lebih efisien (mekanisme katrol)."
+            },
+            {
+                q: "Jika kadar kalsium darah turun drastis (Hipokalsemia, misal 7 mg/dL), respon hormonal tubuh adalah...",
+                o: ["Kelenjar Paratiroid melepaskan PTH", "Kelenjar Tiroid melepaskan Kalsitonin", "Ginjal membuang kalsium", "Tulang menyerap kalsium", "Usus stop menyerap kalsium"],
+                a: "Kelenjar Paratiroid melepaskan PTH",
+                exp: "<b>Jawaban: Paratiroid melepaskan PTH</b><br>PTH bekerja menaikkan kalsium darah dengan mengambil dari tulang, menahan di ginjal, dan menyerap di usus (via Vit D)."
+            },
+            {
+                q: "Proses keratinisasi (penebalan stratum korneum/kapalan) pada kulit akan meningkat jika mendapat stimulus...",
+                o: ["Tekanan dan gesekan berulang", "Suhu dingin", "Air", "Cahaya matahari", "Hormon tiroid"],
+                a: "Tekanan dan gesekan berulang",
+                exp: "<b>Jawaban: Tekanan/Gesekan</b><br>Mekanisme proteksi kulit terhadap gesekan fisik adalah mempertebal lapisan tanduk (Callus/Kapalan)."
+            },
+            {
+                q: "Fraktur Boxer (Boxer's Fracture) adalah patah tulang pada...",
+                o: ["Collum Metacarpal ke-5", "Os Scaphoid", "Radius Distal", "Phalanx Distal", "Os Hamatum"],
+                a: "Collum Metacarpal ke-5",
+                exp: "<b>Jawaban: Collum Metacarpal 5</b><br>Terjadi akibat memukul benda keras dengan kepalan tangan, leher tulang jari kelingking patah."
+            },
+            {
+                q: "Ligamen lutut yang berfungsi mencegah tibia bergeser ke DEPAN (Anterior) terhadap femur adalah...",
+                o: ["ACL (Anterior Cruciate Ligament)", "PCL (Posterior Cruciate Ligament)", "MCL", "LCL", "Ligamen Patella"],
+                a: "ACL (Anterior Cruciate Ligament)",
+                exp: "<b>Jawaban: ACL</b><br>ACL menahan tibia agar tidak 'maju' (Anterior Drawer Test). PCL menahan agar tidak 'mundur'."
+            },
+            {
+                q: "Tipe sendi yang memiliki rongga sendi, cairan sinovial, dan kapsul sendi disebut...",
+                o: ["Diartrosis (Sinovial)", "Sinartrosis", "Amfiartrosis", "Sutura", "Gomphosis"],
+                a: "Diartrosis (Sinovial)",
+                exp: "<b>Jawaban: Diartrosis</b><br>Ciri utama sendi gerak bebas (diartrosis) adalah adanya celah sinovial."
+            },
+            {
+                q: "Bagian tulang panjang tempat terjadinya pertumbuhan memanjang pada anak-anak disebut...",
+                o: ["Lempeng Epifisis (Epiphyseal Plate)", "Diafisis", "Metafisis", "Periosteum", "Endosteum"],
+                a: "Lempeng Epifisis (Epiphyseal Plate)",
+                exp: "<b>Jawaban: Lempeng Epifisis</b><br>Area kartilago hialin yang terus tumbuh sebelum menutup (mengeras) saat dewasa."
+            },
+            {
+                q: "Otot hamstring terdiri dari otot-otot berikut, KECUALI...",
+                o: ["Rectus Femoris", "Biceps Femoris", "Semitendinosus", "Semimembranosus", "Semua salah"],
+                a: "Rectus Femoris",
+                exp: "<b>Jawaban: Rectus Femoris</b><br>Rectus femoris adalah bagian dari Quadriceps (depan paha). Hamstring (belakang paha) = Biceps femoris, Semitendinosus, Semimembranosus."
+            },
+            {
+                q: "Kontraksi otot di mana panjang otot tetap namun ketegangan meningkat (seperti mendorong tembok) disebut...",
+                o: ["Isometrik", "Isotonik", "Eksentrik", "Konsentrik", "Isokinetik"],
+                a: "Isometrik",
+                exp: "<b>Jawaban: Isometrik</b><br>Iso = sama, Metric = panjang. Otot menegang tapi tidak memendek."
+            },
+            {
+                q: "Saraf yang terjepit pada Carpal Tunnel Syndrome adalah...",
+                o: ["Nervus Medianus", "Nervus Ulnaris", "Nervus Radialis", "Nervus Axillaris", "Nervus Musculocutaneus"],
+                a: "Nervus Medianus",
+                exp: "<b>Jawaban: N. Medianus</b><br>N. Medianus melewati terowongan karpal dan sering tertekan, menyebabkan kesemutan jari 1,2,3."
+            },
+            {
+                q: "Tulang sesamoid terbesar pada tubuh manusia adalah...",
+                o: ["Patella", "Pisiform", "Fabella", "Hyoid", "Talus"],
+                a: "Patella",
+                exp: "<b>Jawaban: Patella</b><br>Tulang sesamoid adalah tulang yang tumbuh di dalam tendon. Patella (tempurung lutut) adalah yang terbesar."
+            },
+            {
+                q: "Bagian dari vertebra yang menanggung beban berat tubuh paling besar adalah...",
+                o: ["Corpus Vertebrae", "Processus Spinosus", "Processus Transversus", "Lamina", "Pedicle"],
+                a: "Corpus Vertebrae",
+                exp: "<b>Jawaban: Corpus</b><br>Badan vertebra (corpus) semakin ke bawah semakin besar karena menumpu beban tubuh."
+            },
+            {
+                q: "Lapisan kulit yang mengandung sel melanosit, sel merkel, dan sel punca keratinosit aktif membelah adalah...",
+                o: ["Stratum Basale", "Stratum Spinosum", "Stratum Granulosum", "Stratum Lucidum", "Stratum Corneum"],
+                a: "Stratum Basale",
+                exp: "<b>Jawaban: Stratum Basale</b><br>Lapisan terbawah epidermis tempat pabrik sel baru dan pigmen."
+            },
+            {
+                q: "Penyakit autoimun yang menyerang reseptor asetilkolin di NMJ menyebabkan kelemahan otot yang memburuk dengan aktivitas adalah...",
+                o: ["Myasthenia Gravis", "Duchenne Muscular Dystrophy", "Guillain-Barre Syndrome", "Multiple Sclerosis", "Botulisme"],
+                a: "Myasthenia Gravis",
+                exp: "<b>Jawaban: Myasthenia Gravis</b><br>Antibodi menyerang reseptor ACh -> sinyal saraf ke otot terputus -> lemas."
+            },
+            {
+                q: "Tendon Achilles (Tendo Calcaneus) merupakan gabungan insersio dari otot...",
+                o: ["Gastrocnemius & Soleus", "Tibialis Anterior & Posterior", "Peroneus Longus & Brevis", "Quadriceps", "Hamstring"],
+                a: "Gastrocnemius & Soleus",
+                exp: "<b>Jawaban: Gastrocnemius & Soleus</b><br>Otot betis (triceps surae) bersatu menjadi tendon Achilles."
+            },
+            {
+                q: "Manakah tulang yang termasuk dalam Skeleton Aksial?",
+                o: ["Sternum (Tulang Dada)", "Clavicula", "Scapula", "Femur", "Humerus"],
+                a: "Sternum (Tulang Dada)",
+                exp: "<b>Jawaban: Sternum</b><br>Aksial = Sumbu tubuh (Tengkorak, Vertebra, Iga, Sternum). Sisanya Apendikular (anggota gerak)."
+            },
+            {
+                q: "Hormon Kalsitonin dihasilkan oleh sel apa dan di organ mana?",
+                o: ["Sel Parafolikuler (Sel C) Tiroid", "Sel Folikel Tiroid", "Sel Chief Paratiroid", "Sel Oksifil Paratiroid", "Sel Beta Pankreas"],
+                a: "Sel Parafolikuler (Sel C) Tiroid",
+                exp: "<b>Jawaban: Sel C Tiroid</b><br>Sel C (Parafolikuler) di antara folikel tiroid menghasilkan kalsitonin (penurun kalsium)."
+            },
+            {
+                q: "Jenis fraktur di mana tulang patah menjadi berkeping-keping (lebih dari 2 fragmen) disebut...",
+                o: ["Comminuted Fracture", "Greenstick Fracture", "Spiral Fracture", "Transverse Fracture", "Oblique Fracture"],
+                a: "Comminuted Fracture",
+                exp: "<b>Jawaban: Comminuted</b><br>Comminuted = remuk/berkeping-keping."
+            },
+            {
+                q: "Gerakan memutar telapak kaki ke arah dalam (medial) disebut...",
+                o: ["Inversi", "Eversi", "Dorsifleksi", "Plantarfleksi", "Abduksi"],
+                a: "Inversi",
+                exp: "<b>Jawaban: Inversi</b><br>Inversi = telapak kaki hadap dalam. Eversi = hadap luar."
+            },
+            {
+                q: "Struktur fungsional terkecil dari kontraksi otot (unit kontraktil) adalah...",
+                o: ["Sarkomer", "Miofibril", "Sarkolema", "Fasikula", "Aktin"],
+                a: "Sarkomer",
+                exp: "<b>Jawaban: Sarkomer</b><br>Area antara dua garis Z disebut sarkomer, unit dasar kontraksi."
+            },
+            {
+                q: "Cairan sinovial yang melumasi sendi diproduksi oleh...",
+                o: ["Membran Sinovial", "Kartilago Hialin", "Kapsul Fibrosa", "Bursa", "Meniskus"],
+                a: "Membran Sinovial",
+                exp: "<b>Jawaban: Membran Sinovial</b><br>Sel sinoviosit tipe B mensekresi cairan lubrikasi kaya asam hialuronat."
+            },
+            {
+                q: "Vitamin C sangat penting dalam penyembuhan tulang dan luka karena berperan dalam sintesis...",
+                o: ["Kolagen", "Elastin", "Keratin", "Miosin", "Aktin"],
+                a: "Kolagen",
+                exp: "<b>Jawaban: Kolagen</b><br>Vit C kofaktor enzim hidroksilase untuk stabilitas serat kolagen. Defisiensi = Skorbut (Scurvy)."
+            },
+            {
+                q: "Sendi bahu (Glenohumeral) adalah sendi yang paling sering mengalami dislokasi karena...",
+                o: ["Mangkuk (Fossa Glenoid) dangkal dan gerakan sangat luas", "Ligamennya sangat lemah", "Tidak ada otot yang melindunginya", "Humerus terlalu kecil", "Kapsul sendi terlalu tebal"],
+                a: "Mangkuk (Fossa Glenoid) dangkal dan gerakan sangat luas",
+                exp: "<b>Jawaban: Glenoid dangkal</b><br>Mobilitas tinggi dibayar dengan stabilitas rendah. Glenoid hanya menampung 1/3 caput humeri."
+            },
+            {
+                q: "Pada pemeriksaan refleks patella (Knee Jerk), ketukan pada tendon patella menyebabkan kontraksi otot...",
+                o: ["Quadriceps Femoris", "Hamstring", "Gastrocnemius", "Tibialis Anterior", "Gluteus Maximus"],
+                a: "Quadriceps Femoris",
+                exp: "<b>Jawaban: Quadriceps</b><br>Refleks regang (stretch reflex) L3-L4 menyebabkan ekstensi lutut lewat kontraksi Quadriceps."
+            },
+            {
+                q: "Otot utama untuk pernapasan (inspirasi) adalah...",
+                o: ["Diafragma", "Intercostalis Internus", "Pectoralis Minor", "Abdominalis", "Scalenus"],
+                a: "Diafragma",
+                exp: "<b>Jawaban: Diafragma</b><br>Kontraksi diafragma memperbesar rongga dada ke bawah."
+            },
+            {
+                q: "Sutura yang menghubungkan tulang frontal dan parietal di tengkorak adalah...",
+                o: ["Sutura Coronalis", "Sutura Sagittalis", "Sutura Lambdoidea", "Sutura Squamosa", "Sutura Metopica"],
+                a: "Sutura Coronalis",
+                exp: "<b>Jawaban: Coronalis</b><br>Seperti mahkota (corona) di depan."
+            }
+        ];
+
+        // --- GAME LOGIC ---
+        let currentIdx = 0;
+        let score = 0;
+        let mode = '';
+        let userAnswers = [];
+
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const qText = document.getElementById('question-text');
+        const optContainer = document.getElementById('options-container');
+        const feedbackArea = document.getElementById('feedback-area');
+        const btnNext = document.getElementById('btn-next');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnFinish = document.getElementById('btn-finish');
+
+        function startQuiz(selectedMode) {
+            mode = selectedMode;
+            currentIdx = 0;
+            score = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            
+            startScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentIdx];
+            
+            document.getElementById('curr-q').innerText = currentIdx + 1;
+            document.getElementById('total-q').innerText = questions.length;
+            document.getElementById('score-display').innerText = `Score: ${score}`;
+            document.getElementById('score-display').classList.toggle('hidden', mode === 'exam');
+
+            qText.innerHTML = q.q;
+            feedbackArea.classList.add('hidden');
+            optContainer.innerHTML = '';
+
+            // Shuffle options slightly just for display? No, keep standard order for consistency
+            q.o.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-option p-4 rounded-xl w-full font-medium text-gray-700';
+                btn.innerText = opt;
+                
+                // Check state
+                if (userAnswers[currentIdx]) {
+                    btn.disabled = true;
+                    if (opt === q.a && mode === 'practice') {
+                        btn.classList.add('correct');
+                        btn.innerHTML += ' <i class="ph-bold ph-check-circle float-right text-lg"></i>';
+                    } else if (opt === userAnswers[currentIdx]) {
+                        if (mode === 'practice' && opt !== q.a) {
+                            btn.classList.add('incorrect');
+                            btn.innerHTML += ' <i class="ph-bold ph-x-circle float-right text-lg"></i>';
+                        } else {
+                            btn.classList.add('selected'); // Exam mode just shows selection
+                        }
+                    }
+                } else {
+                    btn.onclick = () => selectAnswer(opt, q, btn);
+                }
+                
+                optContainer.appendChild(btn);
+            });
+
+            // Show feedback if answered in practice mode
+            if (userAnswers[currentIdx] && mode === 'practice') {
+                feedbackArea.innerHTML = q.exp;
+                feedbackArea.classList.remove('hidden');
+            }
+
+            // Buttons state
+            btnPrev.disabled = currentIdx === 0;
+            if (currentIdx === questions.length - 1) {
+                btnNext.classList.add('hidden');
+                btnFinish.classList.remove('hidden');
+            } else {
+                btnNext.classList.remove('hidden');
+                btnFinish.classList.add('hidden');
+            }
+        }
+
+        function selectAnswer(ans, q, btnElem) {
+            userAnswers[currentIdx] = ans;
+            
+            // Disable all
+            const allBtns = optContainer.querySelectorAll('button');
+            allBtns.forEach(b => b.disabled = true);
+
+            if (ans === q.a) {
+                score++;
+                if (mode === 'practice') {
+                    btnElem.classList.add('correct');
+                    btnElem.innerHTML += ' <i class="ph-bold ph-check-circle float-right text-lg"></i>';
+                }
+            } else {
+                if (mode === 'practice') {
+                    btnElem.classList.add('incorrect');
+                    btnElem.innerHTML += ' <i class="ph-bold ph-x-circle float-right text-lg"></i>';
+                    // Show correct one
+                    allBtns.forEach(b => {
+                        if (b.innerText === q.a) {
+                            b.classList.add('correct');
+                            b.innerHTML += ' <i class="ph-bold ph-check-circle float-right text-lg"></i>';
+                        }
+                    });
+                } else {
+                    btnElem.classList.add('selected');
+                }
+            }
+
+            // Update Score Display
+            document.getElementById('score-display').innerText = `Score: ${score}`;
+
+            if (mode === 'practice') {
+                feedbackArea.innerHTML = q.exp;
+                feedbackArea.classList.remove('hidden');
+            }
+        }
+
+        function nextQuestion() {
+            currentIdx++;
+            loadQuestion();
+        }
+
+        function prevQuestion() {
+            currentIdx--;
+            loadQuestion();
+        }
+
+        function finishQuiz() {
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+            
+            // Animasi skor
+            const finalScoreEl = document.getElementById('final-score');
+            let tempScore = 0;
+            const interval = setInterval(() => {
+                if (tempScore >= score) {
+                    finalScoreEl.innerText = score;
+                    clearInterval(interval);
+                } else {
+                    tempScore++;
+                    finalScoreEl.innerText = tempScore;
+                }
+            }, 30);
+
+            document.getElementById('res-correct').innerText = score;
+            document.getElementById('res-wrong').innerText = questions.length - score;
+        }
+
+        function backToHome() {
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
