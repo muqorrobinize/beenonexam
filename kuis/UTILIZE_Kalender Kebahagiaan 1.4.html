@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalender Akhir Tahun - Versi Santai</title>
+    <!-- Memuat Tailwind CSS untuk styling cepat dan responsif -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Menggunakan font Inter untuk tampilan yang bersih */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f3e8; /* Background krem muda, sangat santai */
+        }
+        .container {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .header-bg {
+            background-image: linear-gradient(135deg, #a7e0e7 0%, #d8f3e8 100%); /* Gradien biru muda dan hijau mint */
+        }
+        .landmark-icon {
+            font-size: 1.2rem;
+            margin-right: 0.5rem;
+        }
+
+        /* Kelas khusus untuk landmark peringatan (IDENT, CBT, SOCA) */
+        .alert-landmark {
+            background-color: #fef3c7; /* Kuning muda/Krem */
+            color: #d97706; /* Teks oranye gelap */
+            border-left: 5px solid #f59e0b; /* Garis peringatan oranye */
+            font-weight: 600;
+            /* Tambahkan sedikit shadow untuk penekanan ekstra */
+            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2); 
+        }
+
+        /* Kelas khusus untuk landmark ceria (akhir tahun) */
+        .cheerful-landmark {
+            background-image: linear-gradient(to right, #fecaca 0%, #fef08a 100%); /* Gradien merah muda ceria ke kuning */
+            color: #ef4444; /* Teks merah cerah */
+            font-weight: 700;
+            animation: pulse-light 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse-light {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.01); opacity: 0.95; }
+        }
+
+        /* Styling untuk baris ganjil/genap tabel */
+        .table-row-odd {
+            background-color: #ffffff; /* Putih */
+        }
+        .table-row-even {
+            background-color: #fefefe; /* Putih kekuningan sangat lembut */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-bg p-8 rounded-b-3xl shadow-lg mb-8">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-4xl font-extrabold text-gray-800 mb-2">
+                <span class="text-5xl">📅</span> Kalender Akhir Tahun
+            </h1>
+            <p class="text-gray-600 text-xl font-light">
+                Versi Santai: Jangan Panik, Nikmati Proses Belajarnya!
+            </p>
+        </div>
+    </div>
+
+    <main class="max-w-4xl mx-auto px-4 pb-12">
+        <div class="bg-white p-6 md:p-8 rounded-xl container">
+            <!-- Deskripsi Singkat -->
+            <p class="text-lg text-gray-600 mb-6 border-b pb-4">
+                Ini adalah ringkasan jadwal kegiatan pembelajaran dan evaluasi Blok 1.4. Fokus dan istirahat seimbang ya!
+            </p>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Tanggal
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Waktu
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Kegiatan
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 text-gray-700">
+                        <!-- SIMULASI JADWAL BLOK (Minggu Awal) -->
+
+                        <tr class="table-row-odd">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">02 Des</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">08:00 - 11:00</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">Kuliah Pengantar Blok 1.4 (Sistem Respirasi)</td>
+                        </tr>
+                        <tr class="table-row-even">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">06 Des</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">13:00 - 15:00</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">Praktikum Histologi: Jaringan Paru</td>
+                        </tr>
+                         <tr class="table-row-odd">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">09 Des</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">08:00 - 10:00</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">Sesi Tutorial 1 (Kelompok A-F)</td>
+                        </tr>
+                        
+                        <!-- NEW CRITICAL DATE: IDENT BIOKIM (ALERT) - WAKTU DIPERBAIKI -->
+                        <tr class="alert-landmark">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">12 Des</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">08:00 - 12:00</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <span class="landmark-icon">🧪</span> 
+                                **IDENT** (Identifikasi Biokimia) - Siapkan Reagen Terbaikmu!
+                            </td>
+                        </tr>
+
+                        <tr class="table-row-even">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">13 Des</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">13:00 - 16:00</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">Kuliah Pakar: Fisiologi Pernapasan Lanjutan</td>
+                        </tr>
+                        
+                        <!-- NEW CRITICAL DATE: BATAS PORTOFOLIO (Standard, tapi Ditebalkan) - WAKTU DIPERBAIKI -->
+                        <tr class="table-row-odd bg-red-50/50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-red-700">16 Des</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-red-700">12:00</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-red-700">
+                                <span class="landmark-icon">📂</span> 
+                                Batas Akhir Pengumpulan Final Portofolio (Tepat Waktu!)
+                            </td>
+                        </tr>
+
+                        <!-- NEW CRITICAL DATE: SOCA (ALERT) - WAKTU DIPERBAIKI -->
+                        <tr class="alert-landmark">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">18 Des</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">08:00 - 10:00</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <span class="landmark-icon">🎤</span> 
+                                **SOCA** (Student Oral Case Analysis) - Semangat Presentasi Kasus!
+                            </td>
+                        </tr>
+                        
+                        <!-- NEW CRITICAL DATE: IDENT HISTO (ALERT) - WAKTU DIPERBAIKI -->
+                        <tr class="alert-landmark">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">19 Des</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">08:00 - 12:00</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <span class="landmark-icon">🔬</span> 
+                                **IDENT** (Identifikasi Histologi) - Lihat Jaringan Lebih Dekat!
+                            </td>
+                        </tr>
+
+                        <!-- NEW CRITICAL DATE: IDENT ANATOMI (ALERT) - WAKTU DIPERBAIKI -->
+                        <tr class="alert-landmark">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">22 Des</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">13:00 - 16:00</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <span class="landmark-icon">💀</span> 
+                                **IDENT** (Identifikasi Anatomi) - Tunjukkan Kemampuan Hafalanmu!
+                            </td>
+                        </tr>
+
+                        <!-- NEW CRITICAL DATE: CBT (ALERT) - WAKTU DIPERBAIKI -->
+                        <tr class="alert-landmark">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">23 Des</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">08:00 - 12:00</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <span class="landmark-icon">🧠</span> 
+                                **CBT** (Computer Based Test) - Kerjakan dengan Santai tapi Serius!
+                            </td>
+                        </tr>
+
+                        <!-- MASA CERIA AKHIR TAHUN (24 Des dan seterusnya) -->
+
+                        <tr class="cheerful-landmark">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">24 Des</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">Sepanjang Hari</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <span class="landmark-icon">🎁</span> 
+                                Persiapan Libur Akhir Tahun / Istirahat
+                            </td>
+                        </tr>
+                        <tr class="cheerful-landmark">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">25 Des</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">Sepanjang Hari</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <span class="landmark-icon">🎄</span> 
+                                Libur Natal - Nikmati Waktu Bersama Keluarga!
+                            </td>
+                        </tr>
+                        <tr class="cheerful-landmark">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">26 Des</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">Sepanjang Hari</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <span class="landmark-icon">🥳</span> 
+                                Blok Selesai Total - Selamat Tinggal Blok 1.4!
+                            </td>
+                        </tr>
+                        <tr class="cheerful-landmark">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">27 Des</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">Sepanjang Hari</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <span class="landmark-icon">✈️</span> 
+                                Masa Liburan Resmi Dimulai!
+                            </td>
+                        </tr>
+
+                        <tr class="table-row-odd">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">30 Des</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">Sepanjang Hari</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">Libur Akhir Tahun / Refreshing</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Catatan Kaki -->
+            <div class="mt-8 pt-4 border-t border-gray-100 text-center text-gray-500 text-xs italic">
+                <span class="text-base">✨</span>
+                "Ingat, kesehatan mental lebih penting dari nilai sempurna. Semangat!"
+            </div>
+
+            <!-- Note Tambahan yang diminta pengguna -->
+            <div class="mt-4 text-center text-xl font-semibold text-pink-600 bg-pink-100 p-4 rounded-lg border border-pink-300 transform hover:scale-[1.01] transition duration-300 ease-in-out">
+                <span class="text-3xl">🥳</span> Selamat kamu hebat, keren, dan kuat karena sudah bisa melewati semua ini! <span class="text-3xl">💪</span>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>
