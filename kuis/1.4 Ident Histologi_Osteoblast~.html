@@ -92,7 +92,7 @@
 
     <div class="mesh-background"></div>
 
-    <div id="app" class="container mx-auto px-4 py-8 max-w-4xl min-h-screen flex flex-col">
+    <div id="app" class="container mx-auto px-4 py-8 max-w-4xl min-h-screen flex flex-col relative">
         <!-- Header -->
         <header class="text-center mb-10">
             <h1 class="text-4xl md:text-5xl font-extrabold text-pink-700 tracking-tight drop-shadow-sm mb-2">Histologi Blok 1.4</h1>
@@ -100,37 +100,46 @@
         </header>
 
         <!-- Main Menu -->
-        <div id="main-menu" class="grid grid-cols-1 md:grid-cols-2 gap-6 flex-grow items-center justify-center">
-            <button onclick="startMode('summary')" class="glass-panel p-8 rounded-2xl hover:bg-white hover:scale-105 transition-all duration-300 group text-left">
-                <div class="text-3xl mb-3">📚</div>
-                <h3 class="text-2xl font-bold text-pink-800 mb-2 group-hover:text-pink-600">Mode Ringkasan</h3>
-                <p class="text-gray-600">Pelajari kembali materi kulit, rambut, tulang rawan, tulang, dan otot secara komprehensif.</p>
-            </button>
-            <button onclick="startMode('flashcard')" class="glass-panel p-8 rounded-2xl hover:bg-white hover:scale-105 transition-all duration-300 group text-left">
-                <div class="text-3xl mb-3">🗂️</div>
-                <h3 class="text-2xl font-bold text-pink-800 mb-2 group-hover:text-pink-600">Mode Flashcard</h3>
-                <p class="text-gray-600">Hafalkan istilah penting dengan metode kartu bolak-balik.</p>
-            </button>
-            <button onclick="startMode('practice')" class="glass-panel p-8 rounded-2xl hover:bg-white hover:scale-105 transition-all duration-300 group text-left">
-                <div class="text-3xl mb-3">🎯</div>
-                <h3 class="text-2xl font-bold text-pink-800 mb-2 group-hover:text-pink-600">Mode Latihan</h3>
-                <p class="text-gray-600">50 soal komprehensif dengan pembahasan langsung. Cocok untuk belajar.</p>
-            </button>
-            <button onclick="startMode('exam')" class="glass-panel p-8 rounded-2xl hover:bg-white hover:scale-105 transition-all duration-300 group text-left">
-                <div class="text-3xl mb-3">📝</div>
-                <h3 class="text-2xl font-bold text-pink-800 mb-2 group-hover:text-pink-600">Mode Ujian</h3>
-                <p class="text-gray-600">Simulasi ujian tanpa bantuan. Lihat skor dan evaluasi di akhir.</p>
-            </button>
+        <div id="main-menu" class="w-full flex-grow flex flex-col justify-center">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center justify-center mb-8">
+                <button onclick="startMode('summary')" class="glass-panel p-8 rounded-2xl hover:bg-white hover:scale-105 transition-all duration-300 group text-left">
+                    <div class="text-3xl mb-3">📚</div>
+                    <h3 class="text-2xl font-bold text-pink-800 mb-2 group-hover:text-pink-600">Mode Ringkasan</h3>
+                    <p class="text-gray-600">Pelajari kembali materi kulit, rambut, tulang rawan, tulang, dan otot secara komprehensif.</p>
+                </button>
+                <button onclick="startMode('flashcard')" class="glass-panel p-8 rounded-2xl hover:bg-white hover:scale-105 transition-all duration-300 group text-left">
+                    <div class="text-3xl mb-3">🗂️</div>
+                    <h3 class="text-2xl font-bold text-pink-800 mb-2 group-hover:text-pink-600">Mode Flashcard</h3>
+                    <p class="text-gray-600">Hafalkan istilah penting dengan metode kartu bolak-balik.</p>
+                </button>
+                <button onclick="startMode('practice')" class="glass-panel p-8 rounded-2xl hover:bg-white hover:scale-105 transition-all duration-300 group text-left">
+                    <div class="text-3xl mb-3">🎯</div>
+                    <h3 class="text-2xl font-bold text-pink-800 mb-2 group-hover:text-pink-600">Mode Latihan</h3>
+                    <p class="text-gray-600">50 soal komprehensif dengan pembahasan langsung. Cocok untuk belajar.</p>
+                </button>
+                <button onclick="startMode('exam')" class="glass-panel p-8 rounded-2xl hover:bg-white hover:scale-105 transition-all duration-300 group text-left">
+                    <div class="text-3xl mb-3">📝</div>
+                    <h3 class="text-2xl font-bold text-pink-800 mb-2 group-hover:text-pink-600">Mode Ujian</h3>
+                    <p class="text-gray-600">Simulasi ujian tanpa bantuan. Lihat skor dan evaluasi di akhir.</p>
+                </button>
+            </div>
         </div>
 
         <!-- Content Area -->
-        <div id="content-area" class="hidden w-full">
+        <div id="content-area" class="hidden w-full flex-grow">
             <button onclick="returnToMenu()" class="mb-6 px-4 py-2 rounded-full bg-white/50 hover:bg-pink-100 text-pink-700 font-semibold transition flex items-center gap-2 border border-pink-200 shadow-sm">
                 ⬅ Kembali ke Menu
             </button>
             
             <div id="dynamic-content" class="w-full"></div>
         </div>
+
+        <!-- Footer Credit -->
+        <footer class="mt-auto py-6 text-center select-none pointer-events-none">
+            <p class="text-pink-900 opacity-40 font-bold tracking-[0.2em] text-sm uppercase drop-shadow-sm">
+                Based on Capsule Histology
+            </p>
+        </footer>
     </div>
 
     <script>
