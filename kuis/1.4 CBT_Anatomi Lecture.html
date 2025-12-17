@@ -83,29 +83,10 @@
             overflow: hidden;
         }
 
-        .menu-btn::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, var(--gold), var(--orange));
-            opacity: 0;
-            transition: opacity 0.3s;
-            z-index: 0;
-        }
-        
-        .menu-btn span {
-            position: relative;
-            z-index: 1;
-        }
-
         .menu-btn:hover {
             transform: translateY(-5px) scale(1.02);
             box-shadow: 0 10px 25px rgba(255, 100, 0, 0.2);
             border-color: var(--gold);
-        }
-
-        .menu-btn:hover::before {
-            opacity: 0.1;
         }
 
         /* --- Return Button --- */
@@ -152,19 +133,6 @@
             line-height: 1.7;
         }
         
-        /* Custom Scrollbar */
-        .summary-content::-webkit-scrollbar {
-            width: 8px;
-        }
-        .summary-content::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
-        }
-        .summary-content::-webkit-scrollbar-thumb {
-            background: var(--orange);
-            border-radius: 4px;
-        }
-
         .summary-content h3 {
             color: #d32f2f;
             border-bottom: 3px solid var(--gold);
@@ -175,41 +143,33 @@
 
         .summary-block {
             display: flex;
-            flex-direction: column; /* Changed to column to put gallery below text */
+            flex-direction: column;
             gap: 20px;
             margin-bottom: 40px;
             border-bottom: 1px solid #eee;
             padding-bottom: 25px;
         }
 
-        .summary-text {
-            width: 100%;
-        }
-
         .summary-gallery {
             display: flex;
             gap: 15px;
             overflow-x: auto;
-            padding-bottom: 10px;
+            padding-bottom: 15px;
             align-items: flex-start;
-            /* Enable horizontal scrolling */
-            white-space: nowrap;
             -webkit-overflow-scrolling: touch;
         }
 
         .gallery-item {
-            flex: 0 0 220px; /* Fixed width for consistent cards */
+            flex: 0 0 220px;
             background: white;
             padding: 10px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             border: 1px solid #eee;
             text-align: center;
-            display: inline-flex; /* Changed for horizontal scroll */
+            display: flex;
             flex-direction: column;
             transition: transform 0.2s;
-            white-space: normal; /* Reset for text wrapping inside card */
-            vertical-align: top;
         }
 
         .gallery-item:hover {
@@ -219,7 +179,7 @@
 
         .gallery-item img {
             width: 100%;
-            height: 180px; /* Fixed height for uniformity */
+            height: 180px;
             object-fit: contain;
             border-radius: 8px;
             margin-bottom: 8px;
@@ -343,15 +303,10 @@
         }
 
         .option-btn:hover:not(:disabled) {
-            background: #fff8e1; /* Light yellow hover */
+            background: #fff8e1;
             border-color: var(--gold);
         }
 
-        .option-btn:disabled {
-            cursor: default;
-        }
-
-        /* Feedback Colors */
         .option-btn.correct {
             background-color: #e8f5e9 !important;
             border-color: #43a047 !important;
@@ -420,9 +375,6 @@
             box-shadow: 0 5px 15px rgba(211, 47, 47, 0.3);
             transition: transform 0.2s;
         }
-        .submit-btn:hover {
-            transform: scale(1.02);
-        }
         
         .exam-navigation {
             display: flex;
@@ -437,7 +389,7 @@
         @media (max-width: 600px) {
             .container { padding: 1.5rem; width: 95%; }
             .menu-grid { grid-template-columns: 1fr; }
-            .gallery-item { flex: 0 0 80%; } /* Cards take more width on mobile */
+            .gallery-item { flex: 0 0 80%; } 
         }
     </style>
 </head>
@@ -496,8 +448,8 @@
                 </div>
                 <div class="summary-gallery">
                     <div class="gallery-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Illu_muscle_structure.jpg/640px-Illu_muscle_structure.jpg" alt="Struktur Otot">
-                        <div class="img-caption">Struktur Otot Lengkap: Epimisium hingga Miofibril</div>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Illu_muscle_structure.jpg/640px-Illu_muscle_structure.jpg" alt="Struktur Otot" onerror="this.parentElement.style.display='none'">
+                        <div class="img-caption">Struktur Otot Lengkap</div>
                     </div>
                 </div>
             </div>
@@ -525,20 +477,20 @@
                 </div>
                 <div class="summary-gallery">
                     <div class="gallery-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Gray_111_-_Vertebral_column-coloured.png" alt="Vertebral Column">
-                        <div class="img-caption">Kolom Vertebra Utuh<br>(Warna-warni per Regio)</div>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Gray_111_-_Vertebral_column-coloured.png" alt="Vertebral Column" onerror="this.parentElement.style.display='none'">
+                        <div class="img-caption">Kolom Vertebra Utuh</div>
                     </div>
                     <div class="gallery-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Lumbar_vertebrae_lateral.png/300px-Lumbar_vertebrae_lateral.png" alt="Lumbar Vertebrae">
-                        <div class="img-caption">Vertebra Lumbalis (Lateral)<br>Korpus Besar & Kuat</div>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Lumbar_vertebrae_lateral.png/300px-Lumbar_vertebrae_lateral.png" alt="Lumbar Vertebrae" onerror="this.parentElement.style.display='none'">
+                        <div class="img-caption">Vertebra Lumbalis (Samping)</div>
                     </div>
                      <div class="gallery-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Gray84.png/300px-Gray84.png" alt="Atlas (C1)">
-                        <div class="img-caption">Atlas (C1) - Tampak Atas<br>Tidak memiliki corpus</div>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Gray84.png/300px-Gray84.png" alt="Atlas (C1)" onerror="this.parentElement.style.display='none'">
+                        <div class="img-caption">Atlas (C1) - Tanpa Corpus</div>
                     </div>
                      <div class="gallery-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Gray85.png/300px-Gray85.png" alt="Axis (C2)">
-                        <div class="img-caption">Axis (C2) - Tampak Atas<br>Memiliki Dens (Prosesus Odontoid)</div>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Gray85.png/300px-Gray85.png" alt="Axis (C2)" onerror="this.parentElement.style.display='none'">
+                        <div class="img-caption">Axis (C2) - Dens Odontoid</div>
                     </div>
                 </div>
             </div>
@@ -565,16 +517,16 @@
                 </div>
                 <div class="summary-gallery">
                     <div class="gallery-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Shoulder_Capsule.png/400px-Shoulder_Capsule.png" alt="Shoulder Joint Capsule">
-                        <div class="img-caption">Kapsul Sendi Bahu (Anterior)<br>Tampak Ligamen Penguat</div>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Shoulder_Capsule.png/400px-Shoulder_Capsule.png" alt="Shoulder Joint Capsule" onerror="this.parentElement.style.display='none'">
+                        <div class="img-caption">Kapsul Sendi Bahu</div>
                     </div>
                     <div class="gallery-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Gray212.png" alt="Radius Ulna">
-                        <div class="img-caption">Tulang Lengan Bawah<br>Radius (Lateral) & Ulna (Medial)</div>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Gray212.png" alt="Radius Ulna" onerror="this.parentElement.style.display='none'">
+                        <div class="img-caption">Radius (Lateral) & Ulna (Medial)</div>
                     </div>
                     <div class="gallery-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Gray219.png/300px-Gray219.png" alt="Hand Bones Volar">
-                        <div class="img-caption">Tulang Tangan (Volar/Palmar)<br>Carpal, Metacarpal, Phalang</div>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Gray219.png/300px-Gray219.png" alt="Hand Bones Volar" onerror="this.parentElement.style.display='none'">
+                        <div class="img-caption">Tulang Tangan (Volar)</div>
                     </div>
                 </div>
             </div>
@@ -602,12 +554,12 @@
                 </div>
                 <div class="summary-gallery">
                     <div class="gallery-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/8/87/Gray347.png" alt="Knee Joint Anterior">
-                        <div class="img-caption">Sendi Lutut (Depan)<br>Perhatikan Ligamen Cruciatum</div>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/8/87/Gray347.png" alt="Knee Joint Anterior" onerror="this.parentElement.style.display='none'">
+                        <div class="img-caption">Sendi Lutut (Depan)</div>
                     </div>
                      <div class="gallery-item">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Gray290.png/640px-Gray290.png" alt="Foot Bones Medial">
-                        <div class="img-caption">Tulang Kaki (Tampak Medial)<br>Memperlihatkan Arcus Longitudinal</div>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Gray290.png/640px-Gray290.png" alt="Foot Bones Medial" onerror="this.parentElement.style.display='none'">
+                        <div class="img-caption">Tulang Kaki (Medial)</div>
                     </div>
                 </div>
             </div>
