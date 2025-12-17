@@ -1,945 +1,813 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  BookOpen, Layers, CheckCircle, PenTool, ArrowLeft, ArrowRight, 
-  RotateCcw, Award, XCircle, Check, HelpCircle, ChevronLeft, ChevronRight,
-  Activity, Hexagon, Droplets, Bone, ScanFace, LogOut
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Histologi: Otot, Tulang, & Integumen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Gradient Mesh Light Pink Background */
+        body {
+            background-color: #fdf2f8; /* pink-50 base */
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(330, 81%, 90%, 1) 0px, transparent 50%),
+                radial-gradient(at 50% 0%, hsla(312, 90%, 93%, 1) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(339, 100%, 89%, 1) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, hsla(305, 100%, 92%, 1) 0px, transparent 50%),
+                radial-gradient(at 100% 50%, hsla(320, 100%, 88%, 1) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, hsla(330, 100%, 90%, 1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, hsla(310, 100%, 91%, 1) 0px, transparent 50%);
+            background-attachment: fixed;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
 
-// --- DATA & CONTENT ---
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.5); 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f472b6; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ec4899; 
+        }
 
-// Summary Content dengan tambahan properti visual (icon & color)
-const summaryContent = [
-  {
-    title: "1. Sistem Integumen (Kulit)",
-    icon: <ScanFace className="w-16 h-16 text-white" />,
-    color: "from-orange-400 to-pink-500",
-    content: `
-      Sistem integumen adalah organ terbesar tubuh yang terdiri dari kulit dan struktur aksesorisnya (rambut, kuku, kelenjar).
-      
-      **A. Lapisan Kulit:**
-      1. **Epidermis (Epitel Berlapis Gepeng Menanduk):**
-         - *Stratum Basale:* Lapisan terdalam, selapis sel kubus/kolumnar, tempat mitosis aktif (sel punca), terdapat melanosit (pigmen) dan sel Merkel (sensori).
-         - *Stratum Spinosum:* Beberapa lapis sel polihedral dengan "spine" (desmosom), terdapat sel Langerhans (imun).
-         - *Stratum Granulosum:* 3-5 lapis sel pipih berisi granul keratohialin (basofilik).
-         - *Stratum Lucidum:* Hanya pada kulit tebal (telapak tangan/kaki), lapisan jernih, sel mati tanpa inti.
-         - *Stratum Corneum:* Lapisan terluar, sel mati berisi keratin, mengelupas (deskuamasi).
-      
-      2. **Dermis (Jaringan Ikat):**
-         - *Lapisan Papilar:* Jaringan ikat longgar, membentuk papila dermis, terdapat badan Meissner (sentuhan halus).
-         - *Lapisan Retikular:* Jaringan ikat padat tidak teratur, serat kolagen tebal, terdapat kelenjar, folikel rambut, badan Pacini (tekanan dalam).
-      
-      3. **Hipodermis (Subkutan):**
-         - Jaringan adiposa (lemak) dan jaringan ikat longgar. Fungsi: isolasi suhu, cadangan energi, bantalan.
+        /* Card & Effects */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
 
-      **B. Kelenjar & Aksesoris:**
-      - *Kelenjar Sebasea:* Menghasilkan sebum (minyak), sekresi holokrin, bermuara ke folikel rambut.
-      - *Kelenjar Keringat Ekrin:* Tersebar luas, sekresi merokrin (cair), termoregulasi.
-      - *Kelenjar Keringat Apokrin:* Di aksila/anogenital, bermuara ke folikel, aktif saat pubertas, bau khas.
-    `
-  },
-  {
-    title: "2. Tulang dan Tulang Rawan",
-    icon: <Hexagon className="w-16 h-16 text-white" />, // Representing Osteon structure
-    color: "from-blue-400 to-indigo-500",
-    content: `
-      Jaringan ikat khusus dengan matriks ekstraseluler yang keras atau kaku.
+        .btn-pink {
+            background: linear-gradient(135deg, #fbcfe8 0%, #f472b6 100%);
+            color: #831843;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(244, 114, 182, 0.3);
+        }
+        .btn-pink:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(244, 114, 182, 0.4);
+            filter: brightness(1.05);
+        }
+        .btn-pink:active {
+            transform: translateY(0);
+        }
 
-      **A. Tulang Rawan (Kartilago):**
-      - *Kondrosit:* Sel tulang rawan, terletak di dalam lakuna.
-      - *Perikondrium:* Lapisan jaringan ikat pembungkus (kecuali pada kartilago artikular & fibrokartilago).
-      - **Jenis:**
-        1. *Hialin:* Matriks homogen (kolagen tipe II), paling umum (hidung, trakea, ujung tulang rusuk).
-        2. *Elastis:* Banyak serat elastin, fleksibel (epiglotis, daun telinga).
-        3. *Fibrokartilago:* Banyak serat kolagen tipe I, sangat kuat, tanpa perikondrium (diskus intervertebralis, simfisis pubis).
+        /* Flashcard Flip Animation */
+        .flip-card {
+            background-color: transparent;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+        .flip-card-front {
+            background: white;
+            color: #831843;
+            border: 2px solid #fbcfe8;
+        }
+        .flip-card-back {
+            background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%);
+            color: #831843;
+            transform: rotateY(180deg);
+            border: 2px solid #f9a8d4;
+        }
 
-      **B. Tulang (Osteon):**
-      - *Osteoblas:* Sel pembentuk tulang, menyekresi osteoid (matriks belum terkalsifikasi).
-      - *Osteosit:* Sel tulang matang di dalam lakuna, memelihara matriks.
-      - *Osteoklas:* Sel raksasa multinukleat (dari monosit), meresorpsi/menghancurkan tulang.
-      - **Struktur Mikroskopis:**
-        - *Sistem Havers (Osteon):* Unit fungsional tulang kompak.
-        - *Kanal Havers:* Pusat berisi pembuluh darah.
-        - *Lamela:* Lapisan matriks konsentris.
-        - *Kanalikuli:* Saluran halus penghubung antar lakuna.
-    `
-  },
-  {
-    title: "3. Jaringan Otot",
-    icon: <Activity className="w-16 h-16 text-white" />,
-    color: "from-red-400 to-pink-600",
-    content: `
-      Jaringan yang berfungsi untuk pergerakan melalui kontraksi.
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
 
-      **A. Otot Rangka (Skeletal Muscle):**
-      - *Bentuk:* Silindris panjang, tidak bercabang.
-      - *Inti:* Banyak (multinukleat), terletak di tepi (perifer).
-      - *Sifat:* Lurik (striated), volunter (sadar), kontraksi cepat & kuat.
-      - *Struktur:* Sarkomer (unit kontraksi antara dua garis Z), Pita A (gelap, miosin+aktin), Pita I (terang, aktin saja).
-
-      **B. Otot Jantung (Cardiac Muscle):**
-      - *Bentuk:* Silindris, bercabang-cabang.
-      - *Inti:* Satu atau dua, terletak di tengah (sentral).
-      - *Sifat:* Lurik, involunter (tidak sadar), kontraksi ritmis.
-      - *Ciri Khas:* Diskus interkalaris (sambungan antar sel dengan desmosom & gap junction).
-
-      **C. Otot Polos (Smooth Muscle):**
-      - *Bentuk:* Gelendong (fusiform), ujung runcing.
-      - *Inti:* Satu, terletak di tengah.
-      - *Sifat:* Tidak lurik (polos), involunter, kontraksi lambat & tahan lama (misal: peristaltik usus).
-      - *Lokasi:* Dinding organ dalam berongga (lambung, usus, pembuluh darah).
-    `
-  }
-];
-
-// Question Bank (Same as before - 60 Questions)
-const questionBank = [
-  // --- INTEGUMENTARY (20 Questions) ---
-  {
-    question: "Lapisan epidermis manakah yang tersusun atas selapis sel kubus atau kolumnar yang aktif melakukan mitosis?",
-    options: ["Stratum Corneum", "Stratum Lucidum", "Stratum Granulosum", "Stratum Basale"],
-    correct: 3,
-    explanation: "Stratum basale adalah lapisan terdalam yang terdiri dari sel punca aktif membelah untuk regenerasi kulit."
-  },
-  {
-    question: "Sel manakah pada epidermis yang berfungsi sebagai reseptor sensorik untuk sentuhan halus?",
-    options: ["Melanosit", "Sel Merkel", "Sel Langerhans", "Keratinosit"],
-    correct: 1,
-    explanation: "Sel Merkel berfungsi sebagai mekanoreseptor untuk sentuhan ringan, biasanya ditemukan di stratum basale."
-  },
-  {
-    question: "Apa fungsi utama dari sel Langerhans yang terdapat pada Stratum Spinosum?",
-    options: ["Menghasilkan pigmen melanin", "Membentuk keratin", "Sistem pertahanan imun (Antigen Presenting Cell)", "Mendeteksi tekanan"],
-    correct: 2,
-    explanation: "Sel Langerhans adalah sel dendritik yang berperan dalam sistem imun kulit dengan mempresentasikan antigen."
-  },
-  {
-    question: "Lapisan epidermis yang hanya ditemukan pada kulit tebal (telapak tangan dan kaki) adalah...",
-    options: ["Stratum Spinosum", "Stratum Basale", "Stratum Lucidum", "Stratum Granulosum"],
-    correct: 2,
-    explanation: "Stratum lucidum adalah lapisan transparan yang hanya ada pada kulit tebal di bawah stratum corneum."
-  },
-  {
-    question: "Struktur pada dermis yang berfungsi mendeteksi tekanan dalam dan getaran adalah...",
-    options: ["Badan Meissner", "Badan Pacini", "Ujung saraf bebas", "Sel Merkel"],
-    correct: 1,
-    explanation: "Badan Pacini (Lamellar corpuscle) adalah reseptor di dermis bagian dalam atau hipodermis yang peka terhadap tekanan kuat/dalam."
-  },
-  {
-    question: "Kelenjar sebasea mensekresikan sebum melalui mekanisme sekresi tipe apa?",
-    options: ["Merokrin", "Apokrin", "Holokrin", "Endokrin"],
-    correct: 2,
-    explanation: "Kelenjar sebasea adalah kelenjar holokrin, di mana seluruh sel hancur untuk melepaskan produk sekresinya (sebum)."
-  },
-  {
-    question: "Pigmen melanin yang melindungi DNA dari radiasi UV diproduksi oleh...",
-    options: ["Keratinosit", "Melanosit", "Adiposit", "Fibroblas"],
-    correct: 1,
-    explanation: "Melanosit memproduksi melanin yang kemudian ditransfer ke keratinosit untuk perlindungan UV."
-  },
-  {
-    question: "Jaringan utama yang menyusun lapisan retikular dermis adalah...",
-    options: ["Jaringan ikat longgar", "Jaringan ikat padat teratur", "Jaringan ikat padat tidak teratur", "Jaringan lemak"],
-    correct: 2,
-    explanation: "Lapisan retikular dermis tersusun atas jaringan ikat padat tidak teratur (dense irregular connective tissue) yang memberikan kekuatan ke berbagai arah."
-  },
-  {
-    question: "Manakah pernyataan yang BENAR mengenai Stratum Granulosum?",
-    options: ["Berisi sel mati tanpa inti", "Mengandung granul keratohialin yang basofilik", "Merupakan lapisan paling dasar", "Terdiri dari jaringan lemak"],
-    correct: 1,
-    explanation: "Stratum granulosum ditandai dengan adanya sel-sel yang mengandung granul keratohialin yang tampak gelap (basofilik)."
-  },
-  {
-    question: "Kelenjar keringat yang aktif sejak lahir, bermuara langsung ke permukaan kulit, dan berfungsi untuk termoregulasi adalah...",
-    options: ["Kelenjar Sebasea", "Kelenjar Apokrin", "Kelenjar Ekrin", "Kelenjar Ceruminosa"],
-    correct: 2,
-    explanation: "Kelenjar keringat ekrin (merokrin) tersebar di seluruh tubuh dan berfungsi mendinginkan tubuh."
-  },
-  {
-    question: "Bagian kuku yang merupakan tempat pertumbuhan kuku baru disebut...",
-    options: ["Lunula", "Eponikium", "Matriks kuku", "Hiponikium"],
-    correct: 2,
-    explanation: "Matriks kuku adalah area proliferasi sel yang mendorong pertumbuhan lempeng kuku."
-  },
-  {
-    question: "Hipodermis (jaringan subkutan) terutama tersusun atas jenis sel apa?",
-    options: ["Kondrosit", "Adiposit", "Osteosit", "Miosit"],
-    correct: 1,
-    explanation: "Hipodermis banyak mengandung adiposit (sel lemak) yang berfungsi sebagai isolator panas dan cadangan energi."
-  },
-  {
-    question: "Rambut velus adalah...",
-    options: ["Rambut kasar di kepala", "Rambut halus tidak berpigmen pada anak-anak/wanita", "Rambut pada masa janin", "Rambut ketiak"],
-    correct: 1,
-    explanation: "Vellus adalah rambut halus, tipis, dan seringkali tidak berpigmen yang menutupi sebagian besar tubuh."
-  },
-  {
-    question: "Otot polos kecil yang menempel pada folikel rambut dan menyebabkan 'merinding' disebut...",
-    options: ["Muskulus orbicularis", "Muskulus arrector pili", "Muskulus skelet", "Muskulus dartos"],
-    correct: 1,
-    explanation: "M. arrector pili berkontraksi saat dingin atau takut, menyebabkan rambut berdiri (piloereksi)."
-  },
-  {
-    question: "Apa nama lapisan terluar dari batang rambut (hair shaft)?",
-    options: ["Medula", "Korteks", "Kutikula", "Matriks"],
-    correct: 2,
-    explanation: "Kutikula adalah lapisan terluar rambut yang tersusun seperti sisik ikan."
-  },
-  {
-    question: "Warna kulit manusia terutama ditentukan oleh...",
-    options: ["Jumlah melanosit", "Jumlah dan jenis melanin yang dihasilkan", "Ketebalan stratum corneum", "Banyaknya pembuluh darah"],
-    correct: 1,
-    explanation: "Setiap orang memiliki jumlah melanosit yang relatif sama; perbedaan warna kulit disebabkan oleh jumlah dan aktivitas melanin yang diproduksi."
-  },
-  {
-    question: "Lapisan kulit yang memberikan sidik jari (fingerprint) adalah...",
-    options: ["Papila dermis", "Retikular dermis", "Hipodermis", "Stratum corneum"],
-    correct: 0,
-    explanation: "Papila dermis yang menonjol ke epidermis membentuk alur-alur epidermal ridge yang menjadi dasar sidik jari."
-  },
-  {
-    question: "Kelenjar apokrin terutama ditemukan di area...",
-    options: ["Telapak tangan", "Dahi", "Aksila (ketiak) dan area genital", "Punggung"],
-    correct: 2,
-    explanation: "Kelenjar keringat apokrin terbatas pada area tertentu seperti ketiak dan selangkangan, dan mulai aktif saat pubertas."
-  },
-  {
-    question: "Sel makrofag yang menetap di kulit untuk memakan debris atau bakteri adalah...",
-    options: ["Sel Merkel", "Sel Langerhans", "Keratinosit", "Mast cell"],
-    correct: 1,
-    explanation: "Sel Langerhans berfungsi sebagai bagian dari sistem imun (mirip makrofag) di epidermis."
-  },
-  {
-    question: "Proses pelepasan sel-sel kulit mati dari permukaan stratum corneum disebut...",
-    options: ["Keratinisasi", "Deskuamasi", "Proliferasi", "Diferensiasi"],
-    correct: 1,
-    explanation: "Deskuamasi adalah proses pengelupasan sel-sel tanduk mati dari permukaan kulit."
-  },
-
-  // --- BONE & CARTILAGE (20 Questions) ---
-  {
-    question: "Jenis sel tulang yang berfungsi untuk meresorpsi atau menghancurkan matriks tulang adalah...",
-    options: ["Osteoblas", "Osteosit", "Osteoklas", "Osteoprogenitor"],
-    correct: 2,
-    explanation: "Osteoklas adalah sel raksasa multinukleat yang mengeluarkan asam dan enzim untuk memecah tulang."
-  },
-  {
-    question: "Unit fungsional dasar dari tulang kompak disebut...",
-    options: ["Trabekula", "Sistem Havers (Osteon)", "Lakuna", "Periosteum"],
-    correct: 1,
-    explanation: "Sistem Havers (Osteon) adalah struktur silindris yang merupakan unit penyusun utama tulang kompak."
-  },
-  {
-    question: "Tulang rawan (kartilago) jenis apa yang menyusun daun telinga dan epiglotis?",
-    options: ["Kartilago Hialin", "Kartilago Fibrosa", "Kartilago Elastis", "Kartilago Artikular"],
-    correct: 2,
-    explanation: "Kartilago elastis mengandung banyak serat elastin yang memberikan fleksibilitas tinggi."
-  },
-  {
-    question: "Di manakah letak osteosit pada jaringan tulang?",
-    options: ["Kanal Havers", "Kanal Volkmann", "Lakuna", "Kanalikuli"],
-    correct: 2,
-    explanation: "Osteosit terperangkap di dalam ruang kecil yang disebut lakuna di antara lapisan matriks."
-  },
-  {
-    question: "Jenis kartilago yang paling banyak ditemukan di tubuh (misal: ujung hidung, trakea, ujung tulang rusuk) adalah...",
-    options: ["Kartilago Hialin", "Kartilago Elastis", "Fibrokartilago", "Tulang Sponsa"],
-    correct: 0,
-    explanation: "Kartilago hialin adalah jenis yang paling umum, memiliki matriks glassy (seperti kaca) dan mengandung kolagen tipe II."
-  },
-  {
-    question: "Sel yang bertanggung jawab untuk mensintesis komponen organik matriks tulang (osteoid) adalah...",
-    options: ["Osteoklas", "Osteosit", "Osteoblas", "Kondrosit"],
-    correct: 2,
-    explanation: "Osteoblas adalah sel pembentuk tulang yang aktif mensintesis kolagen dan matriks tulang baru."
-  },
-  {
-    question: "Fibrokartilago memiliki karakteristik sangat kuat karena mengandung banyak...",
-    options: ["Serat Elastin", "Serat Kolagen Tipe I", "Serat Retikuler", "Kristal Hidroksiapatit"],
-    correct: 1,
-    explanation: "Fibrokartilago mengandung berkas tebal kolagen tipe I, membuatnya sangat kuat menahan beban (contoh: diskus intervertebralis)."
-  },
-  {
-    question: "Saluran kecil yang menghubungkan lakuna satu dengan lainnya untuk pertukaran nutrisi antar osteosit disebut...",
-    options: ["Kanalikuli", "Lamela", "Osteon", "Kanal sentral"],
-    correct: 0,
-    explanation: "Kanalikuli adalah saluran mikroskopis tempat juluran sitoplasma osteosit saling bertemu."
-  },
-  {
-    question: "Pembungkus jaringan ikat pada permukaan luar tulang disebut...",
-    options: ["Endosteum", "Perikondrium", "Periosteum", "Epimisium"],
-    correct: 2,
-    explanation: "Periosteum adalah lapisan jaringan ikat yang membungkus permukaan luar tulang (kecuali di sendi)."
-  },
-  {
-    question: "Proses pembentukan tulang pipih (seperti tulang tengkorak) yang terjadi langsung dari membran mesenkim disebut...",
-    options: ["Osifikasi Endokondral", "Osifikasi Intramembranosa", "Kalsifikasi", "Resorpsi"],
-    correct: 1,
-    explanation: "Osifikasi intramembranosa terjadi ketika tulang terbentuk langsung dari jaringan mesenkim tanpa melalui model kartilago."
-  },
-  {
-    question: "Apa komponen anorganik utama yang membuat tulang menjadi keras?",
-    options: ["Kolagen tipe I", "Proteoglikan", "Kristal Hidroksiapatit (Kalsium Fosfat)", "Asam hialuronat"],
-    correct: 2,
-    explanation: "Kristal kalsium fosfat (hidroksiapatit) mengendap pada matriks kolagen memberikan kekerasan pada tulang."
-  },
-  {
-    question: "Manakah dari berikut ini yang TIDAK memiliki perikondrium?",
-    options: ["Kartilago Hialin pada trakea", "Kartilago Elastis pada telinga", "Fibrokartilago dan Kartilago Artikular", "Kartilago Hialin pada hidung"],
-    correct: 2,
-    explanation: "Fibrokartilago dan kartilago artikular (pada sendi) tidak memiliki perikondrium karena mereka berbatasan langsung dengan tulang atau cairan sendi."
-  },
-  {
-    question: "Zona pertumbuhan memanjang pada tulang panjang anak-anak disebut...",
-    options: ["Lempeng Epifisis", "Diafisis", "Metafisis", "Sutura"],
-    correct: 0,
-    explanation: "Lempeng epifisis adalah area kartilago hialin yang memungkinkan tulang tumbuh memanjang sebelum menutup saat dewasa."
-  },
-  {
-    question: "Saluran yang berjalan melintang/horizontal menghubungkan kanal Havers satu dengan lainnya disebut...",
-    options: ["Kanalikuli", "Kanal Volkmann", "Kanal Sentral", "Lakuna"],
-    correct: 1,
-    explanation: "Kanal Volkmann (perforating canal) berjalan tegak lurus terhadap osteon, membawa pembuluh darah dari periosteum."
-  },
-  {
-    question: "Kondrosit memperoleh nutrisi terutama melalui...",
-    options: ["Pembuluh darah yang menembus matriks", "Difusi dari perikondrium atau cairan sinovial", "Pembuluh limfatik langsung", "Saraf"],
-    correct: 1,
-    explanation: "Kartilago bersifat avaskular (tidak ada pembuluh darah), nutrisi didapat lewat difusi melalui matriks."
-  },
-  {
-    question: "Tipe kolagen utama yang terdapat pada matriks tulang adalah...",
-    options: ["Kolagen Tipe I", "Kolagen Tipe II", "Kolagen Tipe III", "Kolagen Tipe IV"],
-    correct: 0,
-    explanation: "Osteoid tulang sebagian besar terdiri dari Kolagen Tipe I."
-  },
-  {
-    question: "Bagian tulang panjang yang berbentuk batang tengah disebut...",
-    options: ["Epifisis", "Diafisis", "Metafisis", "Artikulasi"],
-    correct: 1,
-    explanation: "Diafisis adalah batang utama atau bagian tengah dari tulang panjang."
-  },
-  {
-    question: "Sel yang berperan sebagai 'sensor mekanik' pada tulang adalah...",
-    options: ["Osteoblas", "Osteoklas", "Osteosit", "Kondroblas"],
-    correct: 2,
-    explanation: "Osteosit mendeteksi beban mekanis (mechanical stress) dan memberi sinyal untuk remodeling tulang."
-  },
-  {
-    question: "Penyakit akibat kekurangan Vitamin D pada anak-anak yang menyebabkan tulang lunak dan bengkok disebut...",
-    options: ["Osteoporosis", "Rickets (Rakhitis)", "Osteomalasia", "Arthritis"],
-    correct: 1,
-    explanation: "Rickets adalah gangguan mineralisasi tulang pada anak akibat defisiensi vitamin D atau kalsium."
-  },
-  {
-    question: "Struktur 'Isogenous group' (kelompok isogen) khas ditemukan pada jaringan...",
-    options: ["Tulang Kompak", "Otot Polos", "Kartilago", "Saraf"],
-    correct: 2,
-    explanation: "Kelompok isogen adalah kumpulan kondrosit hasil pembelahan yang masih berada dalam satu area lakuna pada kartilago."
-  },
-
-  // --- MUSCLE (20 Questions) ---
-  {
-    question: "Otot manakah yang memiliki karakteristik: berinti banyak di tepi, lurik, dan bekerja di bawah kesadaran (volunter)?",
-    options: ["Otot Jantung", "Otot Polos", "Otot Rangka", "Otot Viseral"],
-    correct: 2,
-    explanation: "Otot rangka adalah otot lurik yang menempel pada tulang, dikendalikan secara sadar, dan memiliki inti perifer."
-  },
-  {
-    question: "Struktur khas yang menghubungkan sel-sel otot jantung dan memfasilitasi komunikasi ionik adalah...",
-    options: ["Diskus Interkalaris", "Motor End Plate", "Sarkomer", "Dense Bodies"],
-    correct: 0,
-    explanation: "Diskus interkalaris mengandung gap junction dan desmosom, memungkinkan otot jantung berkontraksi sebagai satu kesatuan (sinsitium)."
-  },
-  {
-    question: "Unit fungsional terkecil dari kontraksi otot rangka disebut...",
-    options: ["Miofibril", "Sarkomer", "Fasikulus", "Sarkolema"],
-    correct: 1,
-    explanation: "Sarkomer adalah unit kontraktil yang berulang antara dua garis Z."
-  },
-  {
-    question: "Otot polos memiliki ciri khas inti sel yang...",
-    options: ["Banyak di tepi", "Satu di tengah", "Satu atau dua di tepi", "Banyak tersebar acak"],
-    correct: 1,
-    explanation: "Sel otot polos berbentuk gelendong dengan satu inti tunggal yang terletak di tengah (sentral)."
-  },
-  {
-    question: "Lapisan jaringan ikat yang membungkus SATU serat otot individu disebut...",
-    options: ["Epimisium", "Perimisium", "Endomisium", "Fasia"],
-    correct: 2,
-    explanation: "Endomisium adalah lapisan retikuler halus yang membungkus setiap serat otot."
-  },
-  {
-    question: "Pita terang pada sarkomer yang hanya berisi filamen aktin disebut...",
-    options: ["Pita A", "Pita I", "Garis Z", "Zona H"],
-    correct: 1,
-    explanation: "Pita I (Isotropik) tampak terang karena hanya mengandung filamen tipis (aktin), tanpa miosin."
-  },
-  {
-    question: "Protein pengikat kalsium pada otot rangka adalah...",
-    options: ["Kalmodulin", "Troponin", "Miosin", "Aktin"],
-    correct: 1,
-    explanation: "Pada otot rangka, kalsium berikatan dengan Troponin C untuk memicu kontraksi. (Pada otot polos barulah Kalmodulin)."
-  },
-  {
-    question: "Manakah otot yang TIDAK memiliki pola lurik (striasi)?",
-    options: ["Otot Rangka", "Otot Jantung", "Otot Polos", "Otot Skelet"],
-    correct: 2,
-    explanation: "Otot polos tidak memiliki sarkomer yang tertata rapi sehingga tidak tampak lurik di bawah mikroskop."
-  },
-  {
-    question: "Tempat pertemuan antara ujung saraf motorik dengan serat otot rangka disebut...",
-    options: ["Sinaps Listrik", "Neuromuscular Junction", "Ganglion", "Pleksus"],
-    correct: 1,
-    explanation: "Neuromuscular junction (Motor end plate) adalah sinaps kimiawi antara motor neuron dan serat otot."
-  },
-  {
-    question: "Pada kontraksi otot, filamen tebal terutama tersusun atas protein...",
-    options: ["Aktin", "Miosin", "Tropomiosin", "Troponin"],
-    correct: 1,
-    explanation: "Filamen tebal dibentuk oleh protein miosin, sedangkan filamen tipis oleh aktin."
-  },
-  {
-    question: "Struktur Triad pada otot rangka terdiri dari...",
-    options: ["Satu tubulus T dan dua sisterna terminal", "Satu tubulus T dan satu sisterna terminal", "Dua tubulus T dan satu sisterna", "Tiga tubulus T"],
-    correct: 0,
-    explanation: "Triad penting untuk pelepasan kalsium, terdiri dari 1 Tubulus Transversal (T) diapit oleh 2 Sisterna Terminal Retikulum Sarkoplasma."
-  },
-  {
-    question: "Sel otot jantung memiliki inti yang biasanya berjumlah...",
-    options: ["Puluhan di tepi", "Satu atau dua di tengah", "Satu di tepi", "Tidak berinti"],
-    correct: 1,
-    explanation: "Otot jantung biasanya memiliki 1 atau 2 inti yang terletak di sentral sel."
-  },
-  {
-    question: "Kemampuan otot untuk kembali ke panjang semula setelah diregangkan disebut...",
-    options: ["Kontraktilitas", "Eksitabilitas", "Ekstensibilitas", "Elastisitas"],
-    correct: 3,
-    explanation: "Elastisitas adalah kemampuan jaringan otot untuk recoil atau kembali ke bentuk awal setelah ditarik."
-  },
-  {
-    question: "Garis gelap yang menjadi batas antar sarkomer adalah...",
-    options: ["Garis M", "Garis Z", "Pita A", "Zona H"],
-    correct: 1,
-    explanation: "Garis Z (Z disc) adalah tempat menempelnya filamen aktin dan membatasi satu sarkomer dengan sarkomer lainnya."
-  },
-  {
-    question: "Peristiwa rigor mortis (kaku mayat) terjadi karena...",
-    options: ["Kelebihan ATP", "Kekurangan Kalsium", "Ketiadaan ATP untuk melepas ikatan aktin-miosin", "Enzim lisosom bocor"],
-    correct: 2,
-    explanation: "Tanpa ATP, kepala miosin tidak bisa lepas dari aktin, menyebabkan otot terkunci dalam keadaan kontraksi (kaku)."
-  },
-  {
-    question: "Otot yang bekerja secara involunter (tidak sadar) adalah...",
-    options: ["Otot Rangka saja", "Otot Jantung dan Otot Polos", "Otot Jantung dan Otot Rangka", "Semua jenis otot"],
-    correct: 1,
-    explanation: "Otot jantung dan otot polos dikendalikan oleh sistem saraf otonom (involunter), sedangkan otot rangka adalah volunter."
-  },
-  {
-    question: "Sel otot satelit (Satellite cells) pada otot rangka berfungsi untuk...",
-    options: ["Kontraksi", "Regenerasi dan perbaikan otot", "Menyimpan kalsium", "Menerima impuls saraf"],
-    correct: 1,
-    explanation: "Sel satelit adalah sel punca otot yang aktif saat cedera untuk membantu regenerasi serat otot rangka."
-  },
-  {
-    question: "Bentuk sel otot polos digambarkan sebagai...",
-    options: ["Silindris panjang", "Bercabang", "Fusiform (gelendong)", "Kuboid"],
-    correct: 2,
-    explanation: "Sel otot polos berbentuk fusiform: tebal di tengah (daerah inti) dan meruncing di kedua ujungnya."
-  },
-  {
-    question: "Pada otot polos, pengganti sistem troponin untuk regulasi kontraksi adalah...",
-    options: ["Dense bodies", "Calmodulin", "Titik buta", "Gap junction"],
-    correct: 1,
-    explanation: "Kalsium pada otot polos berikatan dengan Calmodulin, yang kemudian mengaktifkan enzim Myosin Light Chain Kinase."
-  },
-  {
-    question: "Pita A pada sarkomer tampak gelap karena mengandung...",
-    options: ["Hanya filamen tipis", "Filamen tebal dan tumpang tindih dengan filamen tipis", "Hanya garis Z", "Cairan sarkoplasma"],
-    correct: 1,
-    explanation: "Pita A (Anisotropik) adalah area sepanjang filamen miosin, termasuk area tumpang tindih dengan aktin."
-  }
-];
-
-// --- COMPONENTS ---
-
-const MainMenu = ({ setMode }) => (
-  <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6 animate-fade-in-up">
-    <h1 className="text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600 drop-shadow-sm text-center mb-8">
-      Kuis Histologi Lengkap
-    </h1>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl px-4">
-      <button onClick={() => setMode('summary')} className="mode-card group">
-        <BookOpen className="w-12 h-12 text-pink-500 group-hover:scale-110 transition-transform" />
-        <span className="text-xl font-bold text-gray-800">Mode Ringkasan</span>
-        <span className="text-sm text-gray-500">Pelajari materi otot, tulang, & kulit</span>
-      </button>
-      <button onClick={() => setMode('flashcard')} className="mode-card group">
-        <Layers className="w-12 h-12 text-blue-500 group-hover:scale-110 transition-transform" />
-        <span className="text-xl font-bold text-gray-800">Mode Flashcard</span>
-        <span className="text-sm text-gray-500">Hafalan cepat dengan kartu balik</span>
-      </button>
-      <button onClick={() => setMode('practice')} className="mode-card group">
-        <PenTool className="w-12 h-12 text-green-500 group-hover:scale-110 transition-transform" />
-        <span className="text-xl font-bold text-gray-800">Mode Latihan</span>
-        <span className="text-sm text-gray-500">Latihan santai dengan pembahasan</span>
-      </button>
-      <button onClick={() => setMode('exam')} className="mode-card group">
-        <Award className="w-12 h-12 text-red-500 group-hover:scale-110 transition-transform" />
-        <span className="text-xl font-bold text-gray-800">Mode Ujian</span>
-        <span className="text-sm text-gray-500">Uji kemampuanmu (Skor 0-100)</span>
-      </button>
-    </div>
-  </div>
-);
-
-const SummaryMode = ({ goBack }) => (
-  <div className="w-full max-w-4xl bg-white/80 backdrop-blur-md rounded-3xl shadow-xl p-8 animate-fade-in border border-pink-100">
-    <div className="flex justify-between items-center mb-6 border-b border-pink-200 pb-4">
-      <h2 className="text-3xl font-bold text-pink-700 flex items-center gap-2">
-        <BookOpen className="w-8 h-8" /> Ringkasan Materi
-      </h2>
-      <button onClick={goBack} className="btn-secondary flex items-center gap-2">
-        <ArrowLeft className="w-4 h-4" /> Kembali
-      </button>
-    </div>
-    <div className="space-y-8 max-h-[70vh] overflow-y-auto pr-4 custom-scrollbar">
-      {summaryContent.map((section, idx) => (
-        <div key={idx} className="bg-white p-0 rounded-2xl overflow-hidden shadow-sm border border-pink-100">
-          {/* Visual Header for Summary Card */}
-          <div className={`h-32 bg-gradient-to-r ${section.color} flex items-center justify-between px-8 relative`}>
-            <div className="absolute inset-0 bg-white opacity-10 pattern-dots"></div>
-            <h3 className="text-2xl font-bold text-white relative z-10 drop-shadow-md w-2/3">{section.title}</h3>
-            <div className="bg-white/20 p-4 rounded-full backdrop-blur-sm relative z-10 shadow-inner">
-              {section.icon}
-            </div>
-          </div>
-          
-          <div className="p-8 prose prose-pink max-w-none text-gray-700 whitespace-pre-line leading-relaxed bg-pink-50/30">
-            {section.content}
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-);
-
-const FlashcardMode = ({ goBack }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFlipped, setIsFlipped] = useState(false);
-  const [shuffledQuestions, setShuffledQuestions] = useState([]);
-
-  useEffect(() => {
-    // Shuffle questions for variety
-    const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
-    setShuffledQuestions(shuffled);
-  }, []);
-
-  const handleNext = () => {
-    setIsFlipped(false);
-    setTimeout(() => {
-      setCurrentIndex((prev) => (prev + 1) % shuffledQuestions.length);
-    }, 200);
-  };
-
-  const handlePrev = () => {
-    setIsFlipped(false);
-    setTimeout(() => {
-      setCurrentIndex((prev) => (prev - 1 + shuffledQuestions.length) % shuffledQuestions.length);
-    }, 200);
-  };
-
-  if (shuffledQuestions.length === 0) return null;
-
-  const currentQ = shuffledQuestions[currentIndex];
-
-  return (
-    <div className="flex flex-col items-center justify-center w-full max-w-3xl mx-auto animate-fade-in">
-      <div className="flex justify-between items-center w-full mb-6">
-        <button onClick={goBack} className="btn-secondary flex items-center gap-2">
-          <ArrowLeft className="w-4 h-4" /> Menu
-        </button>
-        <span className="font-mono text-pink-700 font-bold bg-pink-100 px-4 py-1 rounded-full">
-          Kartu {currentIndex + 1} / {shuffledQuestions.length}
-        </span>
-      </div>
-
-      <div 
-        className="relative w-full aspect-[4/3] md:aspect-[5/3] perspective-1000 cursor-pointer group"
-        onClick={() => setIsFlipped(!isFlipped)}
-      >
-        <div className={`w-full h-full transition-all duration-500 transform-style-3d relative shadow-2xl rounded-3xl ${isFlipped ? 'rotate-y-180' : ''}`}>
-          {/* Front */}
-          <div className="absolute inset-0 backface-hidden bg-gradient-to-br from-white to-pink-50 rounded-3xl flex flex-col items-center justify-center p-8 border-2 border-pink-100 text-center">
-            <span className="text-pink-400 font-bold tracking-widest uppercase text-sm mb-4">Pertanyaan</span>
-            <p className="text-2xl md:text-3xl font-bold text-gray-800 leading-snug">{currentQ.question}</p>
-            <p className="mt-8 text-sm text-gray-400 animate-pulse">(Klik untuk melihat jawaban)</p>
-          </div>
-
-          {/* Back */}
-          <div className="absolute inset-0 backface-hidden rotate-y-180 bg-gradient-to-br from-pink-600 to-purple-600 rounded-3xl flex flex-col items-center justify-center p-8 text-white text-center">
-            <span className="text-pink-200 font-bold tracking-widest uppercase text-sm mb-4">Jawaban</span>
-            <p className="text-xl md:text-2xl font-bold leading-relaxed">{currentQ.options[currentQ.correct]}</p>
-            <div className="mt-6 p-4 bg-white/20 rounded-xl backdrop-blur-sm">
-              <p className="text-sm md:text-base font-medium">{currentQ.explanation}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Beautiful Icon Buttons for Flashcard */}
-      <div className="flex items-center justify-center gap-12 mt-10">
-        <button 
-          onClick={handlePrev} 
-          className="w-16 h-16 rounded-full bg-white text-pink-600 shadow-lg hover:shadow-2xl hover:scale-110 active:scale-95 transition-all flex items-center justify-center border-2 border-pink-100 group"
-          title="Sebelumnya"
-        >
-          <ChevronLeft className="w-8 h-8 group-hover:-translate-x-1 transition-transform" />
-        </button>
+    <!-- Main Container -->
+    <div class="container mx-auto px-4 py-8 max-w-5xl">
         
-        <span className="text-pink-400 font-medium text-sm">Navigasi</span>
+        <!-- Header -->
+        <header class="text-center mb-10 fade-in">
+            <h1 class="text-4xl md:text-5xl font-bold text-pink-700 mb-2 drop-shadow-sm">Histologi Master</h1>
+            <p class="text-pink-600 text-lg">Otot • Tulang & Sendi • Sistem Integumen</p>
+        </header>
 
-        <button 
-          onClick={handleNext} 
-          className="w-16 h-16 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg hover:shadow-pink-300/50 hover:scale-110 active:scale-95 transition-all flex items-center justify-center group"
-          title="Selanjutnya"
-        >
-          <ChevronRight className="w-8 h-8 group-hover:translate-x-1 transition-transform" />
-        </button>
-      </div>
+        <!-- MENU MODE -->
+        <div id="menu-section" class="grid grid-cols-1 md:grid-cols-2 gap-6 fade-in">
+            <button onclick="switchMode('summary')" class="glass-panel p-8 rounded-2xl hover:scale-105 transition-transform group text-left">
+                <div class="flex items-center mb-4">
+                    <div class="p-3 bg-pink-100 rounded-full mr-4 group-hover:bg-pink-200 transition-colors">
+                        <i class="fas fa-book-open text-2xl text-pink-600"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Mode Ringkasan</h2>
+                </div>
+                <p class="text-gray-600">Pelajari materi komprehensif dari modul otot, tulang, dan kulit.</p>
+            </button>
+
+            <button onclick="switchMode('flashcard')" class="glass-panel p-8 rounded-2xl hover:scale-105 transition-transform group text-left">
+                <div class="flex items-center mb-4">
+                    <div class="p-3 bg-pink-100 rounded-full mr-4 group-hover:bg-pink-200 transition-colors">
+                        <i class="fas fa-layer-group text-2xl text-pink-600"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Mode Flashcard</h2>
+                </div>
+                <p class="text-gray-600">Hafalkan konsep kunci dengan kartu bolak-balik.</p>
+            </button>
+
+            <button onclick="switchMode('practice')" class="glass-panel p-8 rounded-2xl hover:scale-105 transition-transform group text-left">
+                <div class="flex items-center mb-4">
+                    <div class="p-3 bg-pink-100 rounded-full mr-4 group-hover:bg-pink-200 transition-colors">
+                        <i class="fas fa-dumbbell text-2xl text-pink-600"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Mode Latihan</h2>
+                </div>
+                <p class="text-gray-600">60 Soal dengan umpan balik langsung (Benar/Salah).</p>
+            </button>
+
+            <button onclick="switchMode('exam')" class="glass-panel p-8 rounded-2xl hover:scale-105 transition-transform group text-left">
+                <div class="flex items-center mb-4">
+                    <div class="p-3 bg-pink-100 rounded-full mr-4 group-hover:bg-pink-200 transition-colors">
+                        <i class="fas fa-graduation-cap text-2xl text-pink-600"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Mode Ujian</h2>
+                </div>
+                <p class="text-gray-600">Simulasi ujian nyata dengan skor akhir dan evaluasi.</p>
+            </button>
+        </div>
+
+        <!-- CONTENT SECTIONS (Hidden by default) -->
+        
+        <!-- 1. SUMMARY MODE -->
+        <div id="summary-section" class="hidden fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-pink-700">Ringkasan Materi</h2>
+                <button onclick="returnToMenu()" class="btn-pink px-4 py-2 rounded-lg font-semibold text-sm">
+                    <i class="fas fa-arrow-left mr-2"></i> Kembali
+                </button>
+            </div>
+            
+            <div class="glass-panel rounded-2xl p-8 overflow-y-auto h-[70vh]">
+                <div class="prose prose-pink max-w-none text-gray-700">
+                    <h3 class="text-2xl font-bold text-pink-800 border-b-2 border-pink-200 pb-2">1. Sistem Otot (Muscle Histology)</h3>
+                    <p>Jaringan otot bertanggung jawab untuk pergerakan tubuh dan zat di dalam tubuh. Terdapat tiga jenis utama:</p>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Otot Rangka (Skeletal Muscle):</strong>
+                            <ul class="list-circle pl-5 mt-1">
+                                <li><strong>Struktur:</strong> Sel panjang, silindris, multinukleus (inti banyak di tepi/perifer), memiliki striasi (lurik) jelas.</li>
+                                <li><strong>Kontrol:</strong> Volunter (sadar), kontraksi kuat, cepat, dan terputus-putus.</li>
+                                <li><strong>Organisasi:</strong> Dilapisi oleh epimisium (seluruh otot), perimisium (fasikulus), dan endomisium (serabut individu). Mengandung sel satelit untuk regenerasi terbatas.</li>
+                                <li><strong>Unit Fungsional:</strong> Sarkomer (jarak antara dua garis Z). Pita A (gelap/miosin+aktin), Pita I (terang/aktin saja), Zona H, Garis M.</li>
+                                <li><strong>Mekanisme:</strong> Teori <em>Sliding Filament</em>. Ca2+ mengikat Troponin C, menggeser Tropomiosin, membuka situs aktif Aktin untuk kepala Miosin.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Otot Jantung (Cardiac Muscle):</strong>
+                            <ul class="list-circle pl-5 mt-1">
+                                <li><strong>Struktur:</strong> Sel bercabang, striasi ada, 1-2 inti di tengah (sentral).</li>
+                                <li><strong>Ciri Khas:</strong> Diskus interkalaris (Intercalated discs) yang mengandung <em>gap junctions</em> (komunikasi ion) dan desmosom (adhesi).</li>
+                                <li><strong>Kontrol:</strong> Involunter, kontraksi kuat, terus menerus, ritmis.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Otot Polos (Smooth Muscle):</strong>
+                            <ul class="list-circle pl-5 mt-1">
+                                <li><strong>Struktur:</strong> Bentuk gelendong (fusiform), tanpa striasi, satu inti di tengah.</li>
+                                <li><strong>Lokasi:</strong> Dinding organ berongga (usus, pembuluh darah, rahim).</li>
+                                <li><strong>Kontrol:</strong> Involunter, kontraksi lambat, lemah, tahan lelah. Tidak memiliki tubulus T; Ca2+ berikatan dengan Calmodulin (bukan troponin).</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <h3 class="text-2xl font-bold text-pink-800 border-b-2 border-pink-200 pb-2 mt-8">2. Tulang dan Persendian</h3>
+                    <p>Jaringan ikat khusus yang terdiri dari sel dan matriks ekstraseluler yang termineralisasi.</p>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Sel Tulang:</strong>
+                            <ul class="list-circle pl-5 mt-1">
+                                <li><strong>Osteoblast:</strong> Membentuk tulang baru (osteoid), lokasi di permukaan tulang.</li>
+                                <li><strong>Osteosit:</strong> Sel tulang dewasa yang terperangkap dalam <em>lakuna</em>, memelihara matriks, terhubung via kanalikuli.</li>
+                                <li><strong>Osteoklas:</strong> Sel raksasa multinukleus (turunan monosit) untuk resorpsi tulang (penghancuran matriks).</li>
+                            </ul>
+                        </li>
+                        <li><strong>Struktur Mikroskopis (Tulang Kompak):</strong>
+                            <ul class="list-circle pl-5 mt-1">
+                                <li><strong>Sistem Havers (Osteon):</strong> Unit struktural silindris.</li>
+                                <li><strong>Saluran Havers:</strong> Di tengah, berisi pembuluh darah/saraf.</li>
+                                <li><strong>Saluran Volkmann:</strong> Saluran melintang yang menghubungkan saluran Havers.</li>
+                                <li><strong>Lamela:</strong> Lapisan matriks konsentris.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Kartilago (Tulang Rawan):</strong> Avaskular (tidak ada pembuluh darah).
+                            <ul class="list-circle pl-5 mt-1">
+                                <li><strong>Hialin:</strong> Paling umum (hidung, trakea, ujung tulang panjang). Matriks homogen, kolagen tipe II.</li>
+                                <li><strong>Elastis:</strong> Telinga luar, epiglotis. Banyak serat elastin.</li>
+                                <li><strong>Fibrokartilago:</strong> Diskus intervertebralis, simfisis pubis. Sangat kuat, kolagen tipe I padat.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Pembentukan Tulang (Ossifikasi):</strong>
+                            <ul class="list-circle pl-5 mt-1">
+                                <li><strong>Intramembranosa:</strong> Langsung dari mesenkim (tulang pipih tengkorak).</li>
+                                <li><strong>Endokondral:</strong> Menggunakan model kartilago hialin terlebih dahulu (tulang panjang).</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <h3 class="text-2xl font-bold text-pink-800 border-b-2 border-pink-200 pb-2 mt-8">3. Sistem Integumen (Kulit)</h3>
+                    <p>Organ terbesar tubuh, terdiri dari epidermis dan dermis, serta hipodermis di bawahnya.</p>
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><strong>Epidermis (Epitel Berlapis Gepeng Menanduk):</strong>
+                            <ul class="list-circle pl-5 mt-1">
+                                <li><strong>Stratum Basale:</strong> Lapisan terbawah, sel aktif membelah (mitosis), terdapat melanosit (pigmen) dan sel Merkel (sentuhan).</li>
+                                <li><strong>Stratum Spinosum:</strong> Lapisan tertebal, sel keratinosit saling terhubung oleh desmosom (tampak berduri), terdapat sel Langerhans (imun).</li>
+                                <li><strong>Stratum Granulosum:</strong> Sel gepeng berisi granula keratohialin.</li>
+                                <li><strong>Stratum Lucidum:</strong> Hanya pada kulit tebal (telapak tangan/kaki), bening/transparan.</li>
+                                <li><strong>Stratum Corneum:</strong> Lapisan terluar, sel mati berisi keratin, mengelupas.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Dermis (Jaringan Ikat):</strong>
+                            <ul class="list-circle pl-5 mt-1">
+                                <li><strong>Lapisan Papiler:</strong> Jaringan ikat longgar, membentuk papila dermal (sidik jari), terdapat badan Meissner (sentuhan halus).</li>
+                                <li><strong>Lapisan Retikuler:</strong> Jaringan ikat padat tidak teratur, serat kolagen tebal, terdapat badan Pacini (tekanan/getaran).</li>
+                            </ul>
+                        </li>
+                        <li><strong>Adneksa Kulit:</strong>
+                            <ul class="list-circle pl-5 mt-1">
+                                <li><strong>Kelenjar Sebasea:</strong> Menghasilkan sebum (minyak), sekresi holokrin, biasanya bermuara ke folikel rambut.</li>
+                                <li><strong>Kelenjar Keringat Ekrin:</strong> Tersebar luas, untuk termoregulasi, sekresi merokrin (cair).</li>
+                                <li><strong>Kelenjar Keringat Apokrin:</strong> Di ketiak/genital, sekresi kental, aktif saat pubertas.</li>
+                                <li><strong>Rambut & Kuku:</strong> Struktur keratin keras.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. FLASHCARD MODE -->
+        <div id="flashcard-section" class="hidden fade-in w-full max-w-2xl mx-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-pink-700">Mode Flashcard</h2>
+                <button onclick="returnToMenu()" class="btn-pink px-4 py-2 rounded-lg font-semibold text-sm">Kembali</button>
+            </div>
+
+            <div class="scene w-full h-80 mb-8">
+                <div class="flip-card w-full h-full" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner shadow-xl rounded-2xl">
+                        <div class="flip-card-front glass-panel">
+                            <h3 class="text-xl font-semibold text-pink-500 mb-2">Pertanyaan</h3>
+                            <p id="fc-question" class="text-2xl font-bold text-gray-800 px-4">Memuat...</p>
+                            <p class="text-sm text-gray-400 mt-4">(Klik untuk melihat jawaban)</p>
+                        </div>
+                        <div class="flip-card-back shadow-inner">
+                            <h3 class="text-xl font-semibold text-pink-700 mb-2">Jawaban</h3>
+                            <p id="fc-answer" class="text-xl text-gray-800 px-4 font-medium">...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center bg-white/50 p-4 rounded-xl backdrop-blur-sm">
+                <button onclick="prevFlashcard()" class="p-3 bg-white rounded-full shadow hover:bg-pink-50 text-pink-600 transition-colors">
+                    <i class="fas fa-chevron-left text-xl"></i>
+                </button>
+                <span id="fc-counter" class="font-mono text-pink-700 font-bold">1 / 60</span>
+                <button onclick="nextFlashcard()" class="p-3 bg-white rounded-full shadow hover:bg-pink-50 text-pink-600 transition-colors">
+                    <i class="fas fa-chevron-right text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. PRACTICE MODE -->
+        <div id="practice-section" class="hidden fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-pink-700">Mode Latihan</h2>
+                <button onclick="returnToMenu()" class="btn-pink px-4 py-2 rounded-lg font-semibold text-sm">Kembali</button>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-6 md:p-8">
+                <!-- Progress Bar -->
+                <div class="w-full bg-pink-200 rounded-full h-2.5 mb-6">
+                    <div id="practice-progress" class="bg-pink-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+
+                <div id="practice-container">
+                    <div class="mb-6">
+                        <span class="text-sm font-bold text-pink-500 uppercase tracking-wide">Soal <span id="practice-num">1</span></span>
+                        <h3 id="practice-question" class="text-xl md:text-2xl font-bold text-gray-800 mt-2">...</h3>
+                    </div>
+
+                    <div id="practice-options" class="grid grid-cols-1 gap-3 mb-6">
+                        <!-- Options generated by JS -->
+                    </div>
+
+                    <!-- Feedback Area -->
+                    <div id="practice-feedback" class="hidden rounded-xl p-4 mb-4 border-l-4">
+                        <h4 id="feedback-title" class="font-bold text-lg mb-1"></h4>
+                        <p id="feedback-text" class="text-gray-700"></p>
+                    </div>
+
+                    <button id="practice-next-btn" onclick="nextPracticeQuestion()" class="btn-pink w-full py-3 rounded-xl font-bold text-lg hidden">
+                        Soal Selanjutnya <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+                
+                <!-- Practice End Screen -->
+                <div id="practice-end" class="hidden text-center py-10">
+                    <i class="fas fa-check-circle text-6xl text-green-500 mb-4"></i>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Latihan Selesai!</h3>
+                    <p class="text-gray-600 mb-6">Kamu telah menyelesaikan semua soal latihan.</p>
+                    <button onclick="resetPractice()" class="btn-pink px-6 py-3 rounded-xl font-bold mr-2">Ulangi Latihan</button>
+                    <button onclick="returnToMenu()" class="bg-white text-pink-600 border-2 border-pink-200 px-6 py-3 rounded-xl font-bold hover:bg-pink-50">Menu Utama</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. EXAM MODE -->
+        <div id="exam-section" class="hidden fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-pink-700">Mode Ujian</h2>
+                <div class="flex gap-2">
+                    <span id="exam-timer" class="bg-white px-3 py-2 rounded-lg font-mono text-pink-600 font-bold border border-pink-200">00:00</span>
+                    <button onclick="returnToMenu()" class="bg-white text-pink-600 border border-pink-200 px-3 py-2 rounded-lg font-semibold text-sm hover:bg-pink-50">Batal</button>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-6 md:p-8" id="exam-container">
+                <!-- Question -->
+                <div class="mb-6">
+                    <span class="text-sm font-bold text-pink-500 uppercase tracking-wide">Soal <span id="exam-num">1</span> / 60</span>
+                    <h3 id="exam-question" class="text-xl md:text-2xl font-bold text-gray-800 mt-2">...</h3>
+                </div>
+
+                <!-- Options -->
+                <div id="exam-options" class="grid grid-cols-1 gap-3 mb-8">
+                    <!-- Options JS -->
+                </div>
+
+                <!-- Navigation -->
+                <div class="flex justify-between">
+                    <button id="exam-prev-btn" onclick="prevExamQuestion()" class="px-6 py-2 rounded-xl bg-gray-200 text-gray-600 font-bold hover:bg-gray-300 disabled:opacity-50">Sebelumnya</button>
+                    
+                    <button id="exam-next-btn" onclick="nextExamQuestion()" class="px-6 py-2 rounded-xl bg-pink-100 text-pink-700 font-bold hover:bg-pink-200">Selanjutnya</button>
+                    
+                    <button id="exam-submit-btn" onclick="finishExam()" class="hidden px-6 py-2 rounded-xl btn-pink font-bold shadow-lg">Selesai & Nilai</button>
+                </div>
+                
+                <!-- Question Navigator Grid (Optional for quick jump) -->
+                <div class="mt-8 pt-6 border-t border-pink-100">
+                    <p class="text-sm text-gray-500 mb-2">Navigasi Soal:</p>
+                    <div id="exam-nav-grid" class="flex flex-wrap gap-2">
+                        <!-- Grid generated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- EXAM RESULT -->
+            <div id="exam-result" class="hidden glass-panel rounded-2xl p-8 text-center max-w-2xl mx-auto">
+                <div id="score-emoji" class="text-7xl mb-4 animate-bounce"></div>
+                <h2 class="text-4xl font-bold text-gray-800 mb-2">Skor Kamu: <span id="final-score" class="text-pink-600">0</span></h2>
+                <p id="score-message" class="text-xl text-gray-600 font-medium mb-8 italic">...</p>
+                
+                <div class="grid grid-cols-2 gap-4 text-left bg-white/50 p-4 rounded-xl mb-8 text-sm">
+                    <div>
+                        <span class="block text-gray-500">Benar</span>
+                        <span id="result-correct" class="text-xl font-bold text-green-600">0</span>
+                    </div>
+                    <div>
+                        <span class="block text-gray-500">Salah</span>
+                        <span id="result-wrong" class="text-xl font-bold text-red-600">0</span>
+                    </div>
+                </div>
+
+                <div class="flex justify-center gap-4">
+                    <button onclick="resetExam()" class="btn-pink px-6 py-3 rounded-xl font-bold">Ujian Lagi</button>
+                    <button onclick="returnToMenu()" class="bg-white text-pink-600 border-2 border-pink-200 px-6 py-3 rounded-xl font-bold hover:bg-pink-50">Menu Utama</button>
+                </div>
+            </div>
+        </div>
+
     </div>
-  );
-};
 
-const PracticeMode = ({ goBack }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [isAnswered, setIsAnswered] = useState(false);
-  const [shuffledQuestions, setShuffledQuestions] = useState([]);
+    <!-- DATA & LOGIC -->
+    <script>
+        // DATA SOAL (60 Soal Komprehensif: 20 Otot, 20 Tulang, 20 Kulit)
+        const questionsDB = [
+            // --- BAGIAN 1: OTOT (1-20) ---
+            { q: "Apa unit fungsional terkecil dari kontraksi otot rangka?", options: ["Sarkolema", "Miofibril", "Sarkomer", "Fasikulus"], a: 2, rationale: "Sarkomer adalah unit kontraktil dasar otot rangka yang terletak di antara dua garis Z." },
+            { q: "Protein apakah yang menutupi situs aktif pada aktin saat otot relaksasi?", options: ["Troponin", "Miosin", "Tropomiosin", "Titin"], a: 2, rationale: "Tropomiosin menutupi situs pengikatan miosin pada molekul aktin saat istirahat." },
+            { q: "Ion apakah yang diperlukan untuk berikatan dengan Troponin C agar kontraksi terjadi?", options: ["Natrium", "Kalium", "Kalsium", "Magnesium"], a: 2, rationale: "Kalsium (Ca2+) berikatan dengan Troponin C, menyebabkan perubahan konformasi yang menggeser tropomiosin." },
+            { q: "Struktur spesifik apa yang hanya ditemukan pada otot jantung?", options: ["Inti banyak di tepi", "Diskus interkalaris", "Bentuk gelendong", "Tanpa striasi"], a: 1, rationale: "Diskus interkalaris adalah ciri khas otot jantung yang menghubungkan kardiomiosit." },
+            { q: "Lapisan jaringan ikat yang membungkus seluruh otot disebut?", options: ["Endomisium", "Perimisium", "Epimisium", "Fasia superfisialis"], a: 2, rationale: "Epimisium adalah lapisan jaringan ikat padat yang membungkus keseluruhan otot." },
+            { q: "Dimanakah letak inti sel pada otot rangka?", options: ["Tunggal di tengah", "Banyak di tengah", "Tunggal di tepi", "Banyak di tepi (perifer)"], a: 3, rationale: "Otot rangka memiliki banyak inti yang terletak di bagian tepi (sub-sarkolema)." },
+            { q: "Zona pada sarkomer yang hanya berisi filamen tebal (miosin) adalah?", options: ["Pita I", "Pita A", "Zona H", "Garis Z"], a: 2, rationale: "Zona H adalah area di tengah pita A yang hanya berisi filamen miosin tanpa tumpang tindih dengan aktin." },
+            { q: "Otot polos memiliki karakteristik berikut, KECUALI:", options: ["Involunter", "Tidak memiliki striasi", "Multinukleus", "Berbentuk gelendong"], a: 2, rationale: "Otot polos memiliki satu inti (mononukleus), bukan multinukleus." },
+            { q: "Apa fungsi tubulus T (Transverse Tubules) pada otot rangka?", options: ["Menyimpan kalsium", "Menghantarkan potensial aksi ke dalam sel", "Membentuk energi", "Sintesis protein"], a: 1, rationale: "Tubulus T meneruskan impuls listrik (potensial aksi) dari permukaan sel ke dalam agar retikulum sarkoplasma melepas kalsium." },
+            { q: "Struktur pada otot jantung yang berfungsi sebagai komunikasi ion antar sel adalah?", options: ["Desmosom", "Gap Junction", "Zonula adherens", "Hemidesmosom"], a: 1, rationale: "Gap junction pada diskus interkalaris memungkinkan ion lewat sehingga kontraksi jantung sinkron." },
+            { q: "Sel satelit pada jaringan otot rangka berfungsi untuk?", options: ["Kontraksi", "Menyimpan glikogen", "Regenerasi terbatas", "Membentuk mielin"], a: 2, rationale: "Sel satelit adalah sel punca yang berperan dalam perbaikan dan regenerasi otot rangka." },
+            { q: "Pita terang pada gambaran mikroskopis otot lurik disebut?", options: ["Pita A", "Pita I", "Garis M", "Zona H"], a: 1, rationale: "Pita I (Isotropik) adalah daerah terang yang hanya mengandung filamen aktin." },
+            { q: "Jenis otot apa yang menyusun dinding lambung dan usus?", options: ["Otot Rangka", "Otot Jantung", "Otot Polos", "Otot Lurik"], a: 2, rationale: "Organ dalam (viseral) tersusun atas otot polos yang bekerja secara involunter." },
+            { q: "Garis Z merupakan tempat melekatnya filamen?", options: ["Miosin", "Aktin", "Titin", "Kolagen"], a: 1, rationale: "Filamen tipis (aktin) tertambat pada garis Z (Z-disc)." },
+            { q: "Mekanisme 'Rigor Mortis' terjadi karena?", options: ["Kelebihan ATP", "Kekurangan ATP", "Kelebihan Kalsium", "Kerusakan Saraf"], a: 1, rationale: "Tanpa ATP, kepala miosin tidak bisa lepas dari aktin, menyebabkan kekakuan otot." },
+            { q: "Retikulum sarkoplasma pada otot berfungsi utama sebagai?", options: ["Sintesis protein", "Respirasi sel", "Gudang penyimpanan Kalsium", "Transportasi glukosa"], a: 2, rationale: "Retikulum sarkoplasma menyimpan ion Ca2+ yang dilepaskan saat kontraksi." },
+            { q: "Sel otot jantung sering bercabang. Benar atau Salah?", options: ["Benar", "Salah"], a: 0, rationale: "Benar, sel otot jantung memiliki struktur bercabang (branching)." },
+            { q: "Endomisium adalah jaringan ikat yang membungkus?", options: ["Satu fasikulus", "Satu serat otot", "Seluruh otot", "Tendon"], a: 1, rationale: "Endomisium adalah lapisan retikuler halus yang membungkus setiap serat otot individu." },
+            { q: "Triad pada otot rangka terdiri dari?", options: ["1 Tubulus T dan 1 Sisterna Terminal", "1 Tubulus T dan 2 Sisterna Terminal", "2 Tubulus T dan 1 Sisterna Terminal", "Hanya tubulus T"], a: 1, rationale: "Triad terdiri dari satu tubulus T di tengah yang diapit oleh dua sisterna terminal retikulum sarkoplasma." },
+            { q: "Kontraksi otot jantung dipengaruhi oleh sistem saraf?", options: ["Somatik", "Otonom", "Pusat saja", "Perifer saja"], a: 1, rationale: "Otot jantung bersifat involunter dan dipengaruhi oleh sistem saraf otonom (simpatis/parasimpatis)." },
 
-  useEffect(() => {
-    setShuffledQuestions([...questionBank].sort(() => 0.5 - Math.random()));
-  }, []);
+            // --- BAGIAN 2: TULANG & SENDI (21-40) ---
+            { q: "Sel tulang yang berfungsi menghancurkan/meresorpsi matriks tulang adalah?", options: ["Osteoblast", "Osteosit", "Osteoklas", "Kondrosit"], a: 2, rationale: "Osteoklas adalah sel multinukleus besar yang melarutkan matriks tulang." },
+            { q: "Unit struktural utama pada tulang kompak disebut?", options: ["Trabekula", "Osteon (Sistem Havers)", "Lamela", "Lakuna"], a: 1, rationale: "Osteon atau Sistem Havers adalah unit silindris penyusun tulang kompak." },
+            { q: "Osteosit terletak di dalam ruang kecil yang disebut?", options: ["Kanalikuli", "Lamela", "Lakuna", "Saluran Havers"], a: 2, rationale: "Osteosit terperangkap di dalam rongga kecil matriks yang disebut lakuna." },
+            { q: "Jenis kartilago yang menyusun daun telinga dan epiglotis adalah?", options: ["Kartilago Hialin", "Kartilago Fibrosa", "Kartilago Elastis", "Kartilago Hialin Terkalsifikasi"], a: 2, rationale: "Kartilago elastis mengandung banyak serat elastin yang memberikan fleksibilitas." },
+            { q: "Pembentukan tulang pipih pada tengkorak terjadi melalui proses?", options: ["Osifikasi Endokondral", "Osifikasi Intramembranosa", "Kalsifikasi Distrofik", "Pertumbuhan Aposisional"], a: 1, rationale: "Osifikasi intramembranosa terjadi langsung dari jaringan mesenkim, khas pada tulang pipih." },
+            { q: "Saluran melintang yang menghubungkan saluran Havers satu dengan lainnya adalah?", options: ["Saluran Volkmann", "Kanalikuli", "Lamela sirkumferensial", "Rongga sumsum"], a: 0, rationale: "Saluran Volkmann (perforating canals) berjalan tegak lurus terhadap sumbu panjang tulang." },
+            { q: "Sel yang bertanggung jawab mensintesis matriks tulang baru (osteoid) adalah?", options: ["Osteoklas", "Osteosit", "Osteoblast", "Osteoprogenitor"], a: 2, rationale: "Osteoblast adalah sel pembentuk tulang yang aktif mensintesis osteoid." },
+            { q: "Kartilago hialin memiliki karakteristik berikut, KECUALI:", options: ["Matriks homogen seperti kaca", "Mengandung kolagen tipe II", "Banyak pembuluh darah (vaskular)", "Memiliki perikondrium"], a: 2, rationale: "Kartilago bersifat avaskular (tidak memiliki pembuluh darah)." },
+            { q: "Lapisan luar tulang yang mengandung pembuluh darah dan saraf disebut?", options: ["Endosteum", "Periosteum", "Perikondrium", "Epimisium"], a: 1, rationale: "Periosteum adalah lapisan jaringan ikat yang membungkus permukaan luar tulang." },
+            { q: "Cincin-cincin matriks tulang yang mengelilingi saluran Havers disebut?", options: ["Lamela Konsentris", "Lamela Interstisial", "Lamela Sirkumferensial", "Trabekula"], a: 0, rationale: "Lamela konsentris adalah lapisan matriks yang tersusun melingkar mengelilingi saluran pusat." },
+            { q: "Kanalikuli berfungsi untuk?", options: ["Tempat pembuluh darah", "Menghubungkan osteosit satu sama lain", "Tempat sumsum tulang", "Menyimpan lemak"], a: 1, rationale: "Kanalikuli adalah saluran mikro yang memungkinkan osteosit saling bertukar nutrisi dan sinyal." },
+            { q: "Lempeng epifisis (lempeng pertumbuhan) tersusun atas jaringan?", options: ["Tulang kompak", "Tulang spons", "Kartilago hialin", "Kartilago fibrosa"], a: 2, rationale: "Lempeng epifisis terdiri dari kartilago hialin yang memungkinkan pertumbuhan memanjang tulang." },
+            { q: "Jenis sendi yang memungkinkan pergerakan bebas (seperti bahu) adalah?", options: ["Sinartrosis", "Amfiartrosis", "Diartrosis (Sinovial)", "Sutura"], a: 2, rationale: "Sendi sinovial (diartrosis) memiliki rongga sendi dan memungkinkan gerak bebas." },
+            { q: "Cairan yang melumasi sendi diartrosis dihasilkan oleh?", options: ["Kartilago artikular", "Membran sinovial", "Kapsul fibrosa", "Ligamen"], a: 1, rationale: "Membran sinovial melapisi kapsul sendi dan menghasilkan cairan sinovial pelumas." },
+            { q: "Fibrokartilago ditemukan pada struktur berikut:", options: ["Ujung hidung", "Diskus intervertebralis", "Trakea", "Tulang rusuk"], a: 1, rationale: "Fibrokartilago sangat kuat dan ditemukan pada bantalan antar ruas tulang belakang (diskus intervertebralis)." },
+            { q: "Pusat osifikasi primer pada tulang panjang biasanya muncul di?", options: ["Epifisis", "Diafisis", "Metafisis", "Periosteum"], a: 1, rationale: "Pusat osifikasi primer terbentuk di bagian batang tulang (diafisis) saat perkembangan janin." },
+            { q: "Komponen anorganik utama matriks tulang adalah?", options: ["Kolagen tipe I", "Hidroksiapatit (Kalsium Fosfat)", "Proteoglikan", "Air"], a: 1, rationale: "Hidroksiapatit memberikan kekerasan pada tulang." },
+            { q: "Osteoklas berasal dari fusi sel-sel?", options: ["Osteoblast", "Monosit (darah)", "Fibroblast", "Kondrosit"], a: 1, rationale: "Osteoklas adalah bagian dari sistem fagosit mononuklear, berasal dari fusi monosit." },
+            { q: "Penyakit akibat kekurangan Vitamin D pada anak-anak yang menyebabkan tulang lunak disebut?", options: ["Osteoporosis", "Rakhitis (Rickets)", "Artritis", "Osteomalasia"], a: 1, rationale: "Rakhitis adalah pelunakan tulang pada anak karena defisiensi vitamin D atau kalsium." },
+            { q: "Sharpey's fibers berfungsi untuk?", options: ["Menghubungkan osteon", "Menempelkan periosteum ke tulang", "Membentuk sumsum", "Menghubungkan sendi"], a: 1, rationale: "Serat Sharpey adalah serat kolagen yang menambatkan periosteum ke matriks tulang di bawahnya." },
 
-  const handleOptionClick = (index) => {
-    if (isAnswered) return;
-    setSelectedOption(index);
-    setIsAnswered(true);
-  };
+            // --- BAGIAN 3: INTEGUMEN (41-60) ---
+            { q: "Lapisan epidermis yang sel-selnya aktif membelah (mitosis) adalah?", options: ["Stratum Corneum", "Stratum Granulosum", "Stratum Basale", "Stratum Lucidum"], a: 2, rationale: "Stratum basale adalah lapisan germinal terdalam tempat sel baru diproduksi." },
+            { q: "Sel yang menghasilkan pigmen melanin untuk melindungi dari UV adalah?", options: ["Keratinosit", "Melanosit", "Sel Langerhans", "Sel Merkel"], a: 1, rationale: "Melanosit memproduksi melanin dan mentransfernya ke keratinosit." },
+            { q: "Lapisan kulit yang hanya ditemukan pada kulit tebal (telapak tangan/kaki) adalah?", options: ["Stratum Spinosum", "Stratum Basale", "Stratum Lucidum", "Stratum Granulosum"], a: 2, rationale: "Stratum lucidum adalah lapisan bening transparan yang hanya ada di kulit tebal." },
+            { q: "Sel Langerhans pada epidermis berfungsi sebagai?", options: ["Reseptor sentuhan", "Penghasil pigmen", "Sel penyaji antigen (Sistem Imun)", "Penghasil keratin"], a: 2, rationale: "Sel Langerhans adalah sel dendritik yang berperan dalam pertahanan imun kulit." },
+            { q: "Jaringan utama penyusun dermis lapisan retikuler adalah?", options: ["Ikat longgar", "Ikat padat tidak teratur", "Lemak (adiposa)", "Epitel selapis"], a: 1, rationale: "Lapisan retikuler dermis tersusun atas serat kolagen padat yang tidak teratur, memberikan kekuatan." },
+            { q: "Kelenjar yang menghasilkan sebum (minyak) disebut?", options: ["Kelenjar Ekrin", "Kelenjar Apokrin", "Kelenjar Sebasea", "Kelenjar Ceruminosa"], a: 2, rationale: "Kelenjar sebasea menghasilkan minyak untuk melumasi kulit dan rambut." },
+            { q: "Reseptor kulit yang peka terhadap tekanan dalam dan getaran adalah?", options: ["Badan Meissner", "Badan Pacini", "Diskus Merkel", "Ujung saraf bebas"], a: 1, rationale: "Badan Pacini (lamellar corpuscle) mendeteksi tekanan kuat dan getaran frekuensi tinggi." },
+            { q: "Apa nama otot polos kecil yang menyebabkan rambut berdiri (merinding)?", options: ["Muskulus orbikularis", "Arrector pili", "Muskulus papilaris", "Dartos"], a: 1, rationale: "Otot arrector pili berkontraksi saat dingin atau takut, menyebabkan piloereksi." },
+            { q: "Lapisan paling luar dari epidermis yang terdiri dari sel mati disebut?", options: ["Stratum Corneum", "Stratum Granulosum", "Dermis", "Hipodermis"], a: 0, rationale: "Stratum corneum berisi sel-sel mati terkeratinisasi yang terus mengelupas." },
+            { q: "Kelenjar keringat yang bermuara langsung ke permukaan kulit dan berfungsi mengatur suhu tubuh adalah?", options: ["Kelenjar Apokrin", "Kelenjar Ekrin (Merokrin)", "Kelenjar Sebasea", "Kelenjar Holokrin"], a: 1, rationale: "Kelenjar ekrin tersebar di seluruh tubuh dan menghasilkan keringat encer untuk pendinginan." },
+            { q: "Bagian kuku yang merupakan tempat pertumbuhan kuku baru disebut?", options: ["Lunula", "Eponikium", "Matriks Kuku", "Hiponikium"], a: 2, rationale: "Matriks kuku berisi sel-sel yang membelah untuk membentuk lempeng kuku." },
+            { q: "Hipodermis (Subkutan) terutama tersusun atas jaringan?", options: ["Otot", "Tulang", "Adiposa (Lemak)", "Saraf"], a: 2, rationale: "Hipodermis berisi banyak jaringan lemak untuk isolasi termal dan cadangan energi." },
+            { q: "Granula keratohialin ditemukan secara mencolok pada lapisan?", options: ["Stratum Basale", "Stratum Spinosum", "Stratum Granulosum", "Stratum Corneum"], a: 2, rationale: "Stratum granulosum dinamai demikian karena adanya granula keratohialin gelap." },
+            { q: "Badan Meissner berfungsi untuk mendeteksi?", options: ["Suhu panas", "Nyeri", "Sentuhan halus (rabaan)", "Tekanan kuat"], a: 2, rationale: "Badan Meissner terletak di papila dermis dan peka terhadap sentuhan ringan." },
+            { q: "Jenis sekresi pada kelenjar sebasea adalah?", options: ["Merokrin", "Apokrin", "Holokrin", "Endokrin"], a: 2, rationale: "Sekresi holokrin berarti seluruh sel hancur dan menjadi bagian dari sekret (sebum)." },
+            { q: "Warna kulit manusia terutama ditentukan oleh?", options: ["Jumlah melanosit", "Jumlah melanin yang diproduksi", "Ketebalan dermis", "Jumlah kelenjar keringat"], a: 1, rationale: "Jumlah melanosit relatif sama pada semua ras, perbedaan warna disebabkan oleh jumlah dan jenis melanin yang diproduksi." },
+            { q: "Lapisan Dermis yang membentuk sidik jari (fingerprints) adalah?", options: ["Lapisan Retikuler", "Lapisan Papiler", "Lapisan Basal", "Lapisan Subkutan"], a: 1, rationale: "Papila dermis pada lapisan papiler membentuk alur yang tercermin sebagai sidik jari." },
+            { q: "Sel Merkel paling banyak ditemukan pada kulit bagian?", options: ["Punggung", "Telapak tangan/Ujung jari", "Lengan atas", "Paha"], a: 1, rationale: "Sel Merkel adalah reseptor sentuhan yang banyak terdapat di area sensitif seperti ujung jari." },
+            { q: "Kelenjar keringat apokrin mulai aktif pada saat?", options: ["Lahir", "Pubertas", "Dewasa tua", "Menopause"], a: 1, rationale: "Kelenjar apokrin (ketiak/genital) dipengaruhi hormon seks dan aktif saat pubertas." },
+            { q: "Protein struktural utama yang memberikan kekerasan dan perlindungan air pada epidermis adalah?", options: ["Kolagen", "Elastin", "Keratin", "Miosin"], a: 2, rationale: "Keratin adalah protein serat yang kuat dan tahan air yang mengisi sel epidermis." }
+        ];
 
-  const handleNext = () => {
-    setSelectedOption(null);
-    setIsAnswered(false);
-    setCurrentIndex((prev) => (prev + 1) % shuffledQuestions.length);
-  };
+        // --- STATE MANAGEMENT ---
+        let currentMode = null;
+        let fcIndex = 0;
+        let practiceIndex = 0;
+        let examIndex = 0;
+        let examAnswers = new Array(questionsDB.length).fill(null);
+        let examTimerInterval;
+        let timeElapsed = 0;
 
-  if (shuffledQuestions.length === 0) return null;
-  const currentQ = shuffledQuestions[currentIndex];
-  const isCorrect = selectedOption === currentQ.correct;
+        // --- DOM ELEMENTS ---
+        const menuSection = document.getElementById('menu-section');
+        const sections = {
+            summary: document.getElementById('summary-section'),
+            flashcard: document.getElementById('flashcard-section'),
+            practice: document.getElementById('practice-section'),
+            exam: document.getElementById('exam-section')
+        };
 
-  return (
-    <div className="w-full max-w-3xl bg-white/90 backdrop-blur-md rounded-3xl shadow-xl p-6 md:p-8 animate-fade-in border border-pink-200">
-      <div className="flex justify-between items-center mb-6">
-        <button onClick={goBack} className="btn-secondary flex items-center gap-2">
-          <ArrowLeft className="w-4 h-4" /> Keluar
-        </button>
-        <span className="text-pink-600 font-bold">Latihan Soal {currentIndex + 1}</span>
-      </div>
+        // --- NAVIGATION ---
+        function switchMode(mode) {
+            currentMode = mode;
+            menuSection.classList.add('hidden');
+            Object.values(sections).forEach(el => el.classList.add('hidden'));
+            
+            sections[mode].classList.remove('hidden');
+            
+            // Init Mode
+            if(mode === 'flashcard') initFlashcard();
+            if(mode === 'practice') initPractice();
+            if(mode === 'exam') initExam();
+        }
 
-      <div className="mb-8">
-        <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-6 leading-relaxed">{currentQ.question}</h3>
-        <div className="grid gap-3">
-          {currentQ.options.map((opt, idx) => {
-            let btnClass = "p-4 rounded-xl text-left font-medium transition-all border-2 ";
-            if (isAnswered) {
-              if (idx === currentQ.correct) btnClass += "bg-green-100 border-green-500 text-green-800";
-              else if (idx === selectedOption) btnClass += "bg-red-100 border-red-500 text-red-800";
-              else btnClass += "bg-gray-50 border-gray-200 text-gray-400 opacity-60";
+        function returnToMenu() {
+            if(currentMode === 'exam') {
+                if(!confirm("Yakin ingin keluar dari ujian? Progres akan hilang.")) return;
+                clearInterval(examTimerInterval);
+            }
+            
+            Object.values(sections).forEach(el => el.classList.add('hidden'));
+            menuSection.classList.remove('hidden');
+            currentMode = null;
+            
+            // Reset states
+            document.querySelector('.flip-card').classList.remove('flipped');
+        }
+
+        // --- FLASHCARD LOGIC ---
+        function initFlashcard() {
+            fcIndex = 0;
+            updateFlashcard();
+        }
+
+        function updateFlashcard() {
+            const card = document.querySelector('.flip-card');
+            card.classList.remove('flipped'); // Reset flip
+            
+            setTimeout(() => {
+                document.getElementById('fc-question').innerText = questionsDB[fcIndex].q;
+                document.getElementById('fc-answer').innerText = questionsDB[fcIndex].options[questionsDB[fcIndex].a];
+                document.getElementById('fc-counter').innerText = `${fcIndex + 1} / ${questionsDB.length}`;
+            }, 200);
+        }
+
+        function nextFlashcard() {
+            if (fcIndex < questionsDB.length - 1) {
+                fcIndex++;
+                updateFlashcard();
+            }
+        }
+
+        function prevFlashcard() {
+            if (fcIndex > 0) {
+                fcIndex--;
+                updateFlashcard();
+            }
+        }
+
+        // --- PRACTICE LOGIC ---
+        function initPractice() {
+            practiceIndex = 0;
+            document.getElementById('practice-end').classList.add('hidden');
+            document.getElementById('practice-container').classList.remove('hidden');
+            renderPracticeQuestion();
+        }
+
+        function renderPracticeQuestion() {
+            const q = questionsDB[practiceIndex];
+            document.getElementById('practice-num').innerText = practiceIndex + 1;
+            document.getElementById('practice-question').innerText = q.q;
+            document.getElementById('practice-progress').style.width = `${((practiceIndex) / questionsDB.length) * 100}%`;
+            
+            const optsContainer = document.getElementById('practice-options');
+            optsContainer.innerHTML = '';
+            document.getElementById('practice-feedback').classList.add('hidden');
+            document.getElementById('practice-next-btn').classList.add('hidden');
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-xl border-2 border-white bg-white/60 hover:bg-pink-50 transition-all font-medium text-gray-700 shadow-sm";
+                btn.innerText = opt;
+                btn.onclick = () => checkPracticeAnswer(idx, btn);
+                optsContainer.appendChild(btn);
+            });
+        }
+
+        function checkPracticeAnswer(selectedIndex, btnElement) {
+            // Disable all buttons
+            const buttons = document.getElementById('practice-options').children;
+            for(let btn of buttons) btn.disabled = true;
+
+            const q = questionsDB[practiceIndex];
+            const isCorrect = selectedIndex === q.a;
+            
+            // Style selected button
+            if(isCorrect) {
+                btnElement.classList.remove('bg-white/60', 'border-white');
+                btnElement.classList.add('bg-green-100', 'border-green-500', 'text-green-800');
+                showFeedback(true, q.rationale);
             } else {
-              btnClass += "bg-white border-gray-200 hover:border-pink-400 hover:bg-pink-50 text-gray-700 cursor-pointer";
+                btnElement.classList.remove('bg-white/60', 'border-white');
+                btnElement.classList.add('bg-red-100', 'border-red-500', 'text-red-800');
+                
+                // Highlight correct answer
+                buttons[q.a].classList.remove('bg-white/60', 'border-white');
+                buttons[q.a].classList.add('bg-green-100', 'border-green-500', 'text-green-800');
+                
+                showFeedback(false, q.rationale);
+            }
+            
+            document.getElementById('practice-next-btn').classList.remove('hidden');
+        }
+
+        function showFeedback(isCorrect, text) {
+            const fbBox = document.getElementById('practice-feedback');
+            const fbTitle = document.getElementById('feedback-title');
+            const fbText = document.getElementById('feedback-text');
+            
+            fbBox.classList.remove('hidden', 'bg-green-50', 'border-green-500', 'bg-red-50', 'border-red-500');
+            
+            if(isCorrect) {
+                fbBox.classList.add('bg-green-50', 'border-green-500', 'text-green-900');
+                fbTitle.innerText = "Benar! 🎉";
+            } else {
+                fbBox.classList.add('bg-red-50', 'border-red-500', 'text-red-900');
+                fbTitle.innerText = "Kurang Tepat.";
+            }
+            fbText.innerText = text;
+        }
+
+        function nextPracticeQuestion() {
+            if(practiceIndex < questionsDB.length - 1) {
+                practiceIndex++;
+                renderPracticeQuestion();
+            } else {
+                document.getElementById('practice-container').classList.add('hidden');
+                document.getElementById('practice-end').classList.remove('hidden');
+                document.getElementById('practice-progress').style.width = '100%';
+            }
+        }
+
+        function resetPractice() {
+            initPractice();
+        }
+
+        // --- EXAM LOGIC ---
+        function initExam() {
+            examIndex = 0;
+            examAnswers = new Array(questionsDB.length).fill(null);
+            timeElapsed = 0;
+            
+            document.getElementById('exam-container').classList.remove('hidden');
+            document.getElementById('exam-result').classList.add('hidden');
+            
+            // Generate Nav Grid
+            const navGrid = document.getElementById('exam-nav-grid');
+            navGrid.innerHTML = '';
+            questionsDB.forEach((_, i) => {
+                const dot = document.createElement('div');
+                dot.id = `nav-dot-${i}`;
+                dot.className = "w-8 h-8 flex items-center justify-center rounded-full bg-white border border-gray-300 text-xs font-bold cursor-pointer hover:bg-pink-100";
+                dot.innerText = i + 1;
+                dot.onclick = () => jumpToExamQuestion(i);
+                navGrid.appendChild(dot);
+            });
+
+            startTimer();
+            renderExamQuestion();
+        }
+
+        function startTimer() {
+            clearInterval(examTimerInterval);
+            const timerDisplay = document.getElementById('exam-timer');
+            examTimerInterval = setInterval(() => {
+                timeElapsed++;
+                const mins = Math.floor(timeElapsed / 60).toString().padStart(2, '0');
+                const secs = (timeElapsed % 60).toString().padStart(2, '0');
+                timerDisplay.innerText = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function renderExamQuestion() {
+            const q = questionsDB[examIndex];
+            document.getElementById('exam-num').innerText = examIndex + 1;
+            document.getElementById('exam-question').innerText = q.q;
+            
+            const optsContainer = document.getElementById('exam-options');
+            optsContainer.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                // Check if selected
+                const isSelected = examAnswers[examIndex] === idx;
+                let btnClass = isSelected 
+                    ? "bg-pink-600 text-white border-pink-600 shadow-md transform scale-[1.01]" 
+                    : "bg-white border-gray-200 text-gray-700 hover:bg-pink-50";
+
+                btn.className = `w-full text-left p-4 rounded-xl border-2 transition-all font-medium ${btnClass}`;
+                btn.innerText = opt;
+                btn.onclick = () => selectExamAnswer(idx);
+                optsContainer.appendChild(btn);
+            });
+
+            // Button States
+            document.getElementById('exam-prev-btn').disabled = examIndex === 0;
+            
+            if(examIndex === questionsDB.length - 1) {
+                document.getElementById('exam-next-btn').classList.add('hidden');
+                document.getElementById('exam-submit-btn').classList.remove('hidden');
+            } else {
+                document.getElementById('exam-next-btn').classList.remove('hidden');
+                document.getElementById('exam-submit-btn').classList.add('hidden');
             }
 
-            return (
-              <button key={idx} onClick={() => handleOptionClick(idx)} className={btnClass} disabled={isAnswered}>
-                <div className="flex items-center justify-between">
-                  <span>{opt}</span>
-                  {isAnswered && idx === currentQ.correct && <CheckCircle className="w-5 h-5 text-green-600" />}
-                  {isAnswered && idx === selectedOption && idx !== currentQ.correct && <XCircle className="w-5 h-5 text-red-600" />}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {isAnswered && (
-        <div className={`p-6 rounded-2xl mb-6 animate-fade-in ${isCorrect ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
-          <div className="flex items-start gap-3">
-            {isCorrect ? <Check className="w-6 h-6 text-green-600 mt-1" /> : <HelpCircle className="w-6 h-6 text-red-600 mt-1" />}
-            <div>
-              <p className={`font-bold text-lg mb-1 ${isCorrect ? 'text-green-800' : 'text-red-800'}`}>
-                {isCorrect ? "Benar! 🎉" : "Kurang Tepat!"}
-              </p>
-              <p className="text-gray-700 leading-relaxed">{currentQ.explanation}</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {isAnswered && (
-        <div className="flex justify-end">
-          <button onClick={handleNext} className="btn-primary flex items-center gap-2">
-            Selanjutnya <ArrowLeft className="w-4 h-4 rotate-180" />
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
-
-const ExamMode = ({ goBack }) => {
-  const [questions, setQuestions] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState({});
-  const [isFinished, setIsFinished] = useState(false);
-
-  useEffect(() => {
-    // Take 60 random questions for the exam or all if less
-    const shuffled = [...questionBank].sort(() => 0.5 - Math.random()).slice(0, 60);
-    setQuestions(shuffled);
-  }, []);
-
-  const handleSelect = (idx) => {
-    setAnswers({ ...answers, [currentIndex]: idx });
-  };
-
-  const finishExam = () => {
-    setIsFinished(true);
-  };
-
-  const calculateScore = () => {
-    let correctCount = 0;
-    questions.forEach((q, i) => {
-      if (answers[i] === q.correct) correctCount++;
-    });
-    return Math.round((correctCount / questions.length) * 100);
-  };
-
-  if (questions.length === 0) return null;
-
-  if (isFinished) {
-    const score = calculateScore();
-    let message = "";
-    let emoji = "";
-
-    if (score >= 70) {
-      message = "Selamat kamu sudah paham sejauh ini";
-      emoji = "🌟🤩🔥";
-    } else if (score >= 40) {
-      message = "Tingkatin lagi yaa!";
-      emoji = "💪📚📈";
-    } else {
-      message = "Kamu harus belajar lagi, jangan main mulu";
-      emoji = "🗿📉🧐";
-    }
-
-    return (
-      <div className="flex flex-col items-center justify-center text-center max-w-2xl bg-white/90 backdrop-blur-xl p-10 rounded-3xl shadow-2xl animate-fade-in border-4 border-white/50">
-        <Award className={`w-24 h-24 mb-6 ${score >= 70 ? 'text-yellow-400' : score >= 40 ? 'text-blue-400' : 'text-gray-400'}`} />
-        <h2 className="text-5xl font-black text-gray-800 mb-2">{score}</h2>
-        <p className="text-gray-500 uppercase tracking-widest font-bold text-sm mb-8">Nilai Akhir</p>
-        
-        <div className="bg-pink-50 p-6 rounded-2xl border border-pink-100 w-full mb-8">
-          <p className="text-4xl mb-4">{emoji}</p>
-          <p className="text-xl font-bold text-pink-800">{message}</p>
-        </div>
-
-        <div className="flex gap-4">
-          <button onClick={goBack} className="btn-secondary">Ke Menu Utama</button>
-          <button onClick={() => window.location.reload()} className="btn-primary bg-purple-600">Ulangi Ujian</button>
-        </div>
-      </div>
-    );
-  }
-
-  const currentQ = questions[currentIndex];
-  const isSelected = answers[currentIndex] !== undefined;
-
-  return (
-    <div className="w-full max-w-3xl bg-white/90 backdrop-blur-md rounded-3xl shadow-xl p-6 md:p-8 animate-fade-in border border-pink-200">
-      <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
-        {/* Added Return Button to Exam Mode */}
-        <div className="flex items-center gap-3">
-          <button 
-            onClick={goBack} 
-            className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
-            title="Keluar / Batal Ujian"
-          >
-            <LogOut className="w-5 h-5" />
-          </button>
-          <span className="text-gray-500 font-mono text-sm">Sisa: {questions.length - currentIndex - 1} Soal</span>
-        </div>
-        <span className="text-red-500 font-bold bg-red-50 px-3 py-1 rounded-full text-sm">Mode Ujian ⏱️</span>
-      </div>
-
-      <div className="mb-8">
-        <div className="flex items-start gap-4 mb-6">
-          <span className="bg-pink-600 text-white font-bold w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg shadow-pink-200">
-            {currentIndex + 1}
-          </span>
-          <h3 className="text-xl font-bold text-gray-800 mt-1 leading-relaxed">{currentQ.question}</h3>
-        </div>
-
-        <div className="grid gap-3 pl-14">
-          {currentQ.options.map((opt, idx) => (
-            <button
-              key={idx}
-              onClick={() => handleSelect(idx)}
-              className={`p-4 rounded-xl text-left font-medium transition-all border-2 ${
-                answers[currentIndex] === idx
-                  ? 'bg-pink-100 border-pink-500 text-pink-900 shadow-inner'
-                  : 'bg-white border-gray-200 hover:border-pink-300 text-gray-700 hover:bg-pink-50'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${answers[currentIndex] === idx ? 'border-pink-600' : 'border-gray-300'}`}>
-                  {answers[currentIndex] === idx && <div className="w-3 h-3 bg-pink-600 rounded-full" />}
-                </div>
-                {opt}
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
-        <button
-          onClick={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
-          className={`btn-secondary ${currentIndex === 0 ? 'invisible' : ''}`}
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" /> Sebelumnya
-        </button>
-
-        {currentIndex === questions.length - 1 ? (
-          <button
-            onClick={finishExam}
-            disabled={!isSelected}
-            className={`px-8 py-3 rounded-xl font-bold text-white shadow-lg transition-all ${
-              isSelected ? 'bg-gradient-to-r from-red-500 to-pink-600 hover:scale-105' : 'bg-gray-300 cursor-not-allowed'
-            }`}
-          >
-            Selesai & Lihat Nilai
-          </button>
-        ) : (
-          <button
-            onClick={() => setCurrentIndex(prev => prev + 1)}
-            disabled={!isSelected}
-            className={`btn-primary flex items-center gap-2 ${!isSelected ? 'opacity-50 cursor-not-allowed transform-none' : ''}`}
-          >
-            Selanjutnya <ArrowLeft className="w-4 h-4 rotate-180" />
-          </button>
-        )}
-      </div>
-    </div>
-  );
-};
-
-// --- MAIN APP ---
-
-const App = () => {
-  const [mode, setMode] = useState(null); // 'summary', 'flashcard', 'practice', 'exam', or null (menu)
-
-  return (
-    <div className="min-h-screen font-sans text-gray-800 relative overflow-hidden">
-      {/* Custom Gradient Mesh Background */}
-      <div className="fixed inset-0 -z-10 bg-[#fff0f5]">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-pink-300 blur-[100px] opacity-40 animate-blob"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-purple-300 blur-[120px] opacity-40 animate-blob animation-delay-2000"></div>
-        <div className="absolute top-[40%] left-[40%] w-[40%] h-[40%] rounded-full bg-red-200 blur-[90px] opacity-30 animate-blob animation-delay-4000"></div>
-      </div>
-
-      <div className="container mx-auto px-4 py-8 min-h-screen flex flex-col items-center justify-center">
-        {!mode && <MainMenu setMode={setMode} />}
-        {mode === 'summary' && <SummaryMode goBack={() => setMode(null)} />}
-        {mode === 'flashcard' && <FlashcardMode goBack={() => setMode(null)} />}
-        {mode === 'practice' && <PracticeMode goBack={() => setMode(null)} />}
-        {mode === 'exam' && <ExamMode goBack={() => setMode(null)} />}
-      </div>
-
-      {/* Global Styles for Animations and Custom Classes */}
-      <style>{`
-        @keyframes blob {
-          0% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(30px, -50px) scale(1.1); }
-          66% { transform: translate(-20px, 20px) scale(0.9); }
-          100% { transform: translate(0px, 0px) scale(1); }
+            // Update Nav Dot
+            document.querySelectorAll('#exam-nav-grid div').forEach(d => d.classList.remove('ring-2', 'ring-pink-400'));
+            document.getElementById(`nav-dot-${examIndex}`).classList.add('ring-2', 'ring-pink-400');
         }
-        .animate-blob {
-          animation: blob 7s infinite;
+
+        function selectExamAnswer(idx) {
+            examAnswers[examIndex] = idx;
+            
+            // Mark nav dot as answered
+            const dot = document.getElementById(`nav-dot-${examIndex}`);
+            dot.classList.remove('bg-white', 'border-gray-300');
+            dot.classList.add('bg-pink-500', 'text-white', 'border-pink-500');
+
+            renderExamQuestion(); // Re-render to show selection
         }
-        .animation-delay-2000 {
-          animation-delay: 2s;
+
+        function nextExamQuestion() {
+            if(examIndex < questionsDB.length - 1) {
+                examIndex++;
+                renderExamQuestion();
+            }
         }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-        .animate-fade-in {
-          animation: fadeIn 0.5s ease-out forwards;
-        }
-        .animate-fade-in-up {
-          animation: fadeInUp 0.7s ease-out forwards;
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
+
+        function prevExamQuestion() {
+            if(examIndex > 0) {
+                examIndex--;
+                renderExamQuestion();
+            }
         }
         
-        /* Custom Scrollbar */
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(255, 200, 220, 0.2);
-          border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(236, 72, 153, 0.4);
-          border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: rgba(236, 72, 153, 0.6);
+        function jumpToExamQuestion(idx) {
+            examIndex = idx;
+            renderExamQuestion();
         }
 
-        /* 3D Flip Utilities */
-        .perspective-1000 {
-          perspective: 1000px;
-        }
-        .transform-style-3d {
-          transform-style: preserve-3d;
-        }
-        .backface-hidden {
-          backface-visibility: hidden;
-        }
-        .rotate-y-180 {
-          transform: rotateY(180deg);
+        function finishExam() {
+            if(!confirm("Kumpulkan jawaban dan lihat hasil?")) return;
+            
+            clearInterval(examTimerInterval);
+            
+            let score = 0;
+            let correctCount = 0;
+            let wrongCount = 0;
+
+            examAnswers.forEach((ans, idx) => {
+                if(ans === questionsDB[idx].a) {
+                    correctCount++;
+                } else {
+                    wrongCount++;
+                }
+            });
+
+            score = Math.round((correctCount / questionsDB.length) * 100);
+
+            // Tampilkan Result
+            document.getElementById('exam-container').classList.add('hidden');
+            document.getElementById('exam-result').classList.remove('hidden');
+            
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('result-correct').innerText = correctCount;
+            document.getElementById('result-wrong').innerText = wrongCount;
+
+            // Logic Pesan & Emotikon
+            const msgEl = document.getElementById('score-message');
+            const emojiEl = document.getElementById('score-emoji');
+
+            if (score <= 30) {
+                msgEl.innerText = "Kamu harus belajar lagi, jangan main mulu!";
+                msgEl.className = "text-xl font-bold text-red-500 mb-8 italic";
+                emojiEl.innerText = "😤";
+            } else if (score <= 60) {
+                msgEl.innerText = "Tingkatin lagi yaa!";
+                msgEl.className = "text-xl font-bold text-yellow-600 mb-8 italic";
+                emojiEl.innerText = "🥺";
+            } else {
+                msgEl.innerText = "Selamat kamu sudah paham sejauh ini!";
+                msgEl.className = "text-xl font-bold text-green-600 mb-8 italic";
+                emojiEl.innerText = "🥳";
+            }
         }
 
-        /* Reusable Card Styles */
-        .mode-card {
-          @apply bg-white/70 backdrop-blur-sm p-6 rounded-2xl shadow-lg border-2 border-transparent hover:border-pink-300 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col items-center gap-3 text-center cursor-pointer;
+        function resetExam() {
+            initExam();
         }
-        .btn-primary {
-          @apply bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-pink-200 hover:shadow-xl hover:scale-105 transition-all duration-300 active:scale-95;
-        }
-        .btn-secondary {
-          @apply bg-white text-pink-700 font-bold py-2 px-6 rounded-xl border-2 border-pink-100 hover:bg-pink-50 hover:border-pink-300 transition-all duration-300 shadow-sm;
-        }
-      `}</style>
-    </div>
-  );
-};
 
-export default App;
+    </script>
+</body>
+</html>
