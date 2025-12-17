@@ -112,6 +112,24 @@
         .summary-content ul { line-height: 1.6; }
         .summary-content strong { color: #ffd700; }
 
+        /* Diagrams */
+        .diagram-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            overflow-x: auto;
+            color: #1e3a8a;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .diagram-caption {
+            font-size: 0.9rem;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
         /* Flashcards */
         .flashcard-container {
             perspective: 1000px;
@@ -280,6 +298,29 @@
         <div class="summary-content">
             <h3>1. Sistem Integumentum (Kulit)</h3>
             <p>Sistem ini melibatkan proteksi, termoregulasi, dan sintesis Vitamin D. Komponen biokimiawi utamanya adalah:</p>
+            
+            <div class="diagram-container">
+                <svg width="100%" height="200" viewBox="0 0 400 200">
+                    <!-- Sky/Sun -->
+                    <circle cx="350" cy="30" r="20" fill="#FDB813" />
+                    <line x1="330" y1="30" x2="300" y2="50" stroke="#FDB813" stroke-width="2" stroke-dasharray="4" />
+                    <text x="310" y="65" font-size="10" fill="#333">UV-B</text>
+
+                    <!-- Skin Layers -->
+                    <rect x="50" y="80" width="300" height="20" fill="#e2c4a6" stroke="#d4a373" />
+                    <text x="60" y="95" font-size="12" fill="#5c4033">Epidermis (7-dehidrokolesterol)</text>
+
+                    <rect x="50" y="100" width="300" height="60" fill="#d4a373" opacity="0.6" />
+                    <path d="M50 100 Q 80 110, 110 100 T 170 100 T 230 100 T 290 100 T 350 100" stroke="#8b4513" fill="none" />
+                    <text x="60" y="130" font-size="12" fill="#5c4033">Dermis (Kolagen & Elastin)</text>
+
+                    <!-- Vitamin D Process -->
+                    <path d="M 300 55 L 280 85" stroke="#FDB813" stroke-width="2" marker-end="url(#arrow)" />
+                    <text x="250" y="180" font-size="10" fill="#333" font-style="italic">Sintesis Vit D: UV -> Kulit -> Hati -> Ginjal</text>
+                </svg>
+                <div class="diagram-caption">Ilustrasi 1: Struktur Kulit & Paparan UV</div>
+            </div>
+
             <ul>
                 <li><strong>Keratin:</strong> Protein struktural utama epidermis (kulit, rambut, kuku). Kaya akan asam amino <em>Sistein</em> yang membentuk ikatan disulfida (memberi kekuatan). α-keratin ada di mamalia.</li>
                 <li><strong>Kolagen:</strong> Protein terbanyak di tubuh (±30%). Memberi kekuatan tarik pada dermis. Sintesisnya butuh Vitamin C dan enzim <em>prolyl hydroxylase</em>. Asam amino dominan: Glisin, Prolin, Hidroksiprolin.</li>
@@ -292,6 +333,33 @@
 
             <h3>2. Biokimia Tulang</h3>
             <p>Tulang adalah jaringan dinamis yang terus mengalami <em>remodeling</em> (resorpsi dan formasi).</p>
+
+            <div class="diagram-container">
+                <svg width="100%" height="180" viewBox="0 0 400 180">
+                    <!-- Bone Surface -->
+                    <path d="M 20 120 Q 200 100, 380 120 L 380 150 L 20 150 Z" fill="#e0e0e0" stroke="#999" />
+                    <text x="180" y="140" font-size="12" fill="#666">Matriks Tulang</text>
+                    
+                    <!-- Osteoclast (Eating) -->
+                    <path d="M 50 115 A 30 20 0 0 1 110 115" fill="#ffcccb" stroke="#e57373" />
+                    <circle cx="65" cy="105" r="3" fill="#d32f2f" /> <circle cx="80" cy="100" r="3" fill="#d32f2f" /> <circle cx="95" cy="105" r="3" fill="#d32f2f" />
+                    <text x="50" y="85" font-size="10" fill="#d32f2f" font-weight="bold">Osteoclast</text>
+                    <text x="50" y="95" font-size="9" fill="#d32f2f">(Resorpsi/Penghancuran)</text>
+                    <text x="110" y="110" font-size="14" fill="#d32f2f">←</text> <!-- Arrow -->
+
+                    <!-- Osteoblast (Building) -->
+                    <rect x="250" y="100" width="20" height="20" fill="#90caf9" stroke="#1e88e5" />
+                    <rect x="275" y="100" width="20" height="20" fill="#90caf9" stroke="#1e88e5" />
+                    <rect x="300" y="100" width="20" height="20" fill="#90caf9" stroke="#1e88e5" />
+                    <text x="260" y="85" font-size="10" fill="#1565c0" font-weight="bold">Osteoblast</text>
+                    <text x="260" y="95" font-size="9" fill="#1565c0">(Formasi/Pembentukan)</text>
+                    
+                    <!-- Cycle Text -->
+                    <text x="150" y="50" font-size="14" fill="#333" font-weight="bold">Siklus Remodeling</text>
+                </svg>
+                <div class="diagram-caption">Ilustrasi 2: Dinamika Sel Tulang (Osteoclast vs Osteoblast)</div>
+            </div>
+
             <ul>
                 <li><strong>Komponen Organik (Osteoid):</strong> Terutama Kolagen Tipe I (90-95%).</li>
                 <li><strong>Komponen Anorganik:</strong> Mineral kristal <strong>Hidroksiapatit</strong> [Ca10(PO4)6(OH)2]. Menyusun 65% massa tulang.</li>
@@ -313,6 +381,37 @@
 
             <h3>3. Biokimia Otot</h3>
             <p>Mengubah energi kimia (ATP) menjadi energi mekanik.</p>
+
+            <div class="diagram-container">
+                <svg width="100%" height="150" viewBox="0 0 400 150">
+                    <!-- Z Lines -->
+                    <path d="M 50 30 L 50 120" stroke="#d32f2f" stroke-width="4" />
+                    <path d="M 350 30 L 350 120" stroke="#d32f2f" stroke-width="4" />
+                    <text x="40" y="25" font-size="12" fill="#d32f2f" font-weight="bold">Z-Line</text>
+                    <text x="340" y="25" font-size="12" fill="#d32f2f" font-weight="bold">Z-Line</text>
+
+                    <!-- Actin (Thin) -->
+                    <line x1="50" y1="50" x2="150" y2="50" stroke="#1976d2" stroke-width="2" />
+                    <line x1="50" y1="100" x2="150" y2="100" stroke="#1976d2" stroke-width="2" />
+                    <line x1="350" y1="50" x2="250" y2="50" stroke="#1976d2" stroke-width="2" />
+                    <line x1="350" y1="100" x2="250" y2="100" stroke="#1976d2" stroke-width="2" />
+                    <text x="70" y="45" font-size="10" fill="#1976d2">Aktin (Tipis)</text>
+
+                    <!-- Myosin (Thick) -->
+                    <rect x="130" y="65" width="140" height="20" fill="#388e3c" rx="5" />
+                    <!-- Myosin Heads -->
+                    <path d="M 140 65 L 130 50" stroke="#388e3c" stroke-width="2" />
+                    <path d="M 260 65 L 270 50" stroke="#388e3c" stroke-width="2" />
+                    <path d="M 140 85 L 130 100" stroke="#388e3c" stroke-width="2" />
+                    <path d="M 260 85 L 270 100" stroke="#388e3c" stroke-width="2" />
+                    <text x="175" y="80" font-size="10" fill="white" font-weight="bold">Miosin (Tebal)</text>
+
+                    <!-- Label -->
+                    <text x="165" y="140" font-size="12" fill="#333" font-weight="bold">Sarkomer</text>
+                </svg>
+                <div class="diagram-caption">Ilustrasi 3: Unit Kontraksi Otot (Sarkomer)</div>
+            </div>
+
             <ul>
                 <li><strong>Protein Kontraktil:</strong>
                     <ul>
