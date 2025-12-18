@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BeenDisplayer - Histo Atlas V3.0</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-dark: #1e1e1e;
+            --bg-panel: #252526;
+            --bg-hover: #37373d;
+            --accent: #007acc;
+            --text-main: #d4d4d4;
+            --border: #3e3e42;
+            --danger: #d74e09;
+            --success: #4caf50;
+            --overlay-bg: rgba(25, 25, 25, 0.98);
+        }
+
+        * { box-sizing: border-box; user-select: none; }
+        
+        body {
+            margin: 0; padding: 0; background-color: var(--bg-dark); color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex; height: 100vh; overflow: hidden;
+        }
+
+        /* --- SIDEBAR --- */
+        #sidebar {
+            width: 340px; background-color: var(--bg-panel); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; flex-shrink: 0; z-index: 20;
+        }
+
+        .sidebar-header {
+            padding: 15px; border-bottom: 1px solid var(--border); background-color: #181818;
+            font-weight: bold; display: flex; flex-direction: column; gap: 10px;
+        }
+        
+        .title-editor-group { display: flex; flex-direction: column; gap: 4px; }
+        .title-label { font-size: 0.7rem; color: #888; text-transform: uppercase; letter-spacing: 0.5px;}
+        #prep-title-input {
+            background: #2d2d2d; border: 1px solid #444; color: white;
+            padding: 8px; font-size: 0.9rem; border-radius: 4px; width: 100%;
+        }
+
+        .sidebar-tabs { display: flex; border-bottom: 1px solid var(--border); background: #2d2d2d; }
+        .tab-btn {
+            flex: 1; padding: 12px; text-align: center; cursor: pointer;
+            font-size: 0.85rem; color: #888; border-bottom: 3px solid transparent; transition: all 0.2s;
+        }
+        .tab-btn:hover { background: #333; color: #ddd; }
+        .tab-btn.active { color: white; border-bottom-color: var(--accent); background: var(--bg-panel); }
+
+        #panels-container { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+        .sidebar-panel { flex: 1; display: none; flex-direction: column; overflow: hidden; }
+        .sidebar-panel.active { display: flex; }
+
+        .btn-file {
+            background-color: var(--accent); color: white; padding: 10px;
+            border-radius: 4px; cursor: pointer; font-size: 0.9rem; text-align: center;
+            border: none; width: 100%; margin-top: 10px;
+        }
+        .btn-file:hover { opacity: 0.9; }
+        input[type="file"] { display: none; }
+
+        #file-list, #collection-list { flex: 1; overflow-y: auto; padding: 0; }
+        
+        .file-item {
+            padding: 10px 15px; cursor: pointer; border-left: 3px solid transparent; border-bottom: 1px solid #333;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .file-item:hover { background-color: var(--bg-hover); }
+        .file-item.active { background-color: #37373d; border-left-color: var(--accent); color: white; }
+        .file-info { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; flex: 1; }
+        
+        .collection-item {
+            background: #2a2a2a; margin: 10px; border-radius: 6px; overflow: hidden; border: 1px solid #444; position: relative;
+        }
+        .c-img { width: 100%; height: 120px; object-fit: cover; display: block; opacity: 0.9; }
+        .c-info { padding: 10px; font-size: 0.85rem; background: #252526; }
+        .c-meta { font-size: 0.75rem; color: #888; margin-top: 5px; display: flex; justify-content: space-between; align-items: center; }
+        .c-actions { display: flex; gap: 8px; }
+        .btn-icon-xs { background: #444; border: none; color: white; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 0.7rem; }
+        .btn-icon-xs:hover { background: var(--accent); }
+        .btn-del { background: #522; color: #f88; }
+        .btn-del:hover { background: var(--danger); color: white; }
+
+        .controls-section { padding: 15px; border-top: 1px solid var(--border); background: #1f1f20; }
+        input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--accent); margin-bottom: 8px;}
+        
+        .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .setting-label { font-size: 0.8rem; color: #aaa; }
+        input[type="checkbox"] { transform: scale(1.2); accent-color: var(--accent); cursor: pointer; }
+
+        /* --- MAIN --- */
+        #main { flex: 1; display: flex; flex-direction: column; position: relative; }
+
+        #toolbar {
+            height: 54px; background-color: var(--bg-panel); border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; padding: 0 10px; gap: 5px; z-index: 10;
+        }
+        .tool-btn {
+            background: transparent; border: 1px solid transparent; color: var(--text-main);
+            padding: 0; border-radius: 6px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            width: 38px; height: 38px; position: relative; transition: background 0.2s;
+        }
+        .tool-btn:hover { background-color: var(--bg-hover); }
+        .tool-btn.active { background-color: var(--accent); color: white; }
+        .separator { width: 1px; height: 28px; background-color: var(--border); margin: 0 5px; }
+
+        /* Transfrom Toolbar */
+        .transform-group { display: flex; gap: 2px; background: #333; padding: 2px; border-radius: 6px; margin-right: 5px; }
+
+        #viewport-container { flex: 1; position: relative; overflow: hidden; background-color: #111; display: flex; }
+        .viewport-pane { flex: 1; position: relative; overflow: hidden; cursor: default; border-right: 1px solid #333; }
+        .canvas-wrapper {
+            transform-origin: 0 0; position: absolute; top: 0; left: 0;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5); transition: filter 0.2s;
+        }
+
+        #compare-pane { display: none; background: #000; flex-direction: column; justify-content: center; align-items: center; border-left: 2px solid var(--accent); }
+        #compare-img { max-width: 90%; max-height: 90%; object-fit: contain; border: 1px solid #555; }
+        
+        .compare-toolbar {
+            position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;
+        }
+        .compare-btn {
+            background: rgba(0,0,0,0.7); color: white; border: 1px solid #555; padding: 5px 10px;
+            font-size: 0.8rem; cursor: pointer; border-radius: 4px;
+        }
+        .compare-btn:hover { background: var(--accent); border-color: var(--accent); }
+
+        /* STATIC INPUT OVERLAY */
+        #input-overlay {
+            position: absolute; display: none;
+            background: var(--overlay-bg); padding: 20px; border-radius: 8px;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.8); border: 1px solid var(--border);
+            z-index: 100; width: 320px;
+            bottom: 20px; right: 20px; top: auto !important; left: auto !important;
+        }
+        .input-group label { display: block; font-size: 0.75rem; color: #aaa; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;}
+        .input-field {
+            background: #111; border: 1px solid #444; color: white;
+            padding: 10px; width: 100%; border-radius: 4px; font-size: 0.95rem; margin-bottom: 15px;
+        }
+        .input-field:focus { border-color: var(--accent); outline: none; }
+        .overlay-btns { display: flex; gap: 10px; justify-content: flex-end; }
+        .overlay-btn { padding: 8px 16px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold;}
+        .btn-confirm { background: var(--accent); color: white; }
+        .btn-cancel { background: #444; color: #ccc; }
+
+        #status-bar {
+            height: 28px; background-color: var(--accent); color: white;
+            font-size: 0.8rem; display: flex; align-items: center; padding: 0 15px; justify-content: space-between;
+        }
+
+        svg { width: 20px; height: 20px; fill: currentColor; }
+        #toast {
+            position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.85); color: white; padding: 10px 20px; border-radius: 30px;
+            font-size: 0.9rem; pointer-events: none; opacity: 0; transition: opacity 0.3s; z-index: 200;
+        }
+        #loading {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.8);
+            color: white; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 1000; display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+        <div class="sidebar-header">
+            <div style="font-size: 1.2rem; color: white; display: flex; align-items: center; gap: 10px;">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                BeenDisplayer V3.0
+            </div>
+            <div class="title-editor-group">
+                <span class="title-label">Judul Preparat</span>
+                <input type="text" id="prep-title-input" placeholder="Nama Preparat..." disabled>
+            </div>
+        </div>
+
+        <div class="sidebar-tabs">
+            <div class="tab-btn active" onclick="switchTab('explorer')">Explorer</div>
+            <div class="tab-btn" onclick="switchTab('collection')">Atlas PDF</div>
+        </div>
+        
+        <div id="panels-container">
+            <!-- EXPLORER -->
+            <div id="panel-explorer" class="sidebar-panel active">
+                <div style="padding:15px;">
+                    <label class="btn-file">
+                        📂 Buka Folder Lokal
+                        <input type="file" id="folderInput" webkitdirectory directory multiple>
+                    </label>
+                </div>
+                <div id="file-list">
+                    <div style="padding:20px; text-align:center; color:#555;">Buka folder untuk mulai.</div>
+                </div>
+            </div>
+
+            <!-- COLLECTION (PDF) -->
+            <div id="panel-collection" class="sidebar-panel">
+                <div id="collection-list">
+                    <div style="padding:20px; text-align:center; color:#555;">Belum ada halaman.</div>
+                </div>
+                <div class="controls-section">
+                    <button class="btn-file" id="btn-export-pdf" onclick="exportPDF()" disabled style="background-color: var(--danger); font-weight:bold;">
+                        📄 Download PDF
+                    </button>
+                    <div style="text-align:center; font-size:0.75rem; color:#666; margin-top:5px;">Format Atlas (Kiri Gambar - Kanan Ket)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <div class="setting-row">
+                <span class="setting-label">Ukuran Teks Label</span>
+                <span id="font-size-display" style="font-size:0.8rem; color:var(--accent);">14px</span>
+            </div>
+            <input type="range" id="font-size-slider" min="10" max="40" value="14">
+            
+            <div class="setting-row" style="margin-top:10px;">
+                <span class="setting-label">Ganti Warna Otomatis</span>
+                <input type="checkbox" id="auto-color-check" checked>
+            </div>
+
+            <div class="control-group" style="margin-top:15px;">
+                <label class="control-label">Contrast & Brightness</label>
+                <input type="range" id="contrast-slider" min="50" max="150" value="100">
+                <input type="range" id="brightness-slider" min="50" max="150" value="100">
+            </div>
+            <button style="width:100%; background:transparent; border:1px solid #444; color:#888; padding:5px; cursor:pointer;" id="reset-filters">Reset Tampilan</button>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div id="main">
+        <div id="toolbar">
+            <button class="tool-btn active" id="btn-pan" title="Geser (P)" onclick="setMode('pan')">
+                <svg viewBox="0 0 24 24"><path d="M15 3l2.3 2.3-2.89 2.87 1.42 1.42L18.7 6.7 21 9V3zM3 9l2.3-2.3 2.87 2.89 1.42-1.42L6.7 5.3 9 3H3zm6 12l-2.3-2.3 2.89-2.87-1.42-1.42L5.3 17.3 3 15v6zm12-6l-2.3 2.3-2.87-2.89-1.42 1.42L17.3 18.7 21 21z"/></svg>
+            </button>
+            <div class="separator"></div>
+            
+            <div class="transform-group">
+                <button class="tool-btn" title="Rotate" onclick="transformImage('rotate')"><svg viewBox="0 0 24 24"><path d="M16.48 2.52c3.27 1.55 5.61 4.72 5.97 8.48h1.5C23.44 4.84 18.29 0 12 0l-1 2.02h1L16.48 2.52zM7.52 21.48c-3.27-1.55-5.61-4.72-5.97-8.48h-1.5C.56 19.16 5.71 24 12 24l1-2.02h-1L7.52 21.48zM12 5v14l7-7-7-7z"/></svg></button>
+                <button class="tool-btn" title="Flip H" onclick="transformImage('fliph')"><svg viewBox="0 0 24 24"><path d="M15 21h2v-2h-2v2zm4-12h2V7h-2v2zM3 5v14c0 1.1.9 2 2 2h4v-2H5V5h4V3H5c-1.1 0-2 .9-2 2zm16-2v2h2c0-1.1-.9-2-2-2zm-8 20h2V1h-2v22zm8-6h2v-2h-2v2zM15 5h2V3h-2v2zm4 8h2v-2h-2v2zm0 8c1.1 0 2-.9 2-2h-2v2z"/></svg></button>
+                <button class="tool-btn" title="Flip V" onclick="transformImage('flipv')"><svg viewBox="0 0 24 24"><path d="M19 7v4h-2V7h-2v4h-2V7h-2v4H9V7H7v4H5V7H3v10c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7h-2zm-6 10h-2v-2h2v2zm4 0h-2v-2h2v2zm-8 0H7v-2h2v2z"/></svg></button>
+            </div>
+
+            <div class="separator"></div>
+            
+            <button class="tool-btn" id="btn-label" title="Smart Label (L)" onclick="setMode('label')">
+               <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" transform="rotate(45, 12, 12)"/></svg>
+            </button>
+            <button class="tool-btn" id="btn-area" title="Area Label (A)" onclick="setMode('area')">
+                <svg viewBox="0 0 24 24"><path d="M3 5v14h18V5H3zm16 12H5V7h14v10z" style="stroke-dasharray: 2 2; stroke: currentColor; stroke-width: 1px; fill: none;"/></svg>
+            </button>
+            <button class="tool-btn" id="btn-range" title="Label Jarak (J)" onclick="setMode('range')">
+                <svg viewBox="0 0 24 24"><path d="M3 6h2v12H3zm16 0h2v12h-2zM6 11h12v2H6z"/></svg>
+            </button>
+            <button class="tool-btn" id="btn-text" title="Teks (T)" onclick="setMode('text')">
+                <svg viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4z"/></svg>
+            </button>
+            <button class="tool-btn" id="btn-draw" title="Draw (B)" onclick="setMode('draw')">
+                <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>
+            </button>
+            <button class="tool-btn" id="btn-eraser" title="Eraser (E)" onclick="setMode('eraser')">
+               <svg viewBox="0 0 24 24"><path d="M15.14 3c-.51 0-1.02.2-1.41.59L2.59 14.73c-.78.78-.78 2.05 0 2.83L9.44 24.41c.78.78 2.05.78 2.83 0l11.14-11.14c.79-.78.79-2.05 0-2.83l-6.86-6.85c-.39-.39-.9-.59-1.41-.59zm-8.49 13.31L13.5 9.46l3.54 3.54-6.85 6.85-3.54-3.54z"/></svg>
+            </button>
+
+            <div class="separator"></div>
+
+            <button class="tool-btn" id="btn-undo" title="Undo (Ctrl+Z)" onclick="undo()">
+                <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
+            </button>
+            <input type="color" id="color-picker" value="#ff0000" title="Warna Label">
+
+            <div class="separator"></div>
+            
+            <button class="tool-btn" id="btn-compare" title="Split Screen" onclick="toggleCompare()">
+                <svg viewBox="0 0 24 24"><path d="M10 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h5v-2H5V5h5V3zm9 0h-5v2h5v14h-5v2h5c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+            </button>
+
+            <div class="separator"></div>
+
+            <button class="tool-btn" id="btn-add-collection" title="Simpan ke Atlas" onclick="addToCollection()" style="color: var(--success); width:auto; padding:0 10px;">
+                <span style="font-weight:bold; margin-right:5px;">+</span> Add to PDF
+            </button>
+
+            <div class="separator"></div>
+
+            <button class="tool-btn" id="btn-fit" title="Reset Zoom" onclick="fitToScreen()">
+                <svg viewBox="0 0 24 24"><path d="M5 15h3v3h2v-5H5v2zm0-4h5V6h-2v3H5v2zm14-2h-3V6h-2v5h5V9zm0 4h-5v5h2v-3h3v-2z"/></svg>
+            </button>
+        </div>
+
+        <div id="viewport-container">
+            <div id="main-pane" class="viewport-pane">
+                <div id="canvas-wrapper" class="canvas-wrapper">
+                    <canvas id="main-canvas"></canvas>
+                </div>
+            </div>
+
+            <div id="compare-pane" class="viewport-pane">
+                <div class="compare-toolbar">
+                    <button class="compare-btn" onclick="toggleCompare()">Tutup</button>
+                </div>
+                <div class="compare-label">Referensi (Dari Atlas/Explorer)</div>
+                <img id="compare-img" alt="Reference">
+                <div style="margin-top:10px; color:#888; font-size:0.8rem; text-align:center;">
+                    Klik tombol "Bandingkan" pada list Explorer atau Atlas.
+                </div>
+            </div>
+
+            <div id="input-overlay">
+                <h3 style="margin-top:0; color:#eee;">Label</h3>
+                <div class="input-group">
+                    <label>Label (Gambar)</label>
+                    <input type="text" id="input-title" class="input-field" placeholder="Kode/Nama..." autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <label>Deskripsi (PDF)</label>
+                    <textarea id="input-desc" class="input-field" placeholder="Keterangan..."></textarea>
+                </div>
+                <div class="overlay-btns">
+                    <button class="overlay-btn btn-cancel" id="btn-cancel-input">Batal</button>
+                    <button class="overlay-btn btn-confirm" id="btn-confirm-input">Simpan</button>
+                </div>
+            </div>
+            
+            <div id="toast">Notifikasi</div>
+            <div id="loading">
+                <div style="width: 30px; height: 30px; border: 3px solid #555; border-top: 3px solid #007acc; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <span id="loading-text" style="margin-top:10px">Memuat...</span>
+            </div>
+        </div>
+
+        <div id="status-bar">
+            <span id="status-text">Siap.</span>
+            <span id="status-coords">Zoom: 100%</span>
+        </div>
+    </div>
+
+    <style>
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+
+    <script>
+        // --- GLOBAL UTILS ---
+        function switchTab(t) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.sidebar-panel').forEach(p => p.classList.remove('active'));
+            let btnIndex = 0; let panelId = 'panel-explorer';
+            if(t==='collection') { btnIndex = 1; panelId = 'panel-collection'; }
+            document.querySelectorAll('.tab-btn')[btnIndex].classList.add('active');
+            document.getElementById(panelId).classList.add('active');
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg; t.style.opacity = 1;
+            setTimeout(() => t.style.opacity = 0, 2000);
+        }
+
+        // --- DB (INDEXEDDB) ---
+        const DB_NAME = 'BeenDisplayerDB_v5'; 
+        const STORE_ATLAS = 'atlas';
+        let db;
+
+        async function initDB() {
+            return new Promise((resolve) => {
+                const req = indexedDB.open(DB_NAME, 1);
+                req.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(STORE_ATLAS)) db.createObjectStore(STORE_ATLAS, { keyPath: 'id' });
+                };
+                req.onsuccess = (e) => { db = e.target.result; resolve(db); };
+                req.onerror = () => { console.error("DB Fail"); resolve(null); };
+            });
+        }
+
+        function dbOp(mode, callback) {
+            if(!db) return;
+            const tx = db.transaction([STORE_ATLAS], mode);
+            const store = tx.objectStore(STORE_ATLAS);
+            const req = callback(store);
+            return new Promise(resolve => {
+                req.onsuccess = () => resolve(req.result);
+                req.oncomplete = () => resolve();
+            });
+        }
+
+        // --- STATE ---
+        const state = {
+            mode: 'pan', prevMode: 'pan',
+            scale: 1, panX: 0, panY: 0,
+            
+            // Transforms
+            rotation: 0, flipH: 1, flipV: 1,
+
+            // Interaction
+            isDragging: false, lastMouseX: 0, lastMouseY: 0,
+            startPos: null, isDrawing: false, currentPath: [],
+            
+            color: '#ff0000', lineWidth: 3, fontSize: 14,
+            imgObj: null, currentFileName: '', 
+            
+            folderFiles: [], collection: [],
+            history: [], historyStep: -1,
+            currentLabels: [], labelsHistory: [],
+            
+            isCompareMode: false,
+            autoColor: true,
+            colorPalette: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#00ffff', '#ff00ff', '#ffffff', '#000000'],
+            colorIndex: 0
+        };
+        const MAX_HISTORY = 10;
+
+        const dom = {
+            folderInput: document.getElementById('folderInput'),
+            fileList: document.getElementById('file-list'),
+            colList: document.getElementById('collection-list'),
+            canvas: document.getElementById('main-canvas'),
+            ctx: document.getElementById('main-canvas').getContext('2d'),
+            wrapper: document.getElementById('canvas-wrapper'),
+            viewport: document.getElementById('main-pane'),
+            comparePane: document.getElementById('compare-pane'),
+            compareImg: document.getElementById('compare-img'),
+            titleInput: document.getElementById('prep-title-input'),
+            inputOverlay: document.getElementById('input-overlay'),
+            inputTitle: document.getElementById('input-title'),
+            inputDesc: document.getElementById('input-desc'),
+            statusText: document.getElementById('status-text'),
+            statusCoords: document.getElementById('status-coords'),
+            contrast: document.getElementById('contrast-slider'),
+            brightness: document.getElementById('brightness-slider'),
+            btnExport: document.getElementById('btn-export-pdf'),
+            fontSlider: document.getElementById('font-size-slider'),
+            fontDisplay: document.getElementById('font-size-display'),
+            autoColorCheck: document.getElementById('auto-color-check'),
+            loading: document.getElementById('loading')
+        };
+
+        async function init() {
+            await initDB();
+            loadAtlasUI(); 
+            
+            dom.folderInput.addEventListener('change', handleFolderSelect);
+            window.addEventListener('resize', () => { if(state.imgObj) fitToScreen(); });
+            window.addEventListener('paste', handlePaste);
+            
+            dom.viewport.addEventListener('mousedown', onMouseDown);
+            window.addEventListener('mousemove', onMouseMove);
+            window.addEventListener('mouseup', onMouseUp);
+            dom.viewport.addEventListener('wheel', onWheel);
+            document.addEventListener('keydown', onKeyDown);
+            document.addEventListener('keyup', onKeyUp);
+            
+            dom.titleInput.addEventListener('change', (e) => {
+                if(state.currentFileName) { state.currentFileName = e.target.value; showToast("Judul diperbarui"); }
+            });
+            
+            dom.contrast.addEventListener('input', updateFilters);
+            dom.brightness.addEventListener('input', updateFilters);
+            document.getElementById('reset-filters').addEventListener('click', () => { dom.contrast.value=100;dom.brightness.value=100;updateFilters(); });
+            document.getElementById('color-picker').addEventListener('input', (e) => state.color = e.target.value);
+            
+            dom.fontSlider.addEventListener('input', (e) => { 
+                state.fontSize = parseInt(e.target.value); 
+                dom.fontDisplay.innerText = state.fontSize + "px";
+            });
+            dom.autoColorCheck.addEventListener('change', (e) => state.autoColor = e.target.checked);
+            
+            document.getElementById('btn-confirm-input').onclick = commitInput;
+            document.getElementById('btn-cancel-input').onclick = () => dom.inputOverlay.style.display = 'none';
+        }
+
+        // --- FILE HANDLING ---
+        function handleFolderSelect(e) {
+            const files = Array.from(e.target.files).filter(f => f.name.match(/\.(jpg|jpeg|png|webp|heic|bmp)$/i));
+            files.sort((a,b) => a.webkitRelativePath.localeCompare(b.webkitRelativePath));
+            state.folderFiles = files;
+            renderExplorer();
+            if(files.length) loadFile(0);
+        }
+
+        function renderExplorer() {
+            dom.fileList.innerHTML = '';
+            state.folderFiles.forEach((f, i) => {
+                const el = document.createElement('div');
+                el.className = 'file-item';
+                el.innerHTML = `
+                    <div class="file-info" onclick="loadFile(${i})">
+                        <div class="file-name">${f.name}</div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="btn-icon-xs" title="Bandingkan" onclick="event.stopPropagation(); loadToCompare(${i}, 'folder')">Bandingkan</button>
+                    </div>
+                `;
+                dom.fileList.appendChild(el);
+            });
+        }
+
+        async function loadAtlasUI() {
+            if(!db) return;
+            const items = await dbOp('readonly', s => s.getAll());
+            state.collection = items || [];
+            state.collection.sort((a,b) => a.id - b.id);
+            renderCollection();
+        }
+
+        async function loadFile(index) {
+            const fileData = state.folderFiles[index];
+            if(!fileData) return;
+            
+            dom.loading.style.display = 'flex';
+            let blob = fileData;
+            let name = fileData.name;
+            
+            if(name.toLowerCase().endsWith('.heic')) {
+                try {
+                    const res = await heic2any({ blob, toType: "image/jpeg", quality: 0.8 });
+                    blob = Array.isArray(res) ? res[0] : res;
+                } catch(e) { alert("Error HEIC"); dom.loading.style.display='none'; return; }
+            }
+            
+            const url = URL.createObjectURL(blob);
+            const img = new Image();
+            img.onload = () => {
+                state.imgObj = img; state.currentFileName = name;
+                dom.titleInput.value = name; dom.titleInput.disabled = false;
+                
+                // Reset Transforms
+                state.rotation = 0; state.flipH = 1; state.flipV = 1;
+                
+                // Reset Canvas
+                updateCanvasSize();
+                drawEverything();
+                
+                fitToScreen();
+                state.history = []; state.currentLabels = []; state.labelsHistory = [];
+                saveHistory();
+                dom.loading.style.display = 'none';
+                dom.statusText.innerText = name;
+            };
+            img.src = url;
+        }
+
+        function updateCanvasSize() {
+            // Canvas size doesn't change on rotate (90 deg), we handle it via context transform
+            // Or better: swap width/height if 90/270? No, let's keep canvas = image size and transform context.
+            if(!state.imgObj) return;
+            dom.canvas.width = state.imgObj.width;
+            dom.canvas.height = state.imgObj.height;
+        }
+
+        // --- TRANSFORMATIONS ---
+        window.transformImage = (type) => {
+            if(!state.imgObj) return;
+            if(type === 'rotate') state.rotation = (state.rotation + 90) % 360;
+            else if(type === 'fliph') state.flipH *= -1;
+            else if(type === 'flipv') state.flipV *= -1;
+            
+            drawEverything();
+            saveHistory(); // Save the transform state? 
+            // NOTE: History currently only saves Pixel Data (canvas.toDataURL). 
+            // If we rely on drawing path labels on top of transformed image, the pixel data approach burns them in.
+            // This is actually fine for the request "Label menempel".
+        };
+
+        function drawEverything() {
+            if(!state.imgObj) return;
+            const w = dom.canvas.width; 
+            const h = dom.canvas.height;
+            
+            // Clear
+            dom.ctx.clearRect(0,0,w,h);
+            dom.ctx.save();
+            
+            // Move to center
+            dom.ctx.translate(w/2, h/2);
+            dom.ctx.rotate(state.rotation * Math.PI / 180);
+            dom.ctx.scale(state.flipH, state.flipV);
+            dom.ctx.translate(-w/2, -h/2);
+            
+            dom.ctx.drawImage(state.imgObj, 0, 0);
+            
+            dom.ctx.restore();
+            // Note: We don't redraw labels here because they are "burned" into history pixels in this simple architecture.
+            // If we wanted editable labels after transform, we'd need to store label objects separately and redraw them with transform applied.
+            // Given "One File" constraint and "Undo" logic using images, the "burned in" approach is robust for visual consistency.
+            // However, newly drawn labels need to align with visual.
+        }
+
+        // --- DRAWING & INPUT ---
+        function setMode(m) {
+            state.mode = m;
+            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+            const map = { 'pan':'btn-pan', 'draw':'btn-draw', 'text':'btn-text', 'label':'btn-label', 'area':'btn-area', 'eraser':'btn-eraser', 'range':'btn-range' };
+            if(map[m]) document.getElementById(map[m]).classList.add('active');
+            dom.viewport.style.cursor = m === 'pan' ? 'grab' : 'crosshair';
+            dom.statusText.innerText = "Mode: " + m.toUpperCase();
+        }
+
+        function getMousePos(e) {
+            const r = dom.canvas.getBoundingClientRect();
+            // Mouse relative to canvas element (which is transformed by CSS)
+            // But internal coordinate system is consistent 0..w
+            return { x: (e.clientX - r.left) / state.scale, y: (e.clientY - r.top) / state.scale };
+        }
+
+        function onMouseDown(e) {
+            if(e.button !== 0 || dom.inputOverlay.style.display === 'block') return;
+            const pos = getMousePos(e);
+            state.startPos = pos;
+            
+            if (state.mode === 'pan') {
+                state.isDragging = true;
+                state.lastMouseX = e.clientX; state.lastMouseY = e.clientY;
+                dom.viewport.style.cursor = 'grabbing';
+            } else if (state.mode === 'draw' || state.mode === 'eraser') {
+                state.isDrawing = true;
+                state.currentPath = [pos];
+                dom.ctx.beginPath(); dom.ctx.moveTo(pos.x, pos.y);
+                dom.ctx.lineWidth = state.mode==='eraser'? state.lineWidth*10 : state.lineWidth;
+                dom.ctx.strokeStyle = state.mode==='eraser'? 'rgba(0,0,0,1)' : state.color;
+                dom.ctx.globalCompositeOperation = state.mode==='eraser'? 'destination-out' : 'source-over';
+            } else if (state.mode === 'area' || state.mode === 'range') { state.isDrawing = true; }
+        }
+
+        function onMouseMove(e) {
+            if (state.mode === 'pan' && state.isDragging) {
+                state.panX += e.clientX - state.lastMouseX;
+                state.panY += e.clientY - state.lastMouseY;
+                state.lastMouseX = e.clientX; state.lastMouseY = e.clientY;
+                dom.wrapper.style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.scale})`;
+            } else if (state.isDrawing) {
+                const pos = getMousePos(e);
+                if (state.mode === 'draw' || state.mode === 'eraser') {
+                    dom.ctx.lineTo(pos.x, pos.y); dom.ctx.stroke();
+                    state.currentPath.push(pos);
+                } else if (state.mode === 'area') {
+                    if(state.history.length > 0) {
+                        restoreLastHistory(false); 
+                        const w = pos.x - state.startPos.x; const h = pos.y - state.startPos.y;
+                        dom.ctx.fillStyle = hexToRgba(state.color, 0.2);
+                        dom.ctx.fillRect(state.startPos.x, state.startPos.y, w, h);
+                        dom.ctx.strokeStyle = state.color; dom.ctx.lineWidth = 2;
+                        dom.ctx.strokeRect(state.startPos.x, state.startPos.y, w, h);
+                    }
+                } else if (state.mode === 'range') {
+                    if(state.history.length > 0) {
+                        restoreLastHistory(false);
+                        // Draw Line
+                        dom.ctx.beginPath(); dom.ctx.moveTo(state.startPos.x, state.startPos.y); dom.ctx.lineTo(pos.x, pos.y);
+                        dom.ctx.strokeStyle = state.color; dom.ctx.lineWidth = 2; dom.ctx.stroke();
+                        // Ticks
+                        drawTick(state.startPos, pos);
+                        drawTick(pos, state.startPos);
+                    }
+                }
+            }
+        }
+        
+        function drawTick(p1, p2) {
+            const dx = p2.x - p1.x; const dy = p2.y - p1.y;
+            const angle = Math.atan2(dy, dx);
+            const len = 10;
+            dom.ctx.beginPath();
+            dom.ctx.moveTo(p1.x + len*Math.cos(angle + Math.PI/2), p1.y + len*Math.sin(angle + Math.PI/2));
+            dom.ctx.lineTo(p1.x + len*Math.cos(angle - Math.PI/2), p1.y + len*Math.sin(angle - Math.PI/2));
+            dom.ctx.stroke();
+        }
+
+        function onMouseUp(e) {
+            if (state.mode === 'pan') {
+                state.isDragging = false; dom.viewport.style.cursor = 'grab';
+            } else if (state.isDrawing) {
+                state.isDrawing = false;
+                const pos = getMousePos(e);
+                if(state.mode === 'eraser') {
+                    dom.ctx.closePath(); dom.ctx.globalCompositeOperation = 'source-over'; saveHistory();
+                } else if (state.mode === 'draw') {
+                    dom.ctx.closePath();
+                    // Open Input for Drawing Label
+                    // Find center of path for label position
+                    let cx=0, cy=0;
+                    state.currentPath.forEach(p => {cx+=p.x; cy+=p.y;});
+                    cx /= state.currentPath.length; cy /= state.currentPath.length;
+                    openInput(e.clientX, e.clientY, {x:cx, y:cy}, null, 'draw');
+                } else if (state.mode === 'area') {
+                    openInput(e.clientX, e.clientY, state.startPos, pos, 'area');
+                } else if (state.mode === 'range') {
+                    openInput(e.clientX, e.clientY, state.startPos, pos, 'range');
+                }
+            } else if (state.mode === 'text' && e.target === dom.canvas) {
+                 openInput(e.clientX, e.clientY, getMousePos(e), null, 'text');
+            } else if (state.mode === 'label' && state.startPos && e.target === dom.canvas) {
+                const dist = Math.hypot(getMousePos(e).x - state.startPos.x, getMousePos(e).y - state.startPos.y);
+                const p2 = dist > 10 ? getMousePos(e) : {x: state.startPos.x + 50, y: state.startPos.y - 50};
+                openInput(e.clientX, e.clientY, state.startPos, p2, 'label');
+            }
+        }
+
+        function onWheel(e) {
+            e.preventDefault();
+            const factor = e.deltaY < 0 ? 1.1 : 0.9;
+            const r = dom.wrapper.getBoundingClientRect();
+            state.scale *= factor; if(state.scale < 0.1) state.scale = 0.1;
+            state.panX -= (e.clientX - r.left) * (factor - 1);
+            state.panY -= (e.clientY - r.top) * (factor - 1);
+            dom.wrapper.style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.scale})`;
+            dom.statusCoords.innerText = `Zoom: ${Math.round(state.scale*100)}%`;
+        }
+
+        function fitToScreen() {
+            if(!state.imgObj) return;
+            const vw = dom.viewport.clientWidth; const vh = dom.viewport.clientHeight;
+            const s = Math.min(vw/state.imgObj.width, vh/state.imgObj.height);
+            state.scale = Math.min(s, 1);
+            state.panX = (vw - state.imgObj.width*state.scale)/2; state.panY = (vh - state.imgObj.height*state.scale)/2;
+            dom.wrapper.style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.scale})`;
+        }
+
+        // --- HISTORY ---
+        function saveHistory() {
+            state.historyStep++;
+            state.history.length = state.historyStep;
+            state.history.push(dom.canvas.toDataURL());
+            state.labelsHistory.length = state.historyStep;
+            state.labelsHistory.push(JSON.parse(JSON.stringify(state.currentLabels)));
+            if(state.history.length > MAX_HISTORY) { state.history.shift(); state.labelsHistory.shift(); state.historyStep--; }
+        }
+        function undo() {
+            if(state.historyStep > 0) { 
+                state.historyStep--; 
+                restoreLastHistory(); 
+                state.currentLabels = JSON.parse(JSON.stringify(state.labelsHistory[state.historyStep]));
+                showToast("Undo Action");
+            }
+        }
+        function restoreLastHistory(redraw=true) {
+            const img = new Image();
+            img.onload = () => { dom.ctx.clearRect(0,0,dom.canvas.width, dom.canvas.height); dom.ctx.drawImage(img,0,0); };
+            img.src = state.history[state.historyStep];
+        }
+
+        // --- LABELING ---
+        let pendingInput = null;
+        function openInput(sx, sy, p1, p2, type) {
+            pendingInput = { p1, p2, type };
+            dom.inputTitle.value = ''; dom.inputDesc.value = '';
+            dom.inputOverlay.style.display = 'block';
+            dom.inputTitle.focus();
+        }
+
+        function commitInput() {
+            const title = dom.inputTitle.value;
+            const desc = dom.inputDesc.value;
+            if(!title && !desc) { dom.inputOverlay.style.display = 'none'; return; }
+            
+            const { p1, p2, type } = pendingInput;
+            dom.ctx.globalCompositeOperation = 'source-over';
+            
+            state.currentLabels.push({ title: title, desc: desc, color: state.color, type: type });
+            
+            // Draw
+            if (type === 'text' || type === 'draw') {
+                drawCanvasLabel(p1.x, p1.y, title, false);
+            } else if (type === 'label') {
+                dom.ctx.beginPath(); dom.ctx.moveTo(p1.x, p1.y); dom.ctx.lineTo(p2.x, p2.y);
+                dom.ctx.lineWidth = 2; dom.ctx.strokeStyle = state.color; dom.ctx.stroke();
+                dom.ctx.beginPath(); dom.ctx.arc(p1.x, p1.y, 4, 0, 2*Math.PI); dom.ctx.fillStyle = state.color; dom.ctx.fill();
+                drawCanvasLabel(p2.x, p2.y, title, true);
+            } else if (type === 'area') {
+                const w = p2.x - p1.x; const h = p2.y - p1.y;
+                dom.ctx.fillStyle = hexToRgba(state.color, 0.2);
+                dom.ctx.fillRect(p1.x, p1.y, w, h);
+                dom.ctx.strokeStyle = state.color; dom.ctx.lineWidth = 2;
+                dom.ctx.strokeRect(p1.x, p1.y, w, h);
+                drawCanvasLabel(p1.x + w/2, p1.y + h/2, title, true);
+            } else if (type === 'range') {
+                dom.ctx.beginPath(); dom.ctx.moveTo(p1.x, p1.y); dom.ctx.lineTo(p2.x, p2.y);
+                dom.ctx.strokeStyle = state.color; dom.ctx.lineWidth = 2; dom.ctx.stroke();
+                drawTick(p1, p2); drawTick(p2, p1);
+                // Center Label
+                const cx = (p1.x + p2.x) / 2; const cy = (p1.y + p2.y) / 2;
+                drawCanvasLabel(cx, cy, title, true);
+            }
+            dom.inputOverlay.style.display = 'none';
+            saveHistory();
+
+            if(state.autoColor) {
+                state.colorIndex = (state.colorIndex + 1) % state.colorPalette.length;
+                state.color = state.colorPalette[state.colorIndex];
+                document.getElementById('color-picker').value = state.color;
+            }
+        }
+
+        function drawCanvasLabel(x, y, title, centered) {
+            if(!title) return;
+            const fSize = state.fontSize;
+            dom.ctx.font = `bold ${fSize}px Arial`;
+            
+            const tw = dom.ctx.measureText(title).width;
+            const h = fSize + 8; 
+            const w = tw + 16;
+            
+            const dx = centered ? x - w/2 : x;
+            const dy = centered ? y - h/2 : y;
+            
+            // High contrast bg
+            dom.ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
+            dom.ctx.beginPath();
+            dom.ctx.roundRect ? dom.ctx.roundRect(dx, dy, w, h, 4) : dom.ctx.fillRect(dx, dy, w, h);
+            dom.ctx.fill();
+            
+            // Border
+            dom.ctx.strokeStyle = state.color; dom.ctx.lineWidth = 2;
+            dom.ctx.stroke();
+            
+            dom.ctx.fillStyle = "#fff";
+            dom.ctx.textAlign = "center"; dom.ctx.textBaseline = "middle";
+            dom.ctx.fillText(title, dx + w/2, dy + h/2);
+        }
+
+        // --- ATLAS & PERSISTENCE ---
+        function addToCollection() {
+            if(!state.imgObj) return;
+            const data = dom.canvas.toDataURL('image/jpeg', 0.85);
+            const item = { 
+                id: Date.now(), 
+                name: state.currentFileName || "Snapshot", 
+                data: data,
+                labels: JSON.parse(JSON.stringify(state.currentLabels))
+            };
+            
+            if(db) dbOp('readwrite', s => s.put(item)).then(() => {
+                loadAtlasUI();
+                showToast("Halaman Atlas Tersimpan");
+            });
+        }
+
+        function renderCollection() {
+            dom.colList.innerHTML = '';
+            if(state.collection.length === 0) { dom.colList.innerHTML = '<div style="text-align:center;padding:20px;color:#666">Kosong</div>'; dom.btnExport.disabled = true; return; }
+            dom.btnExport.disabled = false;
+            state.collection.forEach((item, i) => {
+                const el = document.createElement('div');
+                el.className = 'collection-item';
+                el.innerHTML = `
+                    <img src="${item.data}" class="c-img">
+                    <div class="c-info">
+                        <div style="font-weight:bold;">${i+1}. ${item.name}</div>
+                        <div class="c-meta">
+                            <span>${item.labels.length} Label</span>
+                        </div>
+                        <div class="c-actions" style="margin-top:5px;">
+                            <button class="btn-icon-xs" onclick="loadToCompare(${i}, 'atlas')">Bandingkan</button>
+                            <button class="btn-icon-xs btn-del" onclick="removeFromCol(${item.id})">Hapus</button>
+                        </div>
+                    </div>
+                `;
+                dom.colList.appendChild(el);
+            });
+        }
+
+        window.removeFromCol = (id) => { 
+            dbOp('readwrite', s => s.delete(id)).then(loadAtlasUI);
+        };
+
+        // --- COMPARE ---
+        window.toggleCompare = () => {
+            state.isCompareMode = !state.isCompareMode;
+            dom.comparePane.style.display = state.isCompareMode ? 'flex' : 'none';
+            document.getElementById('btn-compare').classList.toggle('active', state.isCompareMode);
+            if(state.isCompareMode && state.imgObj) fitToScreen();
+        };
+        
+        window.loadToCompare = (i, source) => {
+            let src;
+            if(source === 'folder') {
+                let file = state.folderFiles[i];
+                src = URL.createObjectURL(file instanceof File ? file : file.blob);
+            } else if (source === 'atlas') {
+                src = state.collection[i].data; // DataURL
+            }
+            if(!src) return;
+            dom.compareImg.src = src;
+            if(!state.isCompareMode) window.toggleCompare();
+        };
+
+        // --- EXPORT PDF ---
+        async function exportPDF() {
+            if(!window.jspdf) { alert("Library PDF Error"); return; }
+            showToast("Generating Atlas PDF...");
+            const { jsPDF } = window.jspdf;
+            
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            const pageW = doc.internal.pageSize.getWidth();
+            const pageH = doc.internal.pageSize.getHeight();
+            const margin = 10;
+            const imgAreaW = (pageW - (margin*3)) * 0.70;
+            const sidebarX = margin + imgAreaW + margin;
+            const sidebarW = (pageW - (margin*3)) * 0.30;
+            
+            for(let i=0; i<state.collection.length; i++) {
+                if(i > 0) doc.addPage();
+                const item = state.collection[i];
+                
+                doc.setFontSize(16); doc.setTextColor(0,0,0); doc.setFont("helvetica", "bold");
+                doc.text(`Gambar ${i+1}: ${item.name}`, margin, margin + 5);
+                
+                const props = doc.getImageProperties(item.data);
+                const ratio = props.height / props.width;
+                let renderH = imgAreaW * ratio;
+                const maxH = pageH - 30;
+                let renderW = imgAreaW;
+                
+                if (renderH > maxH) { renderH = maxH; renderW = renderH / ratio; }
+                const imgY = margin + 15;
+                doc.addImage(item.data, 'JPEG', margin, imgY, renderW, renderH);
+                
+                let cursorY = imgY;
+                doc.setFontSize(12); doc.setTextColor(50,50,50);
+                doc.text("Keterangan:", sidebarX, cursorY);
+                cursorY += 8;
+                
+                item.labels.forEach(lbl => {
+                    if(cursorY > pageH - 20) return; 
+                    const rgb = hexToRgb(lbl.color);
+                    doc.setFillColor(rgb.r, rgb.g, rgb.b);
+                    doc.rect(sidebarX, cursorY-4, 5, 5, 'F');
+                    
+                    doc.setFont("helvetica", "bold"); doc.setFontSize(10); doc.setTextColor(0,0,0);
+                    doc.text(lbl.title, sidebarX + 8, cursorY);
+                    
+                    if(lbl.desc) {
+                        cursorY += 5;
+                        doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(60,60,60);
+                        const splitDesc = doc.splitTextToSize(lbl.desc, sidebarW - 5);
+                        doc.text(splitDesc, sidebarX + 8, cursorY);
+                        cursorY += (splitDesc.length * 4);
+                    } else { cursorY += 5; }
+                    cursorY += 4;
+                });
+                
+                doc.setFont("helvetica", "italic"); doc.setFontSize(8); doc.setTextColor(150);
+                doc.text("Generated by BeenDisplayer", margin, pageH - 5);
+            }
+            
+            const dateStr = new Date().toISOString().slice(0,10);
+            doc.save(`Microscopy_Session_${dateStr}.pdf`);
+            showToast("PDF Selesai!");
+        }
+
+        // Utils
+        function updateFilters() { dom.wrapper.style.filter = `brightness(${dom.brightness.value}%) contrast(${dom.contrast.value}%)`; }
+        function hexToRgba(hex, alpha) {
+            const r = parseInt(hex.slice(1,3), 16); const g = parseInt(hex.slice(3,5), 16); const b = parseInt(hex.slice(5,7), 16);
+            return `rgba(${r},${g},${b},${alpha})`;
+        }
+        function hexToRgb(hex) {
+            return { r: parseInt(hex.slice(1,3), 16), g: parseInt(hex.slice(3,5), 16), b: parseInt(hex.slice(5,7), 16) };
+        }
+        function handlePaste(e) {
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            for(let item of items) {
+                if(item.kind === 'file') {
+                    const blob = item.getAsFile(); const url = URL.createObjectURL(blob); const img = new Image();
+                    img.onload = () => {
+                        state.imgObj = img; state.currentFileName = "Clipboard"; 
+                        dom.titleInput.value = "Clipboard"; dom.titleInput.disabled = false;
+                        dom.canvas.width = img.width; dom.canvas.height = img.height;
+                        dom.ctx.drawImage(img,0,0);
+                        fitToScreen(); state.history=[]; state.currentLabels=[]; state.labelsHistory=[]; saveHistory();
+                    };
+                    img.src = url;
+                }
+            }
+        }
+        function onKeyDown(e) {
+            if(dom.inputOverlay.style.display === 'block') { if(e.key === 'Escape') dom.inputOverlay.style.display = 'none'; return; }
+            if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            switch(e.key.toLowerCase()) {
+                case 'p': setMode('pan'); break;
+                case 'l': setMode('label'); break;
+                case 'a': setMode('area'); break;
+                case 'j': setMode('range'); break;
+                case 't': setMode('text'); break;
+                case 'b': setMode('draw'); break;
+                case 'e': setMode('eraser'); break;
+                case 'r': fitToScreen(); break;
+                case ' ': if(state.mode !== 'pan') { state.prevMode = state.mode; setMode('pan'); } break;
+            }
+            if(e.ctrlKey && e.key === 'z') undo();
+        }
+        function onKeyUp(e) { if(e.key === ' ' && state.mode === 'pan') setMode(state.prevMode); }
+
+        init();
+    </script>
+</body>
+</html>
