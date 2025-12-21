@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Boss: Nagging Pomodoro</title>
+    <style>
+        :root {
+            --bg-work: #b71c1c; /* Angry Red */
+            --bg-break: #2e7d32; /* Relaxed Green */
+            --text-color: #ffffff;
+            --card-bg: rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            background-color: var(--bg-work);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.5s ease;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        /* Main Container */
+        .container {
+            text-align: center;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        /* Boss Avatar */
+        #avatar {
+            font-size: 5rem;
+            margin-bottom: 10px;
+            display: inline-block;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both infinite;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+            40%, 60% { transform: translate3d(8px, 0, 0); }
+        }
+
+        /* Speech Bubble */
+        #speech-bubble {
+            background: white;
+            color: black;
+            padding: 15px;
+            border-radius: 15px;
+            position: relative;
+            margin-bottom: 30px;
+            font-weight: bold;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        #speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: white transparent;
+            display: block;
+            width: 0;
+        }
+
+        /* Timer Display */
+        #timer-display {
+            font-size: 5rem;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 2px;
+            margin: 20px 0;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+            text-transform: uppercase;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        #btn-main {
+            background: white;
+            color: var(--bg-work);
+            flex: 2;
+        }
+
+        #btn-reset {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            flex: 1;
+        }
+
+        /* Inputs for Custom Time & Alarm */
+        .settings-row {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .setting-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .setting-item input, .setting-item select {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 5px;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .setting-item select {
+            width: 150px;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .setting-item select option {
+            background: #333;
+            color: white;
+        }
+        
+        .setting-item input:focus, .setting-item select:focus {
+            outline: none;
+            border-color: white;
+            background: rgba(0,0,0,0.5);
+        }
+
+        /* Settings Toggle */
+        .mode-switch {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .mode-switch label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Chatty Area -->
+        <div id="speech-bubble">Click "Start" if you actually intend to work.</div>
+        
+        <!-- Avatar -->
+        <div id="avatar" onclick="testSound()">🤨</div>
+
+        <!-- Timer -->
+        <div id="timer-display">25:00</div>
+
+        <!-- Buttons -->
+        <div class="controls">
+            <button id="btn-main" onclick="toggleTimer()">Start Work</button>
+            <button id="btn-reset" onclick="resetTimer()">Reset</button>
+        </div>
+
+        <!-- Custom Time Inputs -->
+        <div class="settings-row">
+            <div class="setting-item">
+                <label>Work (min)</label>
+                <input type="number" id="work-input" value="25" min="1" max="120" onchange="updateCustomTime()">
+            </div>
+            <div class="setting-item">
+                <label>Break (min)</label>
+                <input type="number" id="break-input" value="5" min="1" max="60" onchange="updateCustomTime()">
+            </div>
+            <div class="setting-item" style="width: 100%;">
+                <label>Alarm Sound</label>
+                <select id="alarm-select" onchange="previewAlarm()">
+                    <option value="tts">🗣️ The Boss (TTS)</option>
+                    <option value="beep">⏰ Digital Beep</option>
+                    <option value="bell">🔔 Classic Bell</option>
+                    <option value="siren">🚨 Nuclear Siren</option>
+                    <option value="arcade">👾 Arcade Game</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="mode-switch">
+            <label title="Enable spoken status updates (Start, Pause, etc.)">
+                <input type="checkbox" id="voice-toggle" checked> Voice Updates
+            </label>
+        </div>
+    </div>
+
+    <script>
+        // --- Sound Configuration ---
+        const PHRASES = {
+            startWork: ["Okay, focus! Don't open other tabs.", "Time is ticking.", "Get serious now.", "Work properly!"],
+            pauseWork: ["Hey! Why stop?", "Don't be lazy!", "Press play again.", "I'm watching you."],
+            finishWork: ["Time's up! Stop working!", "Brain cooling time.", "Rest now.", "Done! Go walk."],
+            startBreak: ["Relax now.", "Drink water.", "Breathe in, breathe out.", "Check social media briefly."],
+            finishBreak: ["Break is over!", "Enough relaxing.", "Back to work!", "Productivity calls."],
+            nagging: ["Hey, time is up!", "Turn off the alarm!", "Click the button!", "I won't stop!"]
+        };
+
+        // --- Global Variables ---
+        let timer;
+        let timeLeft = 25 * 60; 
+        let isRunning = false;
+        let isWorkMode = true; 
+        let naggingInterval; 
+        let audioCtx; // Web Audio API Context
+
+        // DOM Elements
+        const timerDisplay = document.getElementById('timer-display');
+        const btnMain = document.getElementById('btn-main');
+        const avatar = document.getElementById('avatar');
+        const bubble = document.getElementById('speech-bubble');
+        const body = document.body;
+        const voiceToggle = document.getElementById('voice-toggle');
+        const workInput = document.getElementById('work-input');
+        const breakInput = document.getElementById('break-input');
+        const alarmSelect = document.getElementById('alarm-select');
+
+        // --- Web Audio API (Synthesized Sounds) ---
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSynthesizedSound(type) {
+            initAudio();
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'beep') {
+                // Classic Alarm Clock
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(880, now);
+                osc.frequency.setValueAtTime(880, now + 0.1);
+                osc.frequency.setValueAtTime(0, now + 0.11); // Silence
+                osc.frequency.setValueAtTime(880, now + 0.2);
+                osc.frequency.setValueAtTime(880, now + 0.3);
+                
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0.1, now + 0.3);
+                gain.gain.linearRampToValueAtTime(0, now + 0.31);
+                
+                osc.start(now);
+                osc.stop(now + 0.35);
+
+            } else if (type === 'bell') {
+                // Ding
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(500, now);
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(0.3, now + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+                
+                osc.start(now);
+                osc.stop(now + 1.5);
+
+            } else if (type === 'siren') {
+                // Wee-Woo
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.linearRampToValueAtTime(1000, now + 0.3);
+                osc.frequency.linearRampToValueAtTime(600, now + 0.6);
+                
+                gain.gain.setValueAtTime(0.05, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.6);
+                
+                osc.start(now);
+                osc.stop(now + 0.6);
+
+            } else if (type === 'arcade') {
+                // Jump sound
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(600, now + 0.2);
+                
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.2);
+                
+                osc.start(now);
+                osc.stop(now + 0.2);
+            }
+        }
+
+        // --- Core Logic ---
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function updateDisplay() {
+            timerDisplay.innerText = formatTime(timeLeft);
+            document.title = `(${formatTime(timeLeft)}) The Boss`;
+        }
+
+        function updateCustomTime() {
+            if (!isRunning) {
+                const w = Math.max(1, parseInt(workInput.value));
+                const b = Math.max(1, parseInt(breakInput.value));
+                timeLeft = isWorkMode ? w * 60 : b * 60;
+                updateDisplay();
+            }
+        }
+
+        // Unified Speak Function
+        function speak(text, isAlarm = false) {
+            // Only speak status updates if toggle is ON, OR if it's the main alarm
+            if (!voiceToggle.checked && !isAlarm) {
+                bubble.innerText = text; // Just show text
+                return;
+            }
+            
+            bubble.innerText = text;
+
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US'; 
+                utterance.rate = 1.1; 
+                utterance.pitch = isWorkMode ? 0.8 : 1.2; 
+                
+                const voices = window.speechSynthesis.getVoices();
+                const engVoice = voices.find(v => v.lang.includes('en'));
+                if (engVoice) utterance.voice = engVoice;
+
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function getRandomPhrase(type) {
+            const list = PHRASES[type];
+            return list[Math.floor(Math.random() * list.length)];
+        }
+
+        function toggleTimer() {
+            if (isRunning) pauseTimer();
+            else startTimer();
+        }
+
+        function startTimer() {
+            initAudio(); // Initialize audio context on user interaction
+            isRunning = true;
+            btnMain.innerText = "Pause";
+            workInput.disabled = true;
+            breakInput.disabled = true;
+            alarmSelect.disabled = true;
+            
+            // Visuals
+            if (isWorkMode) {
+                avatar.innerText = "😠"; 
+                body.style.backgroundColor = "var(--bg-work)";
+                btnMain.style.color = "var(--bg-work)";
+            } else {
+                avatar.innerText = "😎"; 
+                body.style.backgroundColor = "var(--bg-break)";
+                btnMain.style.color = "var(--bg-break)";
+            }
+
+            stopNagging();
+
+            // Initial Voice Status Update
+            const msg = isWorkMode ? getRandomPhrase('startWork') : getRandomPhrase('startBreak');
+            speak(msg);
+
+            timer = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    updateDisplay();
+                } else {
+                    timerFinished();
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            clearInterval(timer);
+            isRunning = false;
+            btnMain.innerText = "Resume";
+            workInput.disabled = false;
+            breakInput.disabled = false;
+            alarmSelect.disabled = false;
+            
+            if (isWorkMode) {
+                avatar.innerText = "🤨"; 
+                speak(getRandomPhrase('pauseWork'));
+            } else {
+                avatar.innerText = "😴";
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            stopNagging();
+            isRunning = false;
+            isWorkMode = true; 
+            
+            workInput.disabled = false;
+            breakInput.disabled = false;
+            alarmSelect.disabled = false;
+
+            timeLeft = parseInt(workInput.value) * 60;
+            
+            updateDisplay();
+            body.style.backgroundColor = "var(--bg-work)";
+            btnMain.style.color = "var(--bg-work)";
+            btnMain.innerText = "Start Work";
+            avatar.innerText = "😐";
+            bubble.innerText = "Ready to start from scratch?";
+            window.speechSynthesis.cancel();
+        }
+
+        function timerFinished() {
+            clearInterval(timer);
+            isRunning = false;
+            
+            workInput.disabled = false;
+            breakInput.disabled = false;
+            alarmSelect.disabled = false;
+            
+            // Phase Logic & Start Alarm
+            if (isWorkMode) {
+                // Work Finished
+                timeLeft = parseInt(breakInput.value) * 60; 
+                body.style.backgroundColor = "var(--bg-break)"; 
+                startNagging(getRandomPhrase('finishWork')); // Start the persistent alarm
+                isWorkMode = false;
+                btnMain.innerText = "Start Break";
+                btnMain.style.color = "var(--bg-break)";
+                avatar.innerText = "🎉";
+            } else {
+                // Break Finished
+                timeLeft = parseInt(workInput.value) * 60; 
+                body.style.backgroundColor = "var(--bg-work)";
+                startNagging(getRandomPhrase('finishBreak'));
+                isWorkMode = true;
+                btnMain.innerText = "Start Work";
+                btnMain.style.color = "var(--bg-work)";
+                avatar.innerText = "😡";
+            }
+            updateDisplay();
+        }
+
+        // --- Main Feature: THE ALARM LOOP ---
+        function startNagging(initialMessage) {
+            avatar.classList.add('shake');
+            const alarmType = alarmSelect.value;
+            
+            if (alarmType === 'tts') {
+                // Original TTS Behavior
+                speak(initialMessage, true);
+                let counter = 0;
+                naggingInterval = setInterval(() => {
+                    counter++;
+                    const nagText = counter % 2 === 0 ? getRandomPhrase('nagging') : initialMessage;
+                    speak(nagText, true);
+                }, 4000); // 4 seconds interval for speech
+            } else {
+                // Sound Effect Behavior
+                bubble.innerText = "TIME'S UP! CLICK THE BUTTON!";
+                playSynthesizedSound(alarmType);
+                
+                // Faster interval for beeps
+                const intervalTime = (alarmType === 'siren') ? 800 : 1000;
+                
+                naggingInterval = setInterval(() => {
+                    playSynthesizedSound(alarmType);
+                }, intervalTime);
+            }
+        }
+
+        function stopNagging() {
+            if (naggingInterval) {
+                clearInterval(naggingInterval);
+                naggingInterval = null;
+            }
+            avatar.classList.remove('shake');
+            window.speechSynthesis.cancel();
+        }
+
+        function testSound() {
+            // Secret feature: click avatar to test current alarm sound
+            const type = alarmSelect.value;
+            if (type !== 'tts') {
+                playSynthesizedSound(type);
+            } else {
+                speak("I am watching you.");
+            }
+        }
+
+        function previewAlarm() {
+            const type = alarmSelect.value;
+            if (type !== 'tts') {
+                playSynthesizedSound(type);
+            }
+        }
+
+        // Init Voice
+        window.speechSynthesis.getVoices();
+
+    </script>
+</body>
+</html>
