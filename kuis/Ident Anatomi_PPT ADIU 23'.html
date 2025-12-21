@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anatomy Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Custom Red Wine Gradient Mesh */
+        body {
+            background-color: #2b0a0d;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #f3e5f5;
+            overflow-x: hidden;
+        }
+
+        .gradient-mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            background: 
+                radial-gradient(at 0% 0%, hsla(340, 82%, 25%, 1) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(350, 70%, 15%, 1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, hsla(330, 80%, 20%, 1) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, hsla(345, 90%, 10%, 1) 0px, transparent 50%);
+            filter: blur(40px);
+        }
+
+        .glass-panel {
+            background: rgba(88, 28, 40, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-wine {
+            background: linear-gradient(135deg, #722f37 0%, #4a0404 100%);
+            border: 1px solid #9e2a2f;
+            transition: all 0.3s ease;
+        }
+
+        .btn-wine:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(135deg, #8a3440 0%, #5d101d 100%);
+        }
+        
+        .btn-wine-disabled {
+            background: #1a0507;
+            border: 1px solid #4a0404;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        /* Flashcard Flip Animation */
+        .flashcard-container {
+            perspective: 1000px;
+            height: 380px;
+        }
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        .flashcard-flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            overflow-y: auto;
+        }
+        .flashcard-front {
+            background: linear-gradient(145deg, #581c28, #3a0a12);
+            border: 1px solid #722f37;
+        }
+        .flashcard-back {
+            background: linear-gradient(145deg, #1a0507, #2b0a0d);
+            border: 1px solid #ef4444;
+            transform: rotateY(180deg);
+        }
+
+        /* Content Styling */
+        .summary-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #ef4444;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+        .highlight-term { color: #fca5a5; font-weight: bold; }
+        .highlight-clinical { color: #fcd34d; font-weight: bold; }
+        .detail-list li { margin-bottom: 0.5rem; }
+        .detail-label { display: inline-block; width: 130px; font-weight: bold; color: #cbd5e1; }
+        
+        /* Muscle Table */
+        .muscle-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .muscle-table th { text-align: left; border-bottom: 1px solid #ef4444; padding: 4px; color: #fca5a5; }
+        .muscle-table td { border-bottom: 1px solid #444; padding: 4px; vertical-align: top; }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #2b0a0d; }
+        ::-webkit-scrollbar-thumb { background: #722f37; border-radius: 4px; }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="text-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="gradient-mesh"></div>
+
+    <div id="app" class="w-full max-w-7xl glass-panel p-6 md:p-8 min-h-[85vh] flex flex-col relative animate-fade-in">
+        
+        <header class="flex justify-between items-center mb-6 border-b border-red-900/50 pb-4">
+            <div>
+                <h1 class="text-3xl font-bold text-red-200 tracking-wider font-mono">💀 ANATOMY MASTER 💀</h1>
+                <p class="text-sm text-red-300 opacity-80">Support & Movement Systems (Blok 1.4)</p>
+            </div>
+            <button onclick="goToMenu()" id="homeBtn" class="hidden text-red-200 hover:text-white transition">
+                <i class="fas fa-home text-2xl"></i>
+            </button>
+        </header>
+
+        <main id="content" class="flex-grow flex flex-col items-center justify-center text-center w-full">
+            <!-- Dynamic Content -->
+        </main>
+
+        <footer class="mt-6 text-center text-xs text-red-400 opacity-60">
+            <!-- Footer -->
+        </footer>
+    </div>
+
+    <script>
+        // --- DATA MASTER ---
+        const anatomyData = {
+            floor1: {
+                title: "Floor 1: Axial Skeleton & Pelvis (P1)",
+                description: "Ossa Cranii, Vertebrae, & Pelvis",
+                backrooms: [
+                    {
+                        id: "P1S1",
+                        title: "Backroom 1: Ossa Cranii 💀",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Tulang Tengkorak & SCALP</h3>
+                            <div class="summary-box">
+                                <p><strong>Os Parietale:</strong> 4 Margo (Sagittalis, Squamosus, Frontalis, Occipitalis) & 4 Angulus.</p>
+                                <p><strong>Pterion:</strong> Pertemuan Frontal, Parietal, Temporal, Sphenoid. Titik terlemah (A. Meningea Media).</p>
+                                <p><strong>Glabella:</strong> Area halus di antara kedua alis (Arcus Superciliaris) pada Os Frontale.</p>
+                            </div>
+                            <div class="summary-box">
+                                <h4 class="font-bold text-white mb-1">SCALP (Lapisan Kepala)</h4>
+                                <ul class="text-sm list-disc pl-5">
+                                    <li><strong>S</strong>kin (Kulit)</li>
+                                    <li><strong>C</strong>onnective Tissue (Jaringan Ikat Padat - Pembuluh darah)</li>
+                                    <li><strong>A</strong>poneurosis (Galea Aponeurotica)</li>
+                                    <li><strong>L</strong>oose Connective Tissue (Jaringan Ikat Longgar - "Danger Area")</li>
+                                    <li><strong>P</strong>ericranium (Periosteum)</li>
+                                </ul>
+                            </div>
+                            <div class="summary-box border-l-yellow-500">
+                                <h4 class="text-yellow-400 font-bold">⚠️ Fraktur LeFort</h4>
+                                <ul class="text-sm list-disc pl-5">
+                                    <li><strong>LeFort I (Horizontal):</strong> Di atas akar gigi. Palatum pisah dari Maxilla.</li>
+                                    <li><strong>LeFort II (Pyramidal):</strong> Melintasi Radix Nasi & Orbita.</li>
+                                    <li><strong>LeFort III (Transversal):</strong> Craniofacial Disjunction.</li>
+                                </ul>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Tulang pembentuk Pterion?", a: "Frontale, Parietale, Temporale, Sphenoidale"},
+                            {q: "Arteri di bawah Pterion?", a: "A. Meningea Media"},
+                            {q: "Lapisan SCALP huruf 'L'?", a: "Loose Connective Tissue"},
+                            {q: "Mengapa Layer 4 SCALP disebut 'Danger Area'?", a: "Penyebaran infeksi lewat Vena Emissaria"},
+                            {q: "Glabella terletak di tulang?", a: "Os Frontale"},
+                            {q: "Fraktur LeFort bentuk Piramid?", a: "LeFort II"},
+                            {q: "Fraktur LeFort I garis patahannya?", a: "Horizontal di atas gigi (Guerin)"},
+                            {q: "Fraktur LeFort III disebut?", a: "Craniofacial Disjunction"},
+                            {q: "Isi Sella Turcica?", a: "Glandula Pituitaria (Hipofisis)"},
+                            {q: "Sutura antara Parietal & Occipital?", a: "Sutura Lambdoidea"},
+                            {q: "Sutura antara Temporal & Parietal?", a: "Sutura Squamosa"},
+                            {q: "Tulang pembentuk pipi?", a: "Os Zygomaticum"},
+                            {q: "Tulang rahang bawah?", a: "Mandibula"},
+                            {q: "Tulang rahang atas?", a: "Maxilla"},
+                            {q: "Fontanella terbesar?", a: "Anterior (Major)"},
+                            {q: "Kapan Fontanella Anterior menutup?", a: "18 Bulan"},
+                            {q: "Batas Fossa Cranii Ant/Med?", a: "Ala Minor Sphenoid"},
+                            {q: "Foramen Magnum di tulang?", a: "Os Occipitale"},
+                            {q: "Crista Galli di tulang?", a: "Os Ethmoidale"},
+                            {q: "Tulang air mata?", a: "Os Lacrimale"},
+                            {q: "Lapisan SCALP yang mengandung pembuluh darah?", a: "Connective Tissue (Layer 2)"},
+                            {q: "Aponeurosis pada SCALP menghubungkan?", a: "Venter Frontalis & Occipitalis"},
+                            {q: "Sutura metopica ada di?", a: "Os Frontale (anak-anak)"},
+                            {q: "Processus Mastoideus bagian dari?", a: "Os Temporale"},
+                            {q: "Concha Nasalis Inferior adalah?", a: "Tulang wajah (Viscerocranium) mandiri"},
+                            {q: "Vomer membentuk?", a: "Septum Nasi inferior"},
+                            {q: "Inion adalah?", a: "Protuberantia Occipitalis Externa"},
+                            {q: "Os Ethmoidale bagian cribrosa dilalui?", a: "N. Olfactorius (I)"},
+                            {q: "Sinus paranasal terbesar?", a: "Sinus Maxillaris"},
+                            {q: "Batas orbita superior?", a: "Os Frontale"}
+                        ]
+                    },
+                    {
+                        id: "P1S2",
+                        title: "Backroom 2: Columna Vertebrae 🦴",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Tulang Belakang</h3>
+                            <div class="summary-box">
+                                <ul class="list-disc pl-5 space-y-1 text-sm">
+                                    <li><span class="highlight-term">Cervical (C1-C7):</span> Foramen Transversarium. C1=Atlas, C2=Axis (Dens). C7=Prominens.</li>
+                                    <li><span class="highlight-term">Thoracal (T1-T12):</span> Corpus Heart Shaped, Fovea Costalis.</li>
+                                    <li><span class="highlight-term">Lumbal (L1-L5):</span> Corpus Kidney Shaped, Proc. Spinosus Kapak.</li>
+                                </ul>
+                            </div>
+                            <div class="summary-box">
+                                <p><strong>Ligamentum:</strong> Flavum (Kuning/Lamina), Nuchae (Leher), Longitudinal Ant/Post.</p>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Ciri khas Cervical?", a: "Foramen Transversarium"},
+                            {q: "Isi Foramen Transversarium?", a: "A. & V. Vertebralis"},
+                            {q: "Vertebra tanpa corpus?", a: "C1 (Atlas)"},
+                            {q: "Vertebra punya Dens?", a: "C2 (Axis)"},
+                            {q: "Bentuk corpus Thoracal?", a: "Jantung (Heart)"},
+                            {q: "Bentuk corpus Lumbal?", a: "Ginjal (Kidney)"},
+                            {q: "Warna Lig. Flavum?", a: "Kuning (Elastin)"},
+                            {q: "Lig. Flavum menghubungkan?", a: "Lamina Vertebrae"},
+                            {q: "Fovea Costalis ada di?", a: "Vertebra Thoracal"},
+                            {q: "Bentuk Proc. Spinosus Lumbal?", a: "Kapak (Hatchet)"},
+                            {q: "Ligamen anterior corpus?", a: "Lig. Longitudinale Anterius"},
+                            {q: "Ligamen posterior corpus?", a: "Lig. Longitudinale Posterius"},
+                            {q: "Penebalan Lig. Supraspinosum di leher?", a: "Lig. Nuchae"},
+                            {q: "Jumlah vertebra cervical?", a: "7"},
+                            {q: "Jumlah vertebra thoracal?", a: "12"},
+                            {q: "Jumlah vertebra lumbal?", a: "5"},
+                            {q: "Tulang ekor disebut?", a: "Os Coccygis"},
+                            {q: "Promontorium bagian dari?", a: "S1 (Sacrum)"},
+                            {q: "Kyphosis normal di?", a: "Thoracal & Sacral"},
+                            {q: "Lordosis normal di?", a: "Cervical & Lumbal"},
+                            {q: "Gerakan utama Atlantooccipital?", a: "Mengangguk (Yes)"},
+                            {q: "Gerakan utama Atlantoaxial?", a: "Menggeleng (No)"},
+                            {q: "Sendi antara corpus vertebra?", a: "Symphysis Intervertebralis"},
+                            {q: "Sendi antara proc articularis?", a: "Zygapophysial (Facet)"},
+                            {q: "Discus intervertebralis paling tebal di?", a: "Lumbal"},
+                            {q: "Fungsi Lig. Longitudinal Ant?", a: "Cegah hiperekstensi"},
+                            {q: "Fungsi Lig. Longitudinal Post?", a: "Cegah hiperfleksi"},
+                            {q: "Hiatus Sacralis dilalui?", a: "Filum terminale & N. S5"},
+                            {q: "Crista Sacralis Mediana adalah?", a: "Fusi Proc. Spinosus Sacrum"},
+                            {q: "Vertebra Prominens adalah?", a: "C7"}
+                        ]
+                    },
+                    {
+                        id: "P1S3",
+                        title: "Backroom 3: Art. Vertebrae & Scotty Dog 🐕",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Sendi Vertebra & Radiologi</h3>
+                            <div class="summary-box">
+                                <p><strong>Scotty Dog Sign (Oblique Lumbar):</strong></p>
+                                <ul class="text-sm detail-list">
+                                    <li><span class="detail-label">Nose:</span> Proc. Transversus</li>
+                                    <li><span class="detail-label">Eye:</span> Pediculus</li>
+                                    <li><span class="detail-label">Ear:</span> Proc. Articularis Sup</li>
+                                    <li><span class="detail-label">Neck:</span> <strong>Pars Interarticularis</strong></li>
+                                    <li><span class="detail-label">Foreleg:</span> Proc. Articularis Inf</li>
+                                    <li><span class="detail-label">Body:</span> Lamina</li>
+                                </ul>
+                            </div>
+                            <div class="summary-box border-l-yellow-500">
+                                <h4 class="text-yellow-400 font-bold">⚠️ Klinis</h4>
+                                <p class="text-sm">Fraktur Neck = <strong>Spondylolysis</strong>. Geser Corpus = <strong>Spondylolisthesis</strong>.</p>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Jenis sendi Facet?", a: "Synovial Plane Joint"},
+                            {q: "Scotty Dog terlihat pada foto?", a: "Lumbal Oblique"},
+                            {q: "Nose Scotty Dog?", a: "Proc. Transversus"},
+                            {q: "Eye Scotty Dog?", a: "Pediculus"},
+                            {q: "Neck Scotty Dog?", a: "Pars Interarticularis"},
+                            {q: "Ear Scotty Dog?", a: "Proc. Articularis Superior"},
+                            {q: "Foreleg Scotty Dog?", a: "Proc. Articularis Inferior"},
+                            {q: "Body Scotty Dog?", a: "Lamina"},
+                            {q: "Fraktur leher Scotty Dog?", a: "Spondylolysis"},
+                            {q: "Pergeseran vertebra ke depan?", a: "Spondylolisthesis"},
+                            {q: "Sendi C1-C2 (Atlantoaxial)?", a: "Pivot Joint"},
+                            {q: "Gerakan C1-C2?", a: "Rotasi (Menggeleng/No)"},
+                            {q: "Sendi C0-C1 (Atlantooccipital)?", a: "Condyloid Joint"},
+                            {q: "Gerakan C0-C1?", a: "Fleksi-Ekstensi (Mengangguk/Yes)"},
+                            {q: "Inti Discus Intervertebralis?", a: "Nucleus Pulposus"},
+                            {q: "Bagian luar Discus?", a: "Annulus Fibrosus"},
+                            {q: "Sendi Symphysis Intervertebralis tipe?", a: "Cartilaginous (Amphiarthrosis)"},
+                            {q: "HNP arah?", a: "Posterolateral"},
+                            {q: "Ligamen Longitudinal Posterior cegah?", a: "Hiperfleksi"},
+                            {q: "Sendi Costovertebral menghubungkan?", a: "Caput Costae & Corpus Vertebrae"},
+                            {q: "Sendi Uncovertebral (Luschka) di?", a: "C3-C7 lateral"},
+                            {q: "Ligamen Cruciforme Atlantis?", a: "Menahan Dens di C1"},
+                            {q: "Ligamen Alaria fungsi?", a: "Batasi rotasi kepala"},
+                            {q: "Membrana Tectoria lanjutan dari?", a: "Lig. Longitudinal Post"},
+                            {q: "Ligamen Apicalis menghubungkan?", a: "Apex Dens ke Occiput"},
+                            {q: "Anulus fibrosus terdiri dari?", a: "Fibrocartilage"},
+                            {q: "Nucleus pulposus berasal dari?", a: "Notochord"},
+                            {q: "Sendi Sacrococcygeal tipe?", a: "Symphysis"},
+                            {q: "Kurvatura Sekunder?", a: "Cervical & Lumbal"},
+                            {q: "Penyebab Lordosis berlebih?", a: "Kehamilan / Obesitas"}
+                        ]
+                    },
+                    {
+                        id: "P1S4",
+                        title: "Backroom 4: Skeleton Coxae & Apertura Pelvis 🚻",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Tulang Panggul</h3>
+                            <div class="summary-box">
+                                <p><strong>Apertura Pelvis:</strong></p>
+                                <ul class="text-sm list-disc pl-5">
+                                    <li><strong>Superior (Pelvic Inlet):</strong> Promontorium, Ala sacrum, Linea arcuata, Pecten pubis, Symphysis pubis.</li>
+                                    <li><strong>Media (Least Dimensions):</strong> Spina Ischiadica, Sacrum bawah, Symphysis bawah.</li>
+                                    <li><strong>Inferior (Pelvic Outlet):</strong> Coccyx, Tuber ischiadicum, Arcus pubis.</li>
+                                </ul>
+                            </div>
+                            <div class="summary-box">
+                                <p><strong>Trigonum Iliopectinea:</strong> Fascia yang memisahkan Lacuna Musculorum (Iliopsoas) dan Lacuna Vasorum (A/V Femoralis) di bawah Lig. Inguinale.</p>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Batas Apertura Pelvis Superior?", a: "Linea Terminalis (Promontorium, Arcuata, Pecten)"},
+                            {q: "Batas Apertura Pelvis Inferior?", a: "Coccyx, Tuber Ischiadicum, Arcus Pubis"},
+                            {q: "Diameter terpenting persalinan?", a: "Conjugata Vera / Diagonalis"},
+                            {q: "Landmark Pelvis Media?", a: "Spina Ischiadica"},
+                            {q: "Trigonum Iliopectinea memisahkan?", a: "Lacuna Musculorum & Vasorum"},
+                            {q: "Isi Lacuna Musculorum?", a: "M. Iliopsoas & N. Femoralis"},
+                            {q: "Isi Lacuna Vasorum?", a: "A. & V. Femoralis, N. Genitofemoralis"},
+                            {q: "3 Tulang penyusun Os Coxae?", a: "Ilium, Ischium, Pubis"},
+                            {q: "Tempat fusi ke-3 tulang?", a: "Acetabulum"},
+                            {q: "Tulang untuk duduk?", a: "Tuber Ischiadicum"},
+                            {q: "Origo M. Rectus Femoris?", a: "SIAI"},
+                            {q: "Origo M. Sartorius?", a: "SIAS"},
+                            {q: "Batas Pelvis Major & Minor?", a: "Linea Terminalis"},
+                            {q: "Isi Pelvis Major?", a: "Usus (Ileum, Sigmoid)"},
+                            {q: "Isi Pelvis Minor?", a: "Buli, Uterus/Prostat, Rectum"},
+                            {q: "Tipe panggul wanita?", a: "Ginekoid"},
+                            {q: "Tipe panggul pria?", a: "Android"},
+                            {q: "Lubang besar di bawah acetabulum?", a: "Foramen Obturatum"},
+                            {q: "Ligamen Sacrotuberale melekat di?", a: "Sacrum & Tuber Ischiadicum"},
+                            {q: "Ligamen Sacrospinale melekat di?", a: "Sacrum & Spina Ischiadica"},
+                            {q: "Fungsi Foramen Ischiadicum Majus?", a: "Jalur otot Piriformis"},
+                            {q: "Sudut Arcus Pubis wanita?", a: ">90 derajat"},
+                            {q: "Bagian tertinggi Ilium?", a: "Crista Iliaca"},
+                            {q: "Sendi penghubung 2 Os Pubis?", a: "Symphysis Pubis"},
+                            {q: "Sendi Sacroiliaca tipe?", a: "Synovial (Ant) & Syndesmosis (Post)"},
+                            {q: "Promontorium ada di tulang?", a: "Sacrum"},
+                            {q: "Landmark 'Dimple of Venus'?", a: "SIPS"},
+                            {q: "Bentuk Foramen Obturatum Pria?", a: "Bulat (Wanita: Segitiga)"},
+                            {q: "Arcus Pubis Pria?", a: "<90 derajat (Tajam)"},
+                            {q: "Diameter Interspinosum?", a: "Jarak antar Spina Ischiadica"}
+                        ]
+                    },
+                    {
+                        id: "P1S5",
+                        title: "Backroom 5: Art. Coxae 💃",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Sendi Panggul (Hip Joint)</h3>
+                            <div class="summary-box">
+                                <ul class="text-sm detail-list">
+                                    <li><span class="detail-label">Jenis:</span> Synovial Ball & Socket (Spheroidal).</li>
+                                    <li><span class="detail-label">Artikulasi:</span> Caput Femoris + Acetabulum (Labrum).</li>
+                                    <li><span class="detail-label">Ligamen:</span>
+                                        <ul class="pl-4 list-disc">
+                                            <li><strong>Iliofemorale (Y Ligament):</strong> Terkuat, cegah hiperekstensi.</li>
+                                            <li><strong>Ischiofemorale:</strong> Posterior.</li>
+                                            <li><strong>Pubofemorale:</strong> Anterior bawah.</li>
+                                            <li><strong>Capitis Femoris:</strong> Intracapsular, bawa arteri.</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Jenis sendi Hip Joint?", a: "Ball & Socket"},
+                            {q: "Tulang pembentuk Hip Joint?", a: "Caput Femoris & Acetabulum"},
+                            {q: "Struktur pependalam Acetabulum?", a: "Labrum Acetabulare"},
+                            {q: "Ligamen terkuat tubuh?", a: "Lig. Iliofemorale (Bigelow)"},
+                            {q: "Fungsi Lig. Iliofemorale?", a: "Cegah Hiperekstensi"},
+                            {q: "Ligamen di dalam sendi?", a: "Lig. Capitis Femoris"},
+                            {q: "Isi Lig. Capitis Femoris?", a: "A. Capitis Femoris (dari A. Obturatoria)"},
+                            {q: "Ligamen penutup Incisura Acetabuli?", a: "Lig. Transversum Acetabuli"},
+                            {q: "Gerakan utama Iliopsoas?", a: "Fleksi Hip"},
+                            {q: "Gerakan utama Gluteus Maximus?", a: "Ekstensi Hip"},
+                            {q: "Posisi dislokasi posterior?", a: "Fleksi, Adduksi, Internal Rotasi"},
+                            {q: "Serat kapsul melingkari leher femur?", a: "Zona Orbicularis"},
+                            {q: "Sendi Sacroiliaca (SI) tipe?", a: "Synovial (Ant) & Syndesmosis (Post)"},
+                            {q: "Hormon pelunak ligamen hamil?", a: "Relaxin"},
+                            {q: "Gerakan menjauh tubuh?", a: "Abduksi"},
+                            {q: "Gerakan mendekat tubuh?", a: "Adduksi"},
+                            {q: "Nutrisi utama Caput Femoris dewasa?", a: "A. Circumflexa Femoris Med/Lat"},
+                            {q: "Fossa di dasar Acetabulum?", a: "Fossa Acetabuli (Non-articular)"},
+                            {q: "Permukaan sendi Acetabulum?", a: "Facies Lunata"},
+                            {q: "Otot Abductor Hip utama?", a: "Gluteus Medius & Minimus"},
+                            {q: "Bursa Trochanterica?", a: "Antara Glut Max & Trochanter Major"},
+                            {q: "Gerakan Sartorius?", a: "Fleksi, Abd, Eks Rot Hip + Fleksi Knee"},
+                            {q: "Dislokasi Hip Anterior posisi?", a: "Eks, Abd, Eks Rot"},
+                            {q: "Saraf terancam dislokasi post?", a: "N. Ischiadicus"},
+                            {q: "Arteri A. Circumflexa cabang dari?", a: "A. Profunda Femoris"},
+                            {q: "Acetabular Notch?", a: "Incisura Acetabuli"},
+                            {q: "Sudut inklinasi normal femur?", a: "125 derajat"},
+                            {q: "Coxa Vara?", a: "Sudut < 120 derajat"},
+                            {q: "Coxa Valga?", a: "Sudut > 135 derajat"},
+                            {q: "Gerakan TFL?", a: "Abduksi & Fleksi Hip"}
+                        ]
+                    }
+                ]
+            },
+            floor2: {
+                title: "Floor 2: Bones of Extremities (P2)",
+                description: "Tulang Ekstremitas",
+                backrooms: [
+                    {
+                        id: "P2S1",
+                        title: "Backroom 1: Cinguli Pectoralis 🦴",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Clavicula & Scapula</h3>
+                            <div class="summary-box">
+                                <p><strong>Scapula (Belikat):</strong></p>
+                                <ul class="text-sm detail-list">
+                                    <li><span class="detail-label">Margo:</span> Superior, Medialis (Vertebralis), Lateralis (Axillaris).</li>
+                                    <li><span class="detail-label">Angulus:</span> Superior, Inferior, Lateralis (Fossa Glenoidalis).</li>
+                                    <li><span class="detail-label">Landmark:</span> Acromion (Puncak), Proc. Coracoideus (Depan), Spina (Belakang).</li>
+                                </ul>
+                            </div>
+                            <div class="summary-box">
+                                <p><strong>Clavicula (Selangka):</strong> Fraktur 1/3 tengah (Corpus). Extremitas Sternalis (Bulat) & Acromialis (Pipih).</p>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Fraktur Clavicula tersering di?", a: "1/3 Tengah (Corpus)"},
+                            {q: "Sendi Clavicula ke Sternum?", a: "Art. Sternoclavicularis"},
+                            {q: "Sendi Clavicula ke Scapula?", a: "Art. Acromioclavicularis (AC)"},
+                            {q: "Bagian tertinggi Scapula?", a: "Acromion"},
+                            {q: "Tonjolan anterior Scapula?", a: "Proc. Coracoideus"},
+                            {q: "Mangkuk sendi bahu?", a: "Fossa Glenoidalis"},
+                            {q: "Tonjolan posterior Scapula?", a: "Spina Scapulae"},
+                            {q: "Fossa di atas Spina?", a: "Fossa Supraspinata"},
+                            {q: "Fossa di bawah Spina?", a: "Fossa Infraspinata"},
+                            {q: "Fossa di depan Scapula?", a: "Fossa Subscapularis"},
+                            {q: "Margo scapula dekat vertebra?", a: "Margo Medialis"},
+                            {q: "Angulus scapula paling bawah?", a: "Angulus Inferior"},
+                            {q: "Origo Biceps Caput Breve?", a: "Proc. Coracoideus"},
+                            {q: "Origo Triceps Caput Longum?", a: "Tub. Infraglenoidale"},
+                            {q: "Tulang penghubung lengan ke badan?", a: "Clavicula"},
+                            {q: "Sendi bahu (Humerus-Scapula)?", a: "Art. Glenohumeralis"},
+                            {q: "Tuberculum di atas Glenoid?", a: "Tub. Supraglenoidale"},
+                            {q: "Scapula menutupi costa?", a: "Costa 2-7"},
+                            {q: "Incisura di atas Scapula?", a: "Incisura Scapulae"},
+                            {q: "Extremitas Clavicula yang pipih?", a: "Acromialis"},
+                            {q: "Mekanisme fraktur Clavicula?", a: "FOOSH (Jatuh tangan menumpu)"},
+                            {q: "Arah pergeseran fraktur clavicula medial?", a: "Ke atas (tarikan SCM)"},
+                            {q: "Arah pergeseran fraktur clavicula lateral?", a: "Ke bawah (berat lengan)"},
+                            {q: "Ligamen di Incisura Scapulae?", a: "Lig. Transversum Scapulae Sup"},
+                            {q: "Apa lewat bawah Lig. Transversum?", a: "N. Suprascapularis"},
+                            {q: "Angulus Lateralis Scapula berisi?", a: "Cavitas Glenoidalis"},
+                            {q: "Permukaan posterior Clavicula kasar karena?", a: "Perlekatan Ligamen"},
+                            {q: "Fossa Subscapularis diisi otot?", a: "M. Subscapularis"},
+                            {q: "Supraspinatus fossa diisi?", a: "M. Supraspinatus"},
+                            {q: "Tulang gelang bahu?", a: "Clavicula & Scapula"}
+                        ]
+                    },
+                    {
+                        id: "P2S2",
+                        title: "Backroom 2: Membri Superioris 💪",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Humerus, Radius, Ulna</h3>
+                            <div class="summary-box">
+                                <ul class="text-sm list-disc pl-5">
+                                    <li><strong>Humerus:</strong> Sulcus N. Radialis (Spiral Groove) di corpus posterior. Capitulum (Lateral - utk Radius) & Trochlea (Medial - utk Ulna).</li>
+                                    <li><strong>Radius (Lateral):</strong> Caput (Pivot), Tuberositas (Insertio Biceps), Proc. Styloideus (Lebih distal dari ulna).</li>
+                                    <li><strong>Ulna (Medial):</strong> Olecranon (Siku), Proc. Coronoideus, Incisura Trochlearis.</li>
+                                </ul>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Saraf pada Sulcus Spiralis Humerus?", a: "N. Radialis"},
+                            {q: "Cedera N. Radialis di corpus?", a: "Wrist Drop"},
+                            {q: "Saraf di Collum Chirurgicum?", a: "N. Axillaris"},
+                            {q: "Saraf di belakang Epicondylus Medial?", a: "N. Ulnaris"},
+                            {q: "Bagian Humerus sendi dgn Radius?", a: "Capitulum"},
+                            {q: "Bagian Humerus sendi dgn Ulna?", a: "Trochlea"},
+                            {q: "Tonjolan siku (Elbow)?", a: "Olecranon (Ulna)"},
+                            {q: "Tulang lengan bawah lateral?", a: "Radius"},
+                            {q: "Tulang lengan bawah medial?", a: "Ulna"},
+                            {q: "Tulang yang berputar saat pronasi?", a: "Radius"},
+                            {q: "Fraktur distal radius (Garpu)?", a: "Colles Fracture"},
+                            {q: "Membran antar tulang lengan?", a: "Membrana Interossea"},
+                            {q: "Origo fleksor tangan?", a: "Epicondylus Medialis"},
+                            {q: "Origo ekstensor tangan?", a: "Epicondylus Lateralis"},
+                            {q: "Insertio Deltoid?", a: "Tuberositas Deltoidea"},
+                            {q: "Fossa anterior distal humerus?", a: "Coronoid & Radial Fossa"},
+                            {q: "Fossa posterior distal humerus?", a: "Olecranon Fossa"},
+                            {q: "Sendi Radius-Ulna proximal?", a: "Pivot Joint"},
+                            {q: "Processus di distal ulna/radius?", a: "Styloideus"},
+                            {q: "Tulang 'Jempol'?", a: "Radius"},
+                            {q: "Collum Humeri yang sering fraktur?", a: "Collum Chirurgicum"},
+                            {q: "Tuberculum Majus Humeri letaknya?", a: "Lateral"},
+                            {q: "Tuberculum Minus Humeri letaknya?", a: "Anterior"},
+                            {q: "Di antara Tuberculum ada?", a: "Sulcus Intertubercularis"},
+                            {q: "Isi Sulcus Intertubercularis?", a: "Tendon Biceps Caput Longum"},
+                            {q: "Ujung proximal radius?", a: "Caput Radii"},
+                            {q: "Incisura Radialis ada di?", a: "Ulna (Proximal)"},
+                            {q: "Incisura Ulnaris ada di?", a: "Radius (Distal)"},
+                            {q: "Fraktur Monteggia?", a: "Fx Ulna Proximal + Dislokasi Radius"},
+                            {q: "Fraktur Galeazzi?", a: "Fx Radius Distal + Dislokasi Ulna"}
+                        ]
+                    },
+                    {
+                        id: "P2S3",
+                        title: "Backroom 3: Skeleton Manus 🖐️",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Tulang Tangan</h3>
+                            <div class="summary-box">
+                                <p><strong>Carpal Proksimal (Lat-Med):</strong> Scaphoid, Lunatum, Triquetrum, Pisiforme.</p>
+                                <p><strong>Carpal Distal (Lat-Med):</strong> Trapezium, Trapezoid, Capitatum, Hamatum.</p>
+                                <p><strong>Tabatiere Anatomicum (Snuffbox):</strong> Batas EPL (Med), EPB & APL (Lat). Dasar: Scaphoid. Isi: A. Radialis.</p>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Urutan Carpal Proksimal (Lat-Med)?", a: "Scaphoid, Lunatum, Triquetrum, Pisiforme"},
+                            {q: "Urutan Carpal Distal (Lat-Med)?", a: "Trapezium, Trapezoid, Capitatum, Hamatum"},
+                            {q: "Tulang Carpal sering fraktur?", a: "Scaphoid"},
+                            {q: "Tulang Carpal sering dislokasi?", a: "Lunatum"},
+                            {q: "Tulang Carpal terbesar?", a: "Capitatum"},
+                            {q: "Tulang dengan Hamulus (Kait)?", a: "Hamatum"},
+                            {q: "Tulang sesamoid di carpal?", a: "Pisiforme"},
+                            {q: "Tulang di dasar jempol (MC1)?", a: "Trapezium"},
+                            {q: "Isi Carpal Tunnel?", a: "N. Medianus & 9 Tendon"},
+                            {q: "Atap Carpal Tunnel?", a: "Retinaculum Flexorum"},
+                            {q: "Batas Medial Tabatiere?", a: "EPL (Extensor Pollicis Longus)"},
+                            {q: "Batas Lateral Tabatiere?", a: "EPB & APL"},
+                            {q: "Dasar Tabatiere Anatomicum?", a: "Os Scaphoid"},
+                            {q: "Isi Tabatiere Anatomicum?", a: "Arteri Radialis"},
+                            {q: "Nyeri di Tabatiere tanda?", a: "Fraktur Scaphoid"},
+                            {q: "Phalanx Ibu Jari ada berapa?", a: "2 (Proximal & Distal)"},
+                            {q: "Phalanx jari lain ada berapa?", a: "3 (Prox, Med, Dist)"},
+                            {q: "Sendi pangkal jempol?", a: "CMC 1 (Saddle)"},
+                            {q: "Tulang metakarpal paling mobile?", a: "MC 1"},
+                            {q: "Tulang metakarpal paling stabil?", a: "MC 2 & 3"},
+                            {q: "Sendi antar phalanx?", a: "IP Joint (Hinge)"},
+                            {q: "Sendi knuckle?", a: "MCP Joint (Condyloid)"},
+                            {q: "Fraktur Boxer?", a: "Metacarpal V"},
+                            {q: "Tulang carpal bentuk perahu?", a: "Scaphoid"},
+                            {q: "Tulang carpal bentuk bulan?", a: "Lunatum"},
+                            {q: "Tulang carpal bentuk kacang?", a: "Pisiforme"},
+                            {q: "Bennett Fracture?", a: "Basis Metacarpal I"},
+                            {q: "Tendon di Tabatiere?", a: "Extensor Pollicis Longus/Brevis"},
+                            {q: "Retinaculum Extensorum?", a: "Dorsal Wrist"},
+                            {q: "Guyon's Canal dilalui?", a: "N. & A. Ulnaris"}
+                        ]
+                    },
+                    {
+                        id: "P2S4",
+                        title: "Backroom 4: Membri Inferioris 🦵",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Tungkai Atas & Bawah</h3>
+                            <div class="summary-box">
+                                <ul class="text-sm detail-list">
+                                    <li><span class="detail-label">Femur:</span> Caput (Fovea), Collum (rawan patah), Trochanter Major/Minor (Otot), Linea Aspera (Posterior).</li>
+                                    <li><span class="detail-label">Tibia:</span> Margo Anterior (Shin), Malleolus Medialis. Weight Bearing.</li>
+                                    <li><span class="detail-label">Fibula:</span> Malleolus Lateralis. Non-Weight Bearing.</li>
+                                </ul>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Tulang terpanjang tubuh?", a: "Femur"},
+                            {q: "Cekungan di Caput Femoris?", a: "Fovea Capitis"},
+                            {q: "Tonjolan besar lateral femur?", a: "Trochanter Major"},
+                            {q: "Garis kasar posterior femur?", a: "Linea Aspera"},
+                            {q: "Tulang penopang berat (Tungkai)?", a: "Tibia"},
+                            {q: "Tulang non-weight bearing?", a: "Fibula"},
+                            {q: "Malleolus Medialis bagian dari?", a: "Tibia"},
+                            {q: "Malleolus Lateralis bagian dari?", a: "Fibula"},
+                            {q: "Tulang sesamoid terbesar?", a: "Patella"},
+                            {q: "Patella ada di tendon?", a: "Quadriceps Femoris"},
+                            {q: "Tonjolan depan Tibia?", a: "Tuberositas Tibiae"},
+                            {q: "Lokasi fraktur panggul lansia?", a: "Collum Femoris"},
+                            {q: "Sendi lutut dibentuk oleh?", a: "Femur, Tibia, Patella"},
+                            {q: "Saraf melingkari Collum Fibula?", a: "N. Peroneus Communis"},
+                            {q: "Cedera N. Peroneus?", a: "Foot Drop"},
+                            {q: "Area datar atas Tibia?", a: "Tibial Plateau"},
+                            {q: "Tonjolan tajam depan Tibia?", a: "Margo Anterior"},
+                            {q: "Epicondylus menonjol di femur?", a: "Medial & Lateral"},
+                            {q: "Tuberculum Adductorium di?", a: "Femur Distal Medial"},
+                            {q: "Membran antar tibia-fibula?", a: "Membrana Interossea"},
+                            {q: "Osgood-Schlatter Disease?", a: "Nyeri Tuberositas Tibiae"},
+                            {q: "Crista Intertrochanterica di?", a: "Posterior Femur"},
+                            {q: "Linea Intertrochanterica di?", a: "Anterior Femur"},
+                            {q: "Facies Poplitea di?", a: "Posterior Distal Femur"},
+                            {q: "Condylus Femur bersendi dgn?", a: "Condylus Tibia"},
+                            {q: "Apex Patella arahnya?", a: "Inferior"},
+                            {q: "Fabella adalah?", a: "Sesamoid di Gastrocnemius Lat"},
+                            {q: "Incirsura Fibularis ada di?", a: "Tibia Distal"},
+                            {q: "Tempat origo ACL?", a: "Lateral Condyle Femur"},
+                            {q: "Tempat origo PCL?", a: "Medial Condyle Femur"}
+                        ]
+                    },
+                    {
+                        id: "P2S5",
+                        title: "Backroom 5: Skeleton Pes 🦶",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Tulang Kaki & Arcus</h3>
+                            <div class="summary-box">
+                                <p><strong>Tarsal (7):</strong> Talus, Calcaneus, Naviculare, Cuboid, 3 Cuneiform.</p>
+                                <p><strong>Arcus Pedis:</strong></p>
+                                <ul class="text-sm list-disc pl-5">
+                                    <li><strong>Longitudinal Medial:</strong> Tinggi. Keystone: Talus. (Calcaneus, Talus, Navic, Cun, MT 1-3).</li>
+                                    <li><strong>Longitudinal Lateral:</strong> Rendah. Keystone: Cuboid. (Calcaneus, Cuboid, MT 4-5).</li>
+                                    <li><strong>Transversus:</strong> Keystone: Cuneiform Intermedium.</li>
+                                </ul>
+                            </div>
+                            <div class="summary-box border-l-yellow-500">
+                                <h4 class="text-yellow-400 font-bold">⚠️ Klinis: Hallux Valgus</h4>
+                                <p class="text-sm">Deviasi lateral pada ibu jari kaki di sendi <strong>MTP 1</strong>. Sering disertai tonjolan tulang (Bunion).</p>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Tulang tumit?", a: "Calcaneus"},
+                            {q: "Tulang sendi dengan Tibia?", a: "Talus"},
+                            {q: "Tulang tarsal bentuk perahu?", a: "Naviculare"},
+                            {q: "Tulang tarsal bentuk kubus?", a: "Cuboideum"},
+                            {q: "Jumlah tulang Cuneiform?", a: "3 (Med, Intermed, Lat)"},
+                            {q: "Tempat lekat Tendon Achilles?", a: "Tuber Calcanei"},
+                            {q: "Tarsal tanpa origo otot?", a: "Talus"},
+                            {q: "Deviasi lateral jempol kaki?", a: "Hallux Valgus"},
+                            {q: "Sendi yang kena Hallux Valgus?", a: "MTP 1"},
+                            {q: "Keystone Arcus Medial?", a: "Talus"},
+                            {q: "Tulang tarsal paling lateral?", a: "Cuboideum"},
+                            {q: "Tulang tarsal paling medial?", a: "Cuneiform Mediale"},
+                            {q: "Jumlah Phalanx kaki?", a: "14"},
+                            {q: "Fraktur penari (Metatarsal 5)?", a: "Jones Fracture"},
+                            {q: "Tulang sesamoid kaki di?", a: "Bawah Caput MT 1"},
+                            {q: "Sendi pergelangan kaki?", a: "Talocrural Joint"},
+                            {q: "Sendi bawah Talus?", a: "Subtalar Joint"},
+                            {q: "Sustentaculum Tali ada di?", a: "Calcaneus"},
+                            {q: "Tulang Naviculare ada di sisi?", a: "Medial"},
+                            {q: "Metatarsal terpendek & terkuat?", a: "Metatarsal 1"},
+                            {q: "Pes Planus adalah?", a: "Flat Foot (Arcus runtuh)"},
+                            {q: "Pes Cavus adalah?", a: "High Arch"},
+                            {q: "Tulang penumpu Arcus Lateral?", a: "Cuboid"},
+                            {q: "Tulang penumpu Arcus Transversal?", a: "Cuneiform Intermediate"},
+                            {q: "Sinus Tarsi letaknya?", a: "Antara Talus & Calcaneus"},
+                            {q: "March Fracture?", a: "Stress fracture Metatarsal"},
+                            {q: "Sendi Chopart?", a: "Transverse Tarsal"},
+                            {q: "Sendi Lisfranc?", a: "Tarsometatarsal"},
+                            {q: "Os Trigonum?", a: "Asesoris belakang Talus"},
+                            {q: "Tuberositas Metatarsal V?", a: "Insertio Peroneus Brevis"}
+                        ]
+                    }
+                ]
+            },
+            floor3: {
+                title: "Floor 3: Joints of Extremities (P3)",
+                description: "Persendian",
+                backrooms: [
+                    {
+                        id: "P3S1",
+                        title: "Backroom 1: Pectoral Joints 🦾",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Sendi Bahu (Girdle)</h3>
+                            <div class="summary-box">
+                                <ul class="text-sm detail-list">
+                                    <li><span class="detail-label">Sternoclavicular:</span> Saddle. Elevasi/Depresi, Protraksi/Retraksi. Lig. Sternoclaviculare.</li>
+                                    <li><span class="detail-label">Acromioclavicular:</span> Plane. Lig. Coracoclaviculare (Trapezoid & Conoid).</li>
+                                </ul>
+                            </div>
+                            <div class="summary-box border-l-yellow-500">
+                                <h4 class="text-yellow-400 font-bold">⚠️ Aplikasi Klinis: Separated Shoulder</h4>
+                                <p class="text-sm">Dislokasi AC Joint (Piano Key Sign). Ligamen Coracoclaviculare sering robek.</p>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Jenis sendi SC Joint?", a: "Saddle (Pelana)"},
+                            {q: "Jenis sendi AC Joint?", a: "Plane (Geser)"},
+                            {q: "Ligamen utama AC Joint?", a: "Lig. Coracoclaviculare"},
+                            {q: "Bagian Lig. Coracoclaviculare?", a: "Conoid & Trapezoid"},
+                            {q: "Dislokasi AC Joint disebut?", a: "Separated Shoulder"},
+                            {q: "Gerakan angkat bahu?", a: "Elevasi"},
+                            {q: "Sendi penghubung lengan ke badan?", a: "SC Joint"},
+                            {q: "Ligamen atap bahu?", a: "Lig. Coracoacromiale"},
+                            {q: "Apakah SC Joint punya discus?", a: "Ya"},
+                            {q: "Ligamen antar clavicula?", a: "Lig. Interclaviculare"},
+                            {q: "Ligamen Clavicula ke Costa 1?", a: "Lig. Costoclaviculare"},
+                            {q: "Cedera 'Piano Key Sign'?", a: "Dislokasi AC Joint"},
+                            {q: "Lig. Transversum Scapulae menutup?", a: "Incisura Scapulae"},
+                            {q: "Lewat di bawah Lig. Transversum?", a: "N. Suprascapularis"},
+                            {q: "Lewat di atas Lig. Transversum?", a: "A. Suprascapularis"},
+                            {q: "Gerakan maju bahu?", a: "Protraksi"},
+                            {q: "Gerakan mundur bahu?", a: "Retraksi"},
+                            {q: "Sendi Scapula dengan Thorax?", a: "Scapulothoracic (Fungsional)"},
+                            {q: "Rasio gerak bahu?", a: "2:1 (Scapulohumeral Rhythm)"},
+                            {q: "Ligamen penguat kapsul AC?", a: "Lig. Acromioclaviculare"},
+                            {q: "Sendi sternum-costa 1?", a: "Synchondrosis (Cartilaginous)"},
+                            {q: "Sendi sternum-costa 2-7?", a: "Synovial"},
+                            {q: "Gerakan elevasi bahu otot?", a: "Trapezius Sup & Levator Scap"},
+                            {q: "Gerakan protraksi bahu otot?", a: "Serratus Anterior"},
+                            {q: "Gerakan retraksi bahu otot?", a: "Trapezius Mid & Rhomboid"},
+                            {q: "Tulang rawan SC Joint?", a: "Fibrocartilage"},
+                            {q: "Ligamen Conoid melekat di?", a: "Tuberculum Conoideum"},
+                            {q: "Ligamen Trapezoid melekat di?", a: "Linea Trapezoidea"},
+                            {q: "Dislokasi SC Joint bahaya?", a: "Ya (pembuluh darah besar di belakang)"},
+                            {q: "Fungsi diskus SC Joint?", a: "Shock absorber"}
+                        ]
+                    },
+                    {
+                        id: "P3S2",
+                        title: "Backroom 2: Shoulder & Elbow 💪",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Sendi Glenohumeral & Siku</h3>
+                            <div class="summary-box">
+                                <p><strong>Art. Humeri (Ball & Socket):</strong> Stabilizer utama: <strong>Apparatus Rotator (SITS)</strong>: Supraspinatus, Infraspinatus, Teres Minor, Subscapularis.</p>
+                                <p><strong>Art. Cubiti (Hinge):</strong> Lig. Collaterale Ulnare & Radiale. <strong>Nursemaid's Elbow:</strong> Subluksasi Caput Radii dari Lig. Anulare.</p>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Jenis sendi Bahu?", a: "Ball & Socket"},
+                            {q: "Jenis sendi Siku?", a: "Hinge (Engsel)"},
+                            {q: "Otot Rotator Cuff (SITS)?", a: "Supraspinatus, Infraspinatus, Teres Minor, Subscapularis"},
+                            {q: "Fungsi Labrum Glenoidale?", a: "Memperdalam mangkuk sendi"},
+                            {q: "Dislokasi bahu tersering?", a: "Anterior"},
+                            {q: "Ligamen melingkari kepala radius?", a: "Lig. Anulare Radii"},
+                            {q: "Nursemaid's Elbow?", a: "Subluksasi Caput Radii"},
+                            {q: "Ligamen sisi medial siku?", a: "Ulnar Collateral Lig (UCL)"},
+                            {q: "Ligamen sisi lateral siku?", a: "Radial Collateral Lig (RCL)"},
+                            {q: "Gerakan siku?", a: "Fleksi & Ekstensi"},
+                            {q: "Tommy John Surgery pada?", a: "UCL"},
+                            {q: "Titik lemah kapsul bahu?", a: "Foramen Weitbrecht"},
+                            {q: "Bursa subacromial letaknya?", a: "Di bawah Acromion"},
+                            {q: "Sendi Humeroradial menghubungkan?", a: "Capitulum & Caput Radii"},
+                            {q: "Sendi Humeroulnar menghubungkan?", a: "Trochlea & Incisura Trochlearis"},
+                            {q: "Otot inisiator abduksi bahu?", a: "Supraspinatus"},
+                            {q: "Otot abduktor utama bahu?", a: "Deltoideus"},
+                            {q: "Carrying Angle normal?", a: "5-15 derajat (Valgus)"},
+                            {q: "Bursa olecrani radang disebut?", a: "Student's Elbow"},
+                            {q: "Saraf terancam dislokasi bahu?", a: "N. Axillaris"},
+                            {q: "Fungsi Subscapularis?", a: "Internal Rotasi"},
+                            {q: "Fungsi Infraspinatus?", a: "Eksternal Rotasi"},
+                            {q: "Fungsi Teres Minor?", a: "Eksternal Rotasi"},
+                            {q: "Tendon Biceps lewat di?", a: "Dalam kapsul sendi bahu"},
+                            {q: "Lig. Glenohumeral ada?", a: "Sup, Mid, Inf"},
+                            {q: "Gerakan pronasi/supinasi di?", a: "Radioulnar Joint"},
+                            {q: "Origo Lig. Anulare?", a: "Ulna"},
+                            {q: "Frozen Shoulder?", a: "Adhesive Capsulitis"},
+                            {q: "Bursa subdeltoid menyatu dgn?", a: "Bursa Subacromial"},
+                            {q: "Dislokasi siku tersering?", a: "Posterior"}
+                        ]
+                    },
+                    {
+                        id: "P3S3",
+                        title: "Backroom 3: Wrist & Hand ✋",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Sendi Tangan</h3>
+                            <div class="summary-box">
+                                <ul class="text-sm detail-list">
+                                    <li><span class="detail-label">Radioulnar:</span> Pivot. Pronasi/Supinasi.</li>
+                                    <li><span class="detail-label">Radiocarpal:</span> Condyloid. Fleksi/Eks, Abd/Add.</li>
+                                    <li><span class="detail-label">CMC 1 (Jempol):</span> Saddle. Oposisi.</li>
+                                </ul>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Jenis sendi Radioulnar?", a: "Pivot (Putar)"},
+                            {q: "Gerakan Radioulnar?", a: "Supinasi & Pronasi"},
+                            {q: "Jenis sendi Wrist (Radiocarpal)?", a: "Condyloid"},
+                            {q: "Tulang radius bersendi dengan?", a: "Scaphoid & Lunatum"},
+                            {q: "TFCC adalah?", a: "Triangular Fibrocartilage Complex (pada Ulna)"},
+                            {q: "Jenis sendi CMC 1 (Jempol)?", a: "Saddle (Pelana)"},
+                            {q: "Gerakan unik jempol?", a: "Oposisi"},
+                            {q: "Jenis sendi MCP (Knuckle)?", a: "Condyloid"},
+                            {q: "Jenis sendi IP (Jari)?", a: "Hinge (Engsel)"},
+                            {q: "Gerakan sendi MCP?", a: "Fleksi, Eks, Abd, Add"},
+                            {q: "Sendi Midcarpal jenis?", a: "Plane (Geser)"},
+                            {q: "Ligamen sisi radial wrist?", a: "Radial Collateral Lig"},
+                            {q: "Ligamen sisi ulnar wrist?", a: "Ulnar Collateral Lig"},
+                            {q: "Mallet Finger?", a: "Putus tendon ekstensor di DIP"},
+                            {q: "Boutonniere Deformity?", a: "Fleksi PIP, Ekstensi DIP"},
+                            {q: "Swan Neck Deformity?", a: "Ekstensi PIP, Fleksi DIP"},
+                            {q: "Otot supinator utama?", a: "Biceps Brachii & Supinator"},
+                            {q: "Otot pronator utama?", a: "Pronator Teres & Quadratus"},
+                            {q: "Sendi CMC 2-5 jenis?", a: "Plane (Geser)"},
+                            {q: "Gamekeeper's Thumb?", a: "Cedera UCL pada MCP 1"},
+                            {q: "Gerakan abduksi wrist?", a: "Deviasi Radial"},
+                            {q: "Gerakan adduksi wrist?", a: "Deviasi Ulnar"},
+                            {q: "Ligamen Transversum Carpi?", a: "Retinaculum Flexorum"},
+                            {q: "Sendi antara proximal & distal carpal?", a: "Midcarpal Joint"},
+                            {q: "Gerakan sirkumduksi di?", a: "MCP & CMC 1"},
+                            {q: "Heberden's Node?", a: "Osteofit di DIP"},
+                            {q: "Bouchard's Node?", a: "Osteofit di PIP"},
+                            {q: "Kista ganglion sering di?", a: "Dorsal Wrist"},
+                            {q: "Dupuytren's Contracture?", a: "Fibrosis palmar fascia"},
+                            {q: "Trigger Finger?", a: "Stenosing Tenosynovitis"}
+                        ]
+                    },
+                    {
+                        id: "P3S4",
+                        title: "Backroom 4: Knee Joint & Genu 🦵",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Sendi Lutut</h3>
+                            <div class="summary-box">
+                                <p><strong>Genu Varum (O) & Valgum (X):</strong> Kelainan angulasi lutut.</p>
+                                <ul class="text-sm detail-list">
+                                    <li><span class="detail-label">Ligamen:</span> ACL (Cegah tibia ke depan), PCL (Cegah tibia ke belakang), MCL, LCL.</li>
+                                    <li><span class="detail-label">Meniscus:</span> Medial (C-shape), Lateral (O-shape).</li>
+                                </ul>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Jenis sendi Lutut?", a: "Hinge / Bicondylar"},
+                            {q: "Tulang sendi lutut?", a: "Femur, Tibia, Patella"},
+                            {q: "Fungsi ACL?", a: "Cegah Tibia geser Anterior"},
+                            {q: "Fungsi PCL?", a: "Cegah Tibia geser Posterior"},
+                            {q: "Tes ACL?", a: "Anterior Drawer / Lachman"},
+                            {q: "Tes PCL?", a: "Posterior Drawer"},
+                            {q: "Ligamen cegah valgus?", a: "MCL (Medial Collateral)"},
+                            {q: "Ligamen cegah varus?", a: "LCL (Lateral Collateral)"},
+                            {q: "Bentuk Meniscus Medial?", a: "C-Shape"},
+                            {q: "Bentuk Meniscus Lateral?", a: "O-Shape"},
+                            {q: "Meniscus yang mudah robek?", a: "Medial"},
+                            {q: "Unhappy Triad?", a: "ACL + MCL + Meniscus Medial"},
+                            {q: "Locking mechanism lutut?", a: "Rotasi medial femur"},
+                            {q: "Otot unlock lutut?", a: "M. Popliteus"},
+                            {q: "Ligamen Patella menghubungkan?", a: "Patella ke Tuberositas Tibia"},
+                            {q: "Housemaid's Knee?", a: "Bursitis Prepatellar"},
+                            {q: "Genu Valgum?", a: "Kaki X"},
+                            {q: "Genu Varum?", a: "Kaki O"},
+                            {q: "Fungsi Meniscus?", a: "Peredam kejut"},
+                            {q: "Baker's Cyst?", a: "Kista di popliteal"},
+                            {q: "Sudut Q normal?", a: "10-15 derajat"},
+                            {q: "Patella Gliding?", a: "Articulatio Patellofemoralis"},
+                            {q: "Penyebab Genu Varum?", a: "Rickets (Kekurangan Vit D)"},
+                            {q: "Plicae alares ada di?", a: "Corpus adiposum infrapatellare"},
+                            {q: "Ligamen Transversum Genus?", a: "Hubungkan Meniscus Ant"},
+                            {q: "Ligamen Meniscofemorale?", a: "Wrisberg & Humphrey"},
+                            {q: "Bursa Suprapatellar?", a: "Lanjutan kapsul sendi ke atas"},
+                            {q: "Otot insersi di Pes Anserinus?", a: "Sartorius, Gracilis, Semitendinosus"},
+                            {q: "Arteri suplai lutut?", a: "Genicular Arteries"},
+                            {q: "Saraf kapsul lutut?", a: "N. Obturatorius, Femoralis, Tibialis"}
+                        ]
+                    },
+                    {
+                        id: "P3S5",
+                        title: "Backroom 5: Ankle & Foot 🦶",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Sendi Kaki</h3>
+                            <div class="summary-box">
+                                <p><strong>Art. Talocruralis (Hinge):</strong> Dorsifleksi/Plantarfleksi.</p>
+                                <p><strong>Art. Subtalaris:</strong> Inversi/Eversi.</p>
+                                <p><strong>Arcus Pedis:</strong> Longitudinal Medial (Keystone: Talus), Lateral (Cuboid), Transversal.</p>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Jenis sendi Ankle?", a: "Hinge (Engsel)"},
+                            {q: "Gerakan Ankle?", a: "Dorsifleksi & Plantarfleksi"},
+                            {q: "Ligamen lateral sering cedera?", a: "ATFL"},
+                            {q: "Mekanisme cedera ATFL?", a: "Inversi + Plantarfleksi"},
+                            {q: "Ligamen medial yang kuat?", a: "Lig. Deltoideum"},
+                            {q: "Sendi gerak Inversi/Eversi?", a: "Subtalar Joint"},
+                            {q: "Keystone Arcus Medial?", a: "Talus"},
+                            {q: "High Arch Foot disebut?", a: "Pes Cavus"},
+                            {q: "Flat Foot disebut?", a: "Pes Planus"},
+                            {q: "Ligamen 'Spring' menopang?", a: "Caput Tali"},
+                            {q: "Sendi Chopart?", a: "Transverse Tarsal"},
+                            {q: "Sendi Lisfranc?", a: "Tarsometatarsal"},
+                            {q: "Gout sering menyerang?", a: "MTP 1"},
+                            {q: "Clubfoot (CTEV)?", a: "Inversi + Adduksi + Plantarfleksi"},
+                            {q: "Pott's Fracture?", a: "Fraktur Bimalleolar"},
+                            {q: "Otot utama Dorsifleksi?", a: "Tibialis Anterior"},
+                            {q: "Otot utama Plantarfleksi?", a: "Gastrocnemius/Soleus"},
+                            {q: "Gerakan berdiri jinjit?", a: "Plantarfleksi"},
+                            {q: "Bunions terjadi di?", a: "MTP 1"},
+                            {q: "Posisi Ankle paling stabil?", a: "Dorsifleksi"},
+                            {q: "Keystone Arcus Lateral?", a: "Cuboid"},
+                            {q: "Keystone Arcus Transversal?", a: "Cuneiform Intermedium"},
+                            {q: "Tendon Tom, Dick, Harry?", a: "Tib Post, FDL, FHL"},
+                            {q: "Retinaculum Peroneal?", a: "Tahan tendon eversi"},
+                            {q: "Sinus Tarsi?", a: "Celah Talus-Calcaneus"},
+                            {q: "Os Trigonum Syndrome?", a: "Nyeri belakang ankle (penari)"},
+                            {q: "Plantar Fasciitis?", a: "Nyeri tumit pagi hari"},
+                            {q: "Morton's Neuroma?", a: "Nyeri sela jari 3-4"},
+                            {q: "Gerakan Eversi otot?", a: "Peroneus Longus/Brevis"},
+                            {q: "Gerakan Inversi otot?", a: "Tibialis Anterior/Posterior"}
+                        ]
+                    }
+                ]
+            },
+            floor4: {
+                title: "Floor 4: Trunk & Head Muscles (P4)",
+                description: "Otot Kepala & Badan",
+                backrooms: [
+                    {
+                        id: "P4S1",
+                        title: "Backroom 1: Musculi Capitis 🎭",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Otot Kepala</h3>
+                            <div class="summary-box">
+                                <table class="muscle-table">
+                                    <tr><th>Otot</th><th>Origo</th><th>Insertio</th><th>Fungsi</th></tr>
+                                    <tr><td>Orbicularis Oculi</td><td>Os Frontale & Maxilla</td><td>Kulit kelopak</td><td>Menutup mata</td></tr>
+                                    <tr><td>Orbicularis Oris</td><td>Maxilla & Mandibula</td><td>Kulit bibir</td><td>Tutup/Mencucu</td></tr>
+                                    <tr><td>Buccinator</td><td>Maxilla & Mandibula</td><td>Orbicularis oris</td><td>Tiup/Tekan pipi</td></tr>
+                                    <tr><td>Masseter</td><td>Arcus Zygomaticus</td><td>Ramus Mandibula</td><td>Elevasi Mandibula</td></tr>
+                                    <tr><td>Temporalis</td><td>Fossa Temporalis</td><td>Proc. Coronoideus</td><td>Elevasi & Retraksi</td></tr>
+                                </table>
+                            </div>
+                            <div class="summary-box border-l-yellow-500">
+                                <h4 class="text-yellow-400 font-bold">⚠️ Aplikasi Klinis: Bell's Palsy</h4>
+                                <p class="text-sm">Kelumpuhan N. Facialis perifer.</p>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Saraf otot mimik wajah?", a: "N. Facialis (CN VII)"},
+                            {q: "Saraf otot pengunyah?", a: "N. Mandibularis (CN V3)"},
+                            {q: "Otot penutup kelopak mata?", a: "M. Orbicularis Oculi"},
+                            {q: "Otot penutup mulut?", a: "M. Orbicularis Oris"},
+                            {q: "Otot pipi (meniup)?", a: "M. Buccinator"},
+                            {q: "Otot senyum?", a: "M. Zygomaticus Major"},
+                            {q: "Otot dahi?", a: "M. Frontalis"},
+                            {q: "Otot pengunyah terkuat?", a: "M. Masseter"},
+                            {q: "Origo M. Temporalis?", a: "Fossa Temporalis"},
+                            {q: "Insertio M. Temporalis?", a: "Proc. Coronoideus"},
+                            {q: "Fungsi Pterygoideus Lateralis?", a: "Buka mulut & Protraksi"},
+                            {q: "Bell's Palsy kelumpuhan saraf?", a: "N. Facialis"},
+                            {q: "Otot leher ekspresi ngeri?", a: "Platysma"},
+                            {q: "Otot dagu (pouting)?", a: "M. Mentalis"},
+                            {q: "Saluran tembus Buccinator?", a: "Ductus Parotideus"},
+                            {q: "Otot angkat alis?", a: "M. Frontalis"},
+                            {q: "Otot depresi sudut mulut?", a: "M. Depressor Anguli Oris"},
+                            {q: "Otot elevasi bibir atas?", a: "M. Levator Labii Sup"},
+                            {q: "Lapisan SCALP huruf A?", a: "Aponeurosis"},
+                            {q: "Aponeurosis kepala?", a: "Galea Aponeurotica"},
+                            {q: "Otot sedih (bibir bawah)?", a: "Depressor Labii Inferioris"},
+                            {q: "Otot hidung kembang kempis?", a: "Nasalis"},
+                            {q: "Otot kerut hidung?", a: "Procerus"},
+                            {q: "Otot senyum sinis (dimple)?", a: "Risorius"},
+                            {q: "Otot telinga?", a: "Auricularis"},
+                            {q: "Insertio Masseter?", a: "Angulus & Ramus Mandibula"},
+                            {q: "Fungsi Pterygoideus Medialis?", a: "Elevasi Mandibula"},
+                            {q: "Trigeminal Neuralgia?", a: "Nyeri N. V (Tic Douloureux)"},
+                            {q: "Refleks kornea saraf aferen?", a: "N. V1 (Ophthalmicus)"},
+                            {q: "Refleks kornea saraf eferen?", a: "N. VII (Facialis)"}
+                        ]
+                    },
+                    {
+                        id: "P4S2",
+                        title: "Backroom 2: Musculi Colli & Trigonum 🧣",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Otot Leher & Segitiga</h3>
+                            <div class="summary-box">
+                                <p><strong>Trigonum Colli:</strong> Dibagi oleh SCM.</p>
+                                <ul class="text-sm list-disc pl-5">
+                                    <li><strong>Anterior:</strong> Batas (SCM, Mandibula, Midline). Isi: Submandibular, Carotid, Muscular, Submental.</li>
+                                    <li><strong>Posterior:</strong> Batas (SCM, Trapezius, Clavicle). Isi: Occipital, Supraclavicular.</li>
+                                </ul>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Origo SCM?", a: "Manubrium & Clavicula"},
+                            {q: "Insertio SCM?", a: "Proc. Mastoideus"},
+                            {q: "Fungsi SCM unilateral?", a: "Rotasi wajah kontralateral"},
+                            {q: "Saraf SCM?", a: "N. Accessorius (CN XI)"},
+                            {q: "Otot kulit leher?", a: "Platysma"},
+                            {q: "Kelompok Suprahyoid?", a: "Digastric, Mylohyoid"},
+                            {q: "Kelompok Infrahyoid?", a: "Sternohyoid, Omohyoid"},
+                            {q: "Fungsi otot Hyoid?", a: "Menelan & Bicara"},
+                            {q: "Scalenus menjepit?", a: "Plexus Brachialis & A. Subclavia"},
+                            {q: "Sindrom jepitan Scalenus?", a: "Thoracic Outlet Syndrome"},
+                            {q: "Batas Trigonum Caroticum?", a: "SCM, Omohyoid, Digastric"},
+                            {q: "Isi Trigonum Caroticum?", a: "A. Carotis, V. Jugularis, N. Vagus"},
+                            {q: "Otot lantai mulut?", a: "M. Mylohyoid"},
+                            {q: "Saraf Trapezius?", a: "N. Accessorius"},
+                            {q: "Tortikolis otot apa?", a: "SCM"},
+                            {q: "Vena menyilang SCM?", a: "V. Jugularis Externa"},
+                            {q: "Pembagi segitiga leher?", a: "M. SCM"},
+                            {q: "Insertio Scalenus Ant?", a: "Costa 1"},
+                            {q: "Fungsi Scalenus?", a: "Inspirasi & Flexi leher"},
+                            {q: "Otot panjang depan leher?", a: "Longus Colli"},
+                            {q: "Batas Trigonum Colli Post?", a: "SCM, Trapezius, Clavicle"},
+                            {q: "Isi Trigonum Colli Post?", a: "N. XI, Plexus Brachialis, A. Subclavia"},
+                            {q: "Ansa Cervicalis inervasi?", a: "Infrahyoid (kecuali Thyrohyoid)"},
+                            {q: "Batas Trigonum Submental?", a: "Digastric Ant, Hyoid"},
+                            {q: "Batas Trigonum Muscular?", a: "SCM, Omohyoid, Midline"},
+                            {q: "Phrenic Nerve berasal dari?", a: "C3, C4, C5"},
+                            {q: "Vena Jugularis Interna ada di?", a: "Carotid Sheath"},
+                            {q: "Kelenjar Tiroid di trigonum?", a: "Muscular"},
+                            {q: "Kelenjar Submandibular di?", a: "Trigonum Digastrik"},
+                            {q: "Punctum Nervosum?", a: "Erb's Point (Leher)"}
+                        ]
+                    },
+                    {
+                        id: "P4S3",
+                        title: "Backroom 3: Thorax & Abdomen 🏋️",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Otot Dada & Perut</h3>
+                            <div class="summary-box">
+                                <ul class="text-sm detail-list">
+                                    <li><span class="detail-label">Diaphragma:</span> Inspirasi. N. Phrenicus. Hiatus Aorta(12), Esophagus(10), VC(8).</li>
+                                    <li><span class="detail-label">Rectus Abd:</span> Pubis -> Xiphoid. O: Crista Pubis I: Cartilago Costa 5-7. A: Fleksi.</li>
+                                </ul>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Otot inspirasi utama?", a: "Diaphragma"},
+                            {q: "Saraf Diaphragma?", a: "N. Phrenicus (C3-C5)"},
+                            {q: "Hiatus Vena Cava level?", a: "T8"},
+                            {q: "Hiatus Esophagus level?", a: "T10"},
+                            {q: "Hiatus Aorticus level?", a: "T12"},
+                            {q: "Arah serat Intercostal Ext?", a: "Inferomedial (Saku celana)"},
+                            {q: "Fungsi Intercostal Ext?", a: "Inspirasi (Angkat costa)"},
+                            {q: "Fungsi Intercostal Int?", a: "Ekspirasi (Turun costa)"},
+                            {q: "Otot Sixpack?", a: "Rectus Abdominis"},
+                            {q: "Garis tengah perut?", a: "Linea Alba"},
+                            {q: "Bungkus Rectus?", a: "Rectus Sheath"},
+                            {q: "Otot perut terdalam?", a: "Transversus Abdominis"},
+                            {q: "Pembentuk Lig. Inguinale?", a: "Aponeurosis Obliquus Ext"},
+                            {q: "Batas bawah perut?", a: "Lig. Inguinale"},
+                            {q: "Gerakan Rectus Abd?", a: "Fleksi Trunkus"},
+                            {q: "Gerakan Obliquus?", a: "Rotasi Trunkus"},
+                            {q: "Valsalva Maneuver?", a: "Ngeden (Tekanan perut naik)"},
+                            {q: "Otot dada bantu napas?", a: "Pectoralis Minor"},
+                            {q: "Garis horizontal di Rectus?", a: "Intersectiones Tendineae"},
+                            {q: "Otot kecil depan Rectus?", a: "Pyramidalis"},
+                            {q: "Origo Obliquus Externus?", a: "Costa 5-12"},
+                            {q: "Insertio Obliquus Externus?", a: "Linea Alba, Iliac Crest"},
+                            {q: "Fascia Transversalis letaknya?", a: "Deep to Transversus Abd"},
+                            {q: "Arcuate Line adalah?", a: "Batas bawah posterior rectus sheath"},
+                            {q: "Hernia Direct?", a: "Medial A. Epigastrica Inf"},
+                            {q: "Hernia Indirect?", a: "Lateral A. Epigastrica Inf (Masuk kanal)"},
+                            {q: "Saraf dinding perut?", a: "Thoracoabdominal (T7-T11)"},
+                            {q: "Caput Medusae?", a: "Dilatasi vena paraumbilical"},
+                            {q: "Otot Cremaster dari?", a: "Obliquus Internus"},
+                            {q: "Triangle of Hesselbach?", a: "Tempat Hernia Direct"}
+                        ]
+                    },
+                    {
+                        id: "P4S4",
+                        title: "Backroom 4: Musculi Dorsi 🎒",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Otot Punggung & Trigonum</h3>
+                            <div class="summary-box">
+                                <p><strong>Trigonum Lumbal Petit:</strong> Ant: Obliquus Ext, Post: Latissimus Dorsi, Inf: Crista Iliaca. (Hernia Lumbal).</p>
+                                <p><strong>Trigonum Auscultationum (Mohrenheim):</strong> Med: Trapezius, Lat: Scapula, Inf: Latissimus Dorsi. (Suara Paru Jelas).</p>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Origo Trapezius?", a: "Occiput - T12"},
+                            {q: "Insertio Trapezius?", a: "Clavicula, Acromion, Spina"},
+                            {q: "Fungsi Trapezius?", a: "Gerak Scapula"},
+                            {q: "Otot perenang?", a: "Latissimus Dorsi"},
+                            {q: "Insertio Latissimus?", a: "Sulcus Intertubercularis"},
+                            {q: "Saraf Latissimus?", a: "N. Thoracodorsalis"},
+                            {q: "Fungsi Latissimus?", a: "Ekstensi, Add, Med Rot Humerus"},
+                            {q: "Otot retraksi scapula?", a: "Rhomboideus"},
+                            {q: "Saraf Rhomboideus?", a: "N. Dorsalis Scapulae"},
+                            {q: "Otot angkat scapula?", a: "Levator Scapulae"},
+                            {q: "Otot Erector Spinae?", a: "Iliocostalis, Longissimus, Spinalis"},
+                            {q: "Fungsi Erector Spinae?", a: "Ekstensi Punggung"},
+                            {q: "Fascia punggung bawah?", a: "Fascia Thoracolumbalis"},
+                            {q: "Batas Triangle Auscultation?", a: "Trapezius, Latissimus, Scapula"},
+                            {q: "Batas Lumbar Triangle (Petit)?", a: "Latissimus, Obliq Ext, Crista Iliaca"},
+                            {q: "Saraf kulit punggung?", a: "Rami Posterior"},
+                            {q: "Otot napas punggung?", a: "Serratus Posterior"},
+                            {q: "Gerakan angkat bahu?", a: "Trapezius Descendens"},
+                            {q: "Origo Latissimus?", a: "T7-L5, Sacrum, Ilium"},
+                            {q: "Otot leher belakang?", a: "Splenius Capitis"},
+                            {q: "Dasar Triangle Petit?", a: "Obliquus Internus"},
+                            {q: "Fungsi Triangle Auscultation?", a: "Dengar suara napas (paru)"},
+                            {q: "Otot punggung lapisan dalam?", a: "Multifidus, Rotatores"},
+                            {q: "Saraf Trapezius?", a: "N. Accessorius (XI)"},
+                            {q: "Gerakan Rhomboid?", a: "Retraksi Scapula"},
+                            {q: "Otot penegak tulang belakang?", a: "Erector Spinae"},
+                            {q: "Iliocostalis bagian dari?", a: "Erector Spinae (Lateral)"},
+                            {q: "Spinalis bagian dari?", a: "Erector Spinae (Medial)"},
+                            {q: "Triangle of Grynfeltt?", a: "Superior Lumbar Triangle"},
+                            {q: "Arteri di punggung?", a: "A. Dorsalis Scapulae"}
+                        ]
+                    },
+                    {
+                        id: "P4S5",
+                        title: "Backroom 5: Gluteal Region 🍑",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Otot Bokong</h3>
+                            <div class="summary-box">
+                                <ul class="text-sm detail-list">
+                                    <li><span class="detail-label">Gluteus Max:</span> O: Ilium/Sacrum. I: IT Band/Tuberositas. A: Ekstensi Hip.</li>
+                                    <li><span class="detail-label">Gluteus Med:</span> O: Ilium. I: Trochanter Major. A: Abduksi.</li>
+                                    <li><span class="detail-label">Piriformis:</span> O: Sacrum. I: Trochanter Major. A: Rotasi Lateral.</li>
+                                </ul>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Otot bokong terbesar?", a: "Gluteus Maximus"},
+                            {q: "Fungsi Gluteus Max?", a: "Ekstensi Hip"},
+                            {q: "Saraf Gluteus Max?", a: "N. Glut Inferior"},
+                            {q: "Origo Gluteus Max?", a: "Ilium, Sacrum"},
+                            {q: "Insertio Gluteus Max?", a: "IT Band, Tuberositas Glutea"},
+                            {q: "Otot abduktor Hip?", a: "Gluteus Medius & Minimus"},
+                            {q: "Saraf Gluteus Medius?", a: "N. Glut Superior"},
+                            {q: "Tanda Trendelenburg?", a: "Lemah Abduktor"},
+                            {q: "Lokasi suntik bokong?", a: "Kuadran Superolateral"},
+                            {q: "Otot kunci regio gluteal?", a: "Piriformis"},
+                            {q: "N. Ischiadicus keluar di?", a: "Bawah Piriformis"},
+                            {q: "Piriformis Syndrome?", a: "Jepitan N. Ischiadicus"},
+                            {q: "Rotator Lateral Pendek?", a: "Piriformis, Gemelli, Obturator, Quadratus"},
+                            {q: "Insertio Rotator Pendek?", a: "Trochanter Major"},
+                            {q: "Fungsi TFL?", a: "Abduksi & Kunci Lutut"},
+                            {q: "Tractus Iliotibialis?", a: "Fascia Lata lateral"},
+                            {q: "Insertio IT Band?", a: "Tuberculum Gerdy"},
+                            {q: "Bursitis Ischiadica?", a: "Weaver's Bottom"},
+                            {q: "Letak Gluteus Minimus?", a: "Bawah Gluteus Medius"},
+                            {q: "N. Ischiadicus inervasi?", a: "Hamstrings & Kaki"},
+                            {q: "Origo Piriformis?", a: "Facies Anterior Sacrum"},
+                            {q: "N. Pudendus keluar lewat?", a: "Foramen Ischiadicum Minus"},
+                            {q: "Arteri Glutea Superior keluar?", a: "Atas Piriformis"},
+                            {q: "Arteri Glutea Inferior keluar?", a: "Bawah Piriformis"},
+                            {q: "Otot Gemellus Superior origo?", a: "Spina Ischiadica"},
+                            {q: "Otot Gemellus Inferior origo?", a: "Tuber Ischiadicum"},
+                            {q: "Quadratus Femoris insersi?", a: "Crista Intertrochanterica"},
+                            {q: "Fungsi Quadratus Femoris?", a: "Lateral Rotasi"},
+                            {q: "Tensor Fasciae Latae insersi?", a: "Tractus Iliotibialis"},
+                            {q: "Otot bokong terdalam?", a: "Gluteus Minimus"}
+                        ]
+                    }
+                ]
+            },
+            floor5: {
+                title: "Floor 5: Limb Muscles (P5)",
+                description: "Otot Ekstremitas",
+                backrooms: [
+                    {
+                        id: "P5S1",
+                        title: "Backroom 1: Brachium 💪",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Otot Lengan Atas</h3>
+                            <div class="summary-box">
+                                <table class="muscle-table">
+                                    <tr><th>Otot</th><th>Origo</th><th>Insertio</th><th>Fungsi</th></tr>
+                                    <tr><td>Biceps</td><td>Scapula</td><td>Tub. Radii</td><td>Supinasi, Fleksi</td></tr>
+                                    <tr><td>Brachialis</td><td>Humerus</td><td>Tub. Ulnae</td><td>Fleksi Siku</td></tr>
+                                    <tr><td>Triceps</td><td>Scapula/Hum</td><td>Olecranon</td><td>Ekstensi Siku</td></tr>
+                                </table>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Saraf anterior lengan?", a: "N. Musculocutaneus"},
+                            {q: "Saraf posterior lengan?", a: "N. Radialis"},
+                            {q: "Fungsi Biceps?", a: "Supinasi & Fleksi"},
+                            {q: "Origo Biceps Longum?", a: "Tub. Supraglenoidale"},
+                            {q: "Origo Biceps Breve?", a: "Proc. Coracoideus"},
+                            {q: "Insertio Biceps?", a: "Tuberositas Radii"},
+                            {q: "Fleksor siku terkuat?", a: "Brachialis"},
+                            {q: "Insertio Brachialis?", a: "Tuberositas Ulnae"},
+                            {q: "Otot ditembus saraf?", a: "Coracobrachialis"},
+                            {q: "Fungsi Triceps?", a: "Ekstensi Siku"},
+                            {q: "Origo Triceps Longum?", a: "Tub. Infraglenoidale"},
+                            {q: "Insertio Triceps?", a: "Olecranon"},
+                            {q: "Otot anconeus?", a: "Bantu ekstensi"},
+                            {q: "Cedera N. Radialis?", a: "Wrist Drop"},
+                            {q: "Lacertus Fibrosus?", a: "Aponeurosis Biceps"},
+                            {q: "Refleks Biceps?", a: "C5-C6"},
+                            {q: "Refleks Triceps?", a: "C7-C8"},
+                            {q: "Batas lat Fossa Cubiti?", a: "Brachioradialis"},
+                            {q: "Batas med Fossa Cubiti?", a: "Pronator Teres"},
+                            {q: "Isi Fossa Cubiti?", a: "Tendon, Arteri, Saraf"},
+                            {q: "Otot Apparatus Rotator?", a: "SITS"},
+                            {q: "Fungsi Supraspinatus?", a: "Inisiasi Abduksi"},
+                            {q: "Fungsi Infraspinatus?", a: "Eks Rotasi"},
+                            {q: "Fungsi Teres Minor?", a: "Eks Rotasi"},
+                            {q: "Fungsi Subscapularis?", a: "Int Rotasi"},
+                            {q: "Insertio SIT?", a: "Tub. Majus"},
+                            {q: "Insertio Subscapularis?", a: "Tub. Minus"},
+                            {q: "Otot Coracobrachialis fungsi?", a: "Fleksi & Adduksi Bahu"},
+                            {q: "Origo Triceps Lateral?", a: "Posterior Humerus (atas sulcus)"},
+                            {q: "Origo Triceps Medial?", a: "Posterior Humerus (bawah sulcus)"}
+                        ]
+                    },
+                    {
+                        id: "P5S2",
+                        title: "Backroom 2: Antebrachium 💪",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Otot Lengan Bawah</h3>
+                            <div class="summary-box">
+                                <p><strong>Tabatiere Anatomicum:</strong> Batas (EPL, EPB, APL). Isi: A. Radialis & Scaphoid.</p>
+                                <ul class="text-sm list-disc pl-5">
+                                    <li><strong>Fleksor:</strong> Origo Medial Epicondyle. N. Medianus.</li>
+                                    <li><strong>Ekstensor:</strong> Origo Lateral Epicondyle. N. Radialis.</li>
+                                </ul>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Common Flexor Origin?", a: "Epicondylus Medialis"},
+                            {q: "Common Extensor Origin?", a: "Epicondylus Lateralis"},
+                            {q: "Saraf fleksor?", a: "N. Medianus"},
+                            {q: "Pengecualian saraf fleksor?", a: "FCU & 1/2 FDP (Ulnaris)"},
+                            {q: "Saraf ekstensor?", a: "N. Radialis"},
+                            {q: "Fleksor siku di antebrachium?", a: "Brachioradialis"},
+                            {q: "Otot kadang absen?", a: "Palmaris Longus"},
+                            {q: "Fungsi Pronator Teres?", a: "Pronasi"},
+                            {q: "Fungsi Supinator?", a: "Supinasi"},
+                            {q: "Wad of Three?", a: "Brachioradialis, ECRL, ECRB"},
+                            {q: "FDS gerakkan?", a: "PIP Joint"},
+                            {q: "FDP gerakkan?", a: "DIP Joint"},
+                            {q: "Batas lat Snuffbox?", a: "APL & EPB"},
+                            {q: "Batas med Snuffbox?", a: "EPL"},
+                            {q: "Isi Snuffbox?", a: "A. Radialis"},
+                            {q: "Tennis Elbow?", a: "Epicondylus Lateralis"},
+                            {q: "Golfer's Elbow?", a: "Epicondylus Medialis"},
+                            {q: "Pronator distal?", a: "Pronator Quadratus"},
+                            {q: "Penahan tendon ekstensor?", a: "Retinaculum Extensorum"},
+                            {q: "Otot abduksi jempol?", a: "APL"},
+                            {q: "Otot ekstensor kelingking?", a: "Extensor Digiti Minimi"},
+                            {q: "Otot ekstensor telunjuk?", a: "Extensor Indicis"},
+                            {q: "Fungsi FCU?", a: "Fleksi & Adduksi Wrist"},
+                            {q: "Fungsi FCR?", a: "Fleksi & Abduksi Wrist"},
+                            {q: "N. Ulnaris lewat di antara?", a: "Dua caput FCU"},
+                            {q: "N. Medianus lewat di antara?", a: "Dua caput Pronator Teres"},
+                            {q: "Cabang N. Radialis di supinator?", a: "PIN (Post Interosseous Nerve)"},
+                            {q: "Cabang N. Medianus di interossea?", a: "AIN (Ant Interosseous Nerve)"},
+                            {q: "Otot lantai Snuffbox?", a: "ECRL & ECRB"},
+                            {q: "Fraktur Scaphoid nyeri di?", a: "Snuffbox"}
+                        ]
+                    },
+                    {
+                        id: "P5S3",
+                        title: "Backroom 3: Manus 🖐️",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Otot Tangan</h3>
+                            <div class="summary-box">
+                                <ul class="text-sm detail-list">
+                                    <li><span class="detail-label">Thenar (Medianus):</span> APB, FPB, OP. Oposisi Jempol.</li>
+                                    <li><span class="detail-label">Hypothenar (Ulnaris):</span> ADM, FDM, ODM. Kelingking.</li>
+                                    <li><span class="detail-label">Interossei (Ulnaris):</span> DAB (Abduksi), PAD (Adduksi).</li>
+                                </ul>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Otot Thenar?", a: "APB, FPB, OP"},
+                            {q: "Saraf Thenar?", a: "N. Medianus"},
+                            {q: "Otot Hypothenar?", a: "ADM, FDM, ODM"},
+                            {q: "Saraf Hypothenar?", a: "N. Ulnaris"},
+                            {q: "Fungsi Dorsal Interossei?", a: "Abduksi (DAB)"},
+                            {q: "Fungsi Palmar Interossei?", a: "Adduksi (PAD)"},
+                            {q: "Fungsi Lumbricales?", a: "Flex MCP, Ext IP"},
+                            {q: "Saraf Lumbrical 1-2?", a: "N. Medianus"},
+                            {q: "Saraf Lumbrical 3-4?", a: "N. Ulnaris"},
+                            {q: "Saraf Adductor Pollicis?", a: "N. Ulnaris"},
+                            {q: "Ape Hand?", a: "Rusak N. Medianus"},
+                            {q: "Claw Hand?", a: "Rusak N. Ulnaris"},
+                            {q: "Otot Oposisi?", a: "Opponens Pollicis"},
+                            {q: "Jml Dorsal Interossei?", a: "4"},
+                            {q: "Jml Palmar Interossei?", a: "3"},
+                            {q: "Isi Kanalis Guyon?", a: "N. & A. Ulnaris"},
+                            {q: "Otot kulit palmar?", a: "Palmaris Brevis"},
+                            {q: "Tanda Froment?", a: "Lemah Adductor Pollicis"},
+                            {q: "Origo Lumbricales?", a: "Tendon FDP"},
+                            {q: "Insertio Interossei?", a: "Extensor Hood"},
+                            {q: "Origo Adductor Pollicis?", a: "MC 2-3 & Capitatum"},
+                            {q: "Opponens Digiti Minimi fungsi?", a: "Oposisi Kelingking"},
+                            {q: "Gerakan 'Bye-bye'?", a: "Lumbricales"},
+                            {q: "Otot Thenar paling superficial?", a: "APB"},
+                            {q: "Deep Ulnar Nerve inervasi?", a: "Interossei, Lumb 3-4, Add Pollicis"},
+                            {q: "Recurrent Median Nerve?", a: "Saraf ke Thenar"},
+                            {q: "Palmar Aponeurosis?", a: "Perlindungan saraf/pembuluh"},
+                            {q: "Dupuytren's Contracture?", a: "Fibrosis Palmar Fascia"},
+                            {q: "Tenar Atrophy?", a: "CTS lama"},
+                            {q: "Ulnar Paradox?", a: "Cedera tinggi lebih ringan clawing"}
+                        ]
+                    },
+                    {
+                        id: "P5S4",
+                        title: "Backroom 4: Femur 🦵",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Otot Paha</h3>
+                            <div class="summary-box">
+                                <p><strong>Trigonum Femoralis Scarpae:</strong></p>
+                                <ul class="text-sm list-disc pl-5">
+                                    <li>Batas: Lig. Inguinale (Sup), Sartorius (Lat), Adductor Longus (Med).</li>
+                                    <li>Dasar: Iliopsoas, Pectineus. Isi: <strong>NAVEL</strong> (Nerve, Artery, Vein, Empty, Lymph).</li>
+                                </ul>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Otot Quadriceps?", a: "Rectus, Vastus Lat/Med/Int"},
+                            {q: "Fungsi Quadriceps?", a: "Ekstensi Lutut"},
+                            {q: "Origo Rectus Femoris?", a: "SIAI"},
+                            {q: "Insertio Quadriceps?", a: "Tub. Tibiae"},
+                            {q: "Saraf Quadriceps?", a: "N. Femoralis"},
+                            {q: "Otot Hamstrings?", a: "Biceps, SemiT, SemiM"},
+                            {q: "Origo Hamstrings?", a: "Tuber Ischiadicum"},
+                            {q: "Fungsi Hamstrings?", a: "Fleksi Lutut, Eks Hip"},
+                            {q: "Saraf Hamstrings?", a: "N. Ischiadicus"},
+                            {q: "Otot Adductor?", a: "Magnus, Longus, Brevis"},
+                            {q: "Saraf Adductor?", a: "N. Obturatorius"},
+                            {q: "Otot terpanjang?", a: "Sartorius"},
+                            {q: "Pes Anserinus?", a: "Sartorius, Gracilis, Semitendinosus"},
+                            {q: "Lokasi Pes Anserinus?", a: "Medial Tibia Prox"},
+                            {q: "Batas Segitiga Femoral?", a: "Inguinal, Sartorius, Adductor"},
+                            {q: "Isi Segitiga Femoral?", a: "NAVEL"},
+                            {q: "Fungsi Gracilis?", a: "Adduksi"},
+                            {q: "Isi Hiatus Adductorius?", a: "A. Femoralis"},
+                            {q: "Fungsi VMO?", a: "Stabilisasi Patella"},
+                            {q: "Otot Popliteus?", a: "Unlock lutut"},
+                            {q: "Dasar Trigonum Femoralis?", a: "Iliopsoas & Pectineus"},
+                            {q: "V. Saphena Magna bermuara di?", a: "V. Femoralis (di Trigonum)"},
+                            {q: "Femoral Sheath bungkus?", a: "A. & V. Femoralis (bukan Saraf)"},
+                            {q: "Canalis Femoralis berisi?", a: "Kelenjar Limfe (Cloquet)"},
+                            {q: "Hernia Femoralis lewat?", a: "Canalis Femoralis"},
+                            {q: "Pectineus inervasi?", a: "N. Femoralis (& Obturator)"},
+                            {q: "Adductor Magnus bagian hamstring?", a: "Inervasi N. Tibialis"},
+                            {q: "Biceps Femoris Caput Breve?", a: "Satu-satunya fleksor lutut non-hip"},
+                            {q: "N. Ischiadicus pecah di?", a: "Fossa Poplitea"},
+                            {q: "Batas Fossa Poplitea?", a: "Biceps, Semimemb, Gastrocnemius"}
+                        ]
+                    },
+                    {
+                        id: "P5S5",
+                        title: "Backroom 5: Cruris & Pes 🦶",
+                        summary: `
+                            <h3 class="text-xl font-bold text-red-400 mb-2">Otot Betis</h3>
+                            <div class="summary-box">
+                                <ul class="text-sm detail-list">
+                                    <li><span class="detail-label">Anterior:</span> Tibialis Ant (Dorsifleksi/Inversi). N. Peroneus Prof.</li>
+                                    <li><span class="detail-label">Posterior:</span> Gastrocnemius/Soleus (Plantarfleksi). N. Tibialis.</li>
+                                    <li><span class="detail-label">Lateral:</span> Peroneus (Eversi). N. Peroneus Sup.</li>
+                                </ul>
+                            </div>
+                        `,
+                        flashcards: [
+                            {q: "Otot Dorsifleksi?", a: "Tibialis Anterior"},
+                            {q: "Otot Plantarfleksi?", a: "Gastrocnemius & Soleus"},
+                            {q: "Insertio Triceps Surae?", a: "Tendo Achilles"},
+                            {q: "Saraf Anterior?", a: "N. Peroneus Profundus"},
+                            {q: "Saraf Lateral?", a: "N. Peroneus Superficialis"},
+                            {q: "Saraf Posterior?", a: "N. Tibialis"},
+                            {q: "Fungsi Peroneus?", a: "Eversi"},
+                            {q: "Foot Drop?", a: "Cedera N. Peroneus Communis"},
+                            {q: "Tom, Dick, Harry?", a: "Tibialis Post, FDL, FHL"},
+                            {q: "Origo Gastrocnemius?", a: "Condylus Femoralis"},
+                            {q: "A. Dorsalis Pedis?", a: "Lat tendon EHL"},
+                            {q: "Otot Plantar L1?", a: "Abd Hall, FDB, Abd DM"},
+                            {q: "Fungsi Tibialis Post?", a: "Inversi & Plantarfleksi"},
+                            {q: "Shin Splints?", a: "Tibialis Ant/Post"},
+                            {q: "Otot punggung kaki?", a: "EDB & EHB"},
+                            {q: "Retinaculum Extensorum?", a: "Tahan tendon"},
+                            {q: "Plantaris?", a: "Otot vestigial"},
+                            {q: "Saraf sela jari 1-2?", a: "N. Peroneus Profundus"},
+                            {q: "Saraf dorsum pedis?", a: "N. Peroneus Superficialis"},
+                            {q: "Aponeurosis Plantaris?", a: "Fasia telapak kaki"},
+                            {q: "FHL origo?", a: "Fibula Posterior"},
+                            {q: "FDL origo?", a: "Tibia Posterior"},
+                            {q: "Sustentaculum Tali menopang?", a: "Tendon FHL"},
+                            {q: "Otot Inversi?", a: "Tibialis Ant & Post"},
+                            {q: "Cedera tendon Achilles?", a: "Thompson Test Positif"},
+                            {q: "Kompartemen sindrom?", a: "Nyeri hebat, Nadi hilang"},
+                            {q: "N. Suralis?", a: "Saraf sensorik betis belakang"},
+                            {q: "Fabella?", a: "Sesamoid di Gastrocnemius Lat"},
+                            {q: "Kanal Tarsal isi?", a: "Tom Dick Harry"},
+                            {q: "Otot intrinsik kaki saraf?", a: "Plantar Medial & Lateral"}
+                        ]
+                    }
+                ]
+            }
+        };
+
+        // --- GLOBAL QUESTION BANK (75 QUESTIONS) ---
+        const globalQuestionBank = [
+            // F1
+            {q: "Tulang Pterion?", a: "Frontal, Parietal, Temporal, Sphenoid", opt: ["F, P, T, S", "F, Occ, T, S", "P, Z, T, S", "F, P, E, S"]},
+            {q: "Arteri Pterion?", a: "A. Meningea Media", opt: ["A. Carotis", "A. Meningea Media", "A. Cerebri", "A. Temporalis"]},
+            {q: "LeFort II?", a: "Pyramidal", opt: ["Horizontal", "Pyramidal", "Transversal", "Oblique"]},
+            {q: "LeFort I?", a: "Palatum dari Maxilla", opt: ["Wajah-Basis", "Palatum-Maxilla", "Hidung-Frontal", "Mandibula-Temporal"]},
+            {q: "Isi Foramen Transversarium?", a: "A. Vertebralis", opt: ["Medulla", "A. Vertebralis", "A. Carotis", "V. Jugularis"]},
+            {q: "Ciri Thoracal?", a: "Fovea Costalis", opt: ["Foramen Trans", "Dens", "Fovea Costalis", "Bifida"]},
+            {q: "Ligamen kuning?", a: "Lig. Flavum", opt: ["Nuchae", "Flavum", "ALL", "Supraspinosum"]},
+            {q: "Arah HNP?", a: "Posterolateral", opt: ["Ant", "Post", "Posterolat", "Anterolat"]},
+            {q: "Neck Scotty Dog?", a: "Pars Interarticularis", opt: ["Pediculus", "Pars Interarticularis", "Transversus", "Lamina"]},
+            {q: "Spondylolysis?", a: "Fraktur Pars Interarticularis", opt: ["Listhesis", "Fraktur Pars", "Scoliosis", "Lordosis"]},
+            {q: "Tulang duduk?", a: "Tuber Ischiadicum", opt: ["SIAS", "SIAI", "Tuber Ischiadicum", "Crista"]},
+            {q: "Origo Rectus Fem?", a: "SIAI", opt: ["SIAS", "SIAI", "Tuber", "Crista"]},
+            {q: "Ligamen terkuat Hip?", a: "Lig. Iliofemorale", opt: ["Ischio", "Pubo", "Ilio", "Capitis"]},
+            {q: "Dislokasi Hip Post?", a: "Fleksi, Add, Int Rot", opt: ["Eks, Abd, Ext", "Fleksi, Add, Int", "Fleksi, Abd, Ext", "Eks, Add, Int"]},
+            {q: "Batas Pelvis?", a: "Linea Terminalis", opt: ["Crista", "Linea Terminalis", "Arcus", "Promontorium"]},
+            // F2
+            {q: "Fraktur Clavicula?", a: "1/3 Tengah", opt: ["Lateral", "Medial", "Tengah", "Acromion"]},
+            {q: "Glenoid sendi dgn?", a: "Humerus", opt: ["Clavicula", "Humerus", "Sternum", "Ribs"]},
+            {q: "Saraf Sulcus Spiralis?", a: "N. Radialis", opt: ["Ulnaris", "Medianus", "Radialis", "Axillaris"]},
+            {q: "Wrist Drop?", a: "Cedera N. Radialis", opt: ["Claw", "Ape", "Wrist Drop", "Foot Drop"]},
+            {q: "Colles Fracture?", a: "Distal Radius", opt: ["Smith", "Colles", "Boxer", "Monteggia"]},
+            {q: "Fraktur Carpal?", a: "Scaphoid", opt: ["Lunate", "Scaphoid", "Capitate", "Hamate"]},
+            {q: "Hamulus?", a: "Hamatum", opt: ["Capitate", "Hamatum", "Pisiforme", "Trapezium"]},
+            {q: "Weight Bearing Tungkai?", a: "Tibia", opt: ["Fibula", "Tibia", "Femur", "Patella"]},
+            {q: "Foot Drop?", a: "N. Peroneus", opt: ["Wrist Drop", "Foot Drop", "Claw", "Pes Planus"]},
+            {q: "Tulang Tumit?", a: "Calcaneus", opt: ["Talus", "Calcaneus", "Navicular", "Cuboid"]},
+            // F3
+            {q: "Jenis SC Joint?", a: "Saddle", opt: ["Plane", "Saddle", "Hinge", "Ball"]},
+            {q: "Ligamen AC Joint?", a: "Lig. Coracoclaviculare", opt: ["Acromio", "Coracoacromial", "Coracoclavicular", "Sterno"]},
+            {q: "Rotator Cuff?", a: "SITS", opt: ["SITM", "SITS", "SITSub", "SITI"]},
+            {q: "Dislokasi Bahu?", a: "Anterior", opt: ["Post", "Ant", "Inf", "Sup"]},
+            {q: "Nursemaid Elbow?", a: "Subluksasi Radius", opt: ["Olecranon", "Subluksasi Radius", "Ulna", "Humerus"]},
+            {q: "Jenis Wrist?", a: "Condyloid", opt: ["Hinge", "Pivot", "Condyloid", "Saddle"]},
+            {q: "Saraf CTS?", a: "N. Medianus", opt: ["Ulnaris", "Radialis", "Medianus", "Musculo"]},
+            {q: "Unhappy Triad?", a: "ACL, MCL, Meniscus Med", opt: ["PCL, LCL, Lat", "ACL, MCL, Med", "ACL, LCL, Med", "PCL, MCL, Lat"]},
+            {q: "Fungsi ACL?", a: "Cegah Tibia Depan", opt: ["Belakang", "Depan", "Valgus", "Varus"]},
+            {q: "Sprain Ankle?", a: "ATFL", opt: ["Deltoid", "ATFL", "CFL", "PTFL"]},
+            {q: "Mekanisme Sprain?", a: "Inversi + Plantar", opt: ["Eversi + Dorsi", "Inversi + Plantar", "Eversi + Plantar", "Inversi + Dorsi"]},
+            {q: "Sendi Jempol?", a: "Saddle", opt: ["Hinge", "Condyloid", "Saddle", "Plane"]},
+            {q: "Gerakan Jempol?", a: "Oposisi", opt: ["Supinasi", "Pronasi", "Oposisi", "Retraksi"]},
+            {q: "Ligamen Medial Lutut?", a: "MCL", opt: ["LCL", "MCL", "ACL", "PCL"]},
+            {q: "Keystone Kaki?", a: "Talus", opt: ["Calcaneus", "Talus", "Navicular", "Cuboid"]},
+            // F4
+            {q: "Saraf Wajah?", a: "N. Facialis", opt: ["Trigeminus", "Facialis", "Oculo", "Glossophar"]},
+            {q: "Tutup Mata?", a: "Orbicularis Oculi", opt: ["Oris", "Levator", "Oculi", "Corrugator"]},
+            {q: "Saraf Kunyah?", a: "N. Mandibularis", opt: ["Facialis", "Maxillaris", "Mandibularis", "Hypoglossus"]},
+            {q: "Bell's Palsy?", a: "Wajah Merot", opt: ["Stroke", "Bell's Palsy", "Tetanus", "Neuralgia"]},
+            {q: "Origo SCM?", a: "Sternum & Clavicula", opt: ["Scapula", "Sternum & Clavicula", "Ribs", "Vertebrae"]},
+            {q: "Torticollis?", a: "SCM", opt: ["Trapezius", "SCM", "Platysma", "Scalenus"]},
+            {q: "Otot Napas?", a: "Diaphragma", opt: ["Intercostal", "Diaphragma", "Serratus", "Pectoralis"]},
+            {q: "Saraf Diafragma?", a: "N. Phrenicus", opt: ["Vagus", "Phrenicus", "Intercostal", "Thoracic"]},
+            {q: "Hiatus VC?", a: "T8", opt: ["T8", "T10", "T12", "L1"]},
+            {q: "Batas Perut?", a: "Lig. Inguinale", opt: ["Linea Alba", "Lig. Inguinale", "Crista", "Umbilicus"]},
+            {q: "Hernia Inguinalis?", a: "Canalis Inguinalis", opt: ["Femoralis", "Inguinalis", "Umbilicus", "Linea"]},
+            {q: "Swimmer Muscle?", a: "Latissimus Dorsi", opt: ["Trapezius", "Latissimus Dorsi", "Rhomboid", "Levator"]},
+            {q: "Erector Spinae?", a: "Ekstensi Punggung", opt: ["Fleksi", "Ekstensi", "Rotasi", "Lat Flex"]},
+            {q: "Saraf Glut Max?", a: "N. Glut Inf", opt: ["Sup", "Inf", "Ischiadicus", "Femoralis"]},
+            {q: "Piriformis Synd?", a: "N. Ischiadicus", opt: ["Femoralis", "Ischiadicus", "Obturator", "Pudendus"]},
+            // F5
+            {q: "Fungsi Biceps?", a: "Supinasi & Fleksi", opt: ["Pro & Flex", "Sup & Ext", "Sup & Flex", "Pro & Ext"]},
+            {q: "Saraf Ant Lengan?", a: "N. Musculocutaneus", opt: ["Radialis", "Ulnaris", "Musculo", "Medianus"]},
+            {q: "Ekstensor Siku?", a: "Triceps", opt: ["Biceps", "Brachialis", "Triceps", "Anconeus"]},
+            {q: "Origo Flexor?", a: "Epicondylus Med", opt: ["Lat", "Med", "Olecranon", "Styloid"]},
+            {q: "Tennis Elbow?", a: "Epi Lat", opt: ["Epi Med", "Epi Lat", "Olecranon", "Biceps"]},
+            {q: "Saraf Thenar?", a: "N. Medianus", opt: ["Ulnaris", "Radialis", "Medianus", "Axillaris"]},
+            {q: "Ape Hand?", a: "Medianus", opt: ["Ulnaris", "Medianus", "Radialis", "Axillaris"]},
+            {q: "Fungsi Quads?", a: "Eks Lutut", opt: ["Flex Lutut", "Eks Lutut", "Add", "Abd"]},
+            {q: "Origo Hamstring?", a: "Tuber Isch", opt: ["SIAS", "SIAI", "Tuber", "Crista"]},
+            {q: "Saraf Medial Paha?", a: "N. Obturatorius", opt: ["Femoralis", "Ischiadicus", "Obturatorius", "Tibialis"]},
+            {q: "Trendelenburg?", a: "Gluteus Medius", opt: ["Maximus", "Medius", "Iliopsoas", "Hamstring"]},
+            {q: "Dorsifleksi?", a: "Tibialis Ant", opt: ["Gastro", "Soleus", "Tib Ant", "Peroneus"]},
+            {q: "Plantarfleksi?", a: "Gastro/Soleus", opt: ["Tib Ant", "Gastro/Soleus", "EDL", "Peroneus"]},
+            {q: "Shin Splints?", a: "Tibialis", opt: ["Gastro", "Tibialis", "Peroneus", "Quads"]},
+            {q: "Foot Drop?", a: "N. Peroneus", opt: ["Claw", "Foot Drop", "Pes", "Hallux"]},
+            {q: "Achilles?", a: "Calcaneus", opt: ["Talus", "Calcaneus", "Navicular", "Tibia"]},
+            {q: "Unlock Lutut?", a: "Popliteus", opt: ["Sartorius", "Popliteus", "Plantaris", "Gracilis"]},
+            {q: "Pes Anserinus?", a: "SGS", opt: ["SGM", "SGS", "RGS", "BGS"]},
+            {q: "Eversi?", a: "Peroneus", opt: ["Tib Ant", "Tib Post", "Peroneus", "Gastro"]},
+            {q: "Saraf Post Betis?", a: "N. Tibialis", opt: ["Profundus", "Superficialis", "Tibialis", "Femoralis"]}
+        ];
+
+        // --- LOGIC ---
+        let currentMode = 'menu';
+        let examAnswers = [], currentExamQ = 0, currentFlashcardIndex = 0;
+
+        function goToMenu() {
+            const content = document.getElementById('content');
+            document.getElementById('homeBtn').classList.add('hidden');
+            content.innerHTML = `
+                <div class="animate-fade-in w-full max-w-lg space-y-4">
+                    <button onclick="renderRangkumanMode()" class="w-full btn-wine p-8 rounded-2xl group border-2 border-red-500/50 hover:border-red-400 transition transform hover:scale-105 shadow-2xl">
+                        <div class="text-6xl mb-4 text-red-400 group-hover:text-white"><i class="fas fa-book-journal-whills"></i></div>
+                        <h2 class="text-3xl font-bold text-white mb-2">MODE RANGKUMAN</h2>
+                        <p class="text-red-200 opacity-80">Akses Floor & Backroom</p>
+                    </button>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="startPracticeMode()" class="p-6 bg-gray-800 hover:bg-green-900 border border-gray-600 hover:border-green-500 rounded-xl transition group">
+                            <div class="text-4xl mb-2 text-green-500 group-hover:text-white"><i class="fas fa-dumbbell"></i></div>
+                            <h3 class="font-bold text-white">LATIHAN</h3>
+                        </button>
+                        <button onclick="startExamMode()" class="p-6 bg-gray-800 hover:bg-red-900 border border-gray-600 hover:border-red-500 rounded-xl transition group">
+                            <div class="text-4xl mb-2 text-red-500 group-hover:text-white"><i class="fas fa-file-signature"></i></div>
+                            <h3 class="font-bold text-white">UJIAN</h3>
+                        </button>
+                    </div>
+                </div>`;
+        }
+
+        function renderRangkumanMode() {
+            const content = document.getElementById('content');
+            document.getElementById('homeBtn').classList.remove('hidden');
+            let html = `<div class="w-full max-w-6xl animate-fade-in"><h2 class="text-3xl font-bold text-red-100 mb-8 border-b border-red-800 pb-4">Pilih Lantai</h2><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">`;
+            const floors = [
+                {id: 'floor1', icon: 'fa-skull', color: 'red', name: 'Floor 1', sub: 'Axial'},
+                {id: 'floor2', icon: 'fa-bone', color: 'yellow', name: 'Floor 2', sub: 'Extremity Bones'},
+                {id: 'floor3', icon: 'fa-handshake', color: 'blue', name: 'Floor 3', sub: 'Joints'},
+                {id: 'floor4', icon: 'fa-child', color: 'green', name: 'Floor 4', sub: 'Trunk Muscles'},
+                {id: 'floor5', icon: 'fa-running', color: 'purple', name: 'Floor 5', sub: 'Limb Muscles'}
+            ];
+            floors.forEach(f => {
+                html += `<button onclick="renderFloorDetail('${f.id}')" class="btn-wine p-6 rounded-xl text-left hover:scale-105 transition shadow-lg border-t-4 border-${f.color}-500 group"><div class="flex justify-between items-start mb-4"><span class="text-4xl text-${f.color}-400 group-hover:text-white"><i class="fas ${f.icon}"></i></span><span class="bg-green-900 text-green-300 text-xs px-2 py-1 rounded">Active</span></div><h3 class="text-xl font-bold text-white">${f.name}</h3><p class="text-sm text-gray-300 mt-2">${f.sub}</p></button>`;
+            });
+            html += `</div></div>`;
+            content.innerHTML = html;
+        }
+
+        function renderFloorDetail(floorId) {
+            const content = document.getElementById('content');
+            const data = anatomyData[floorId];
+            let html = `<div class="w-full max-w-4xl animate-fade-in"><div class="flex items-center gap-4 mb-6"><button onclick="renderRangkumanMode()" class="bg-gray-700 hover:bg-gray-600 text-white w-10 h-10 rounded-full flex items-center justify-center"><i class="fas fa-arrow-left"></i></button><div><h2 class="text-2xl font-bold text-white">${data.title}</h2><p class="text-sm text-red-300">${data.description}</p></div></div><div class="grid grid-cols-1 gap-4">`;
+            data.backrooms.forEach((room, index) => {
+                html += `<button onclick="renderBackroomContent('${floorId}', ${index})" class="group bg-black/40 hover:bg-red-900/30 border border-red-900/50 hover:border-red-500 p-5 rounded-lg text-left transition flex items-center"><div class="bg-red-800 text-white w-12 h-12 rounded-lg flex items-center justify-center text-xl font-bold mr-5 shadow-lg group-hover:scale-110 transition">${index + 1}</div><div class="flex-grow"><h3 class="text-lg font-bold text-red-100 group-hover:text-white">${room.title}</h3></div><i class="fas fa-chevron-right text-gray-500 group-hover:text-white"></i></button>`;
+            });
+            html += `</div></div>`;
+            content.innerHTML = html;
+        }
+
+        function renderBackroomContent(floorId, roomIndex) {
+            const content = document.getElementById('content');
+            const room = anatomyData[floorId].backrooms[roomIndex];
+            content.innerHTML = `<div class="w-full max-w-4xl animate-fade-in text-left"><div class="flex items-center gap-4 mb-6 border-b border-red-800 pb-4"><button onclick="renderFloorDetail('${floorId}')" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm"><i class="fas fa-arrow-left mr-2"></i> Back</button><h2 class="text-xl font-bold text-white">${room.title}</h2></div><div class="bg-black/60 p-8 rounded-2xl border border-red-500/30 shadow-2xl mb-8"><div class="prose prose-invert max-w-none text-gray-200">${room.summary}</div></div><div class="text-center"><button onclick="startBackroomFlashcards('${floorId}', ${roomIndex})" class="btn-wine px-8 py-4 rounded-xl text-xl font-bold shadow-lg animate-pulse hover:animate-none w-full md:w-auto transform hover:scale-105 transition"><i class="fas fa-clone mr-2"></i> MULAI FLASHCARD (30 SOAL) 🧠</button></div></div>`;
+        }
+
+        function startBackroomFlashcards(floorId, roomIndex) {
+            currentFlashcardIndex = 0;
+            renderFlashcardUI(floorId, roomIndex);
+        }
+
+        function renderFlashcardUI(floorId, roomIndex) {
+            const content = document.getElementById('content');
+            const room = anatomyData[floorId].backrooms[roomIndex];
+            const cards = room.flashcards;
+            const card = cards[currentFlashcardIndex];
+            content.innerHTML = `<div class="w-full max-w-2xl animate-fade-in flex flex-col items-center"><div class="w-full flex justify-between items-center mb-6"><h2 class="text-xl font-bold text-red-300">Flashcard: ${room.title}</h2><span class="bg-red-900 text-xs px-3 py-1 rounded-full text-white font-bold">${currentFlashcardIndex + 1} / ${cards.length}</span></div><div class="flashcard-container w-full max-w-md mb-8" onclick="this.classList.toggle('flashcard-flipped')"><div class="flashcard-inner"><div class="flashcard-front"><i class="fas fa-question-circle text-5xl mb-6 text-red-400 opacity-80"></i><h3 class="text-xl md:text-2xl font-bold text-white text-center leading-snug">${card.q}</h3><p class="text-xs text-red-300 mt-6 animate-bounce">(Ketuk untuk balik)</p></div><div class="flashcard-back"><i class="fas fa-check-circle text-5xl mb-6 text-green-500 opacity-80"></i><h3 class="text-lg md:text-xl font-bold text-white text-center leading-relaxed">${card.a}</h3></div></div></div><div class="flex gap-4 w-full justify-center"><button onclick="prevFlash('${floorId}',${roomIndex})" class="px-6 py-3 bg-gray-700 rounded-lg hover:bg-gray-600 text-white font-bold ${currentFlashcardIndex===0?'opacity-50 cursor-not-allowed':''}" ${currentFlashcardIndex===0?'disabled':''}><i class="fas fa-arrow-left"></i></button><button onclick="${currentFlashcardIndex<cards.length-1?`nextFlash('${floorId}',${roomIndex})`:`renderBackroomContent('${floorId}',${roomIndex})`}" class="px-6 py-3 ${currentFlashcardIndex<cards.length-1?'bg-red-800 hover:bg-red-700':'bg-green-700 hover:bg-green-600'} rounded-lg transition text-white font-bold flex-grow max-w-xs">${currentFlashcardIndex<cards.length-1?`Next <i class='fas fa-arrow-right ml-2'></i>`:`Selesai <i class='fas fa-flag-checkered ml-2'></i>`}</button></div><button onclick="renderBackroomContent('${floorId}', ${roomIndex})" class="mt-8 text-sm text-gray-400 hover:text-white underline">Keluar</button></div>`;
+        }
+        function nextFlash(f,r){currentFlashcardIndex++;renderFlashcardUI(f,r);}
+        function prevFlash(f,r){currentFlashcardIndex--;renderFlashcardUI(f,r);}
+
+        function startPracticeMode() {
+            document.getElementById('homeBtn').classList.remove('hidden');
+            renderPracticeQ(0);
+        }
+        function renderPracticeQ(idx) {
+            const content = document.getElementById('content');
+            if(idx>=globalQuestionBank.length){content.innerHTML=`<h2 class="text-2xl font-bold text-white">Selesai!</h2><button onclick="goToMenu()" class="mt-4 btn-wine px-6 py-2 rounded">Menu</button>`;return;}
+            const q = globalQuestionBank[idx];
+            let html = `<div class="w-full max-w-2xl text-left animate-fade-in"><div class="flex justify-between mb-2 text-sm text-green-400 font-bold"><span>LATIHAN: ${idx+1}/${globalQuestionBank.length}</span></div><div class="bg-black/40 p-6 rounded-xl border border-green-800 mb-6"><h3 class="text-xl font-bold mb-4 text-white">${q.q}</h3><div class="space-y-3" id="opts">`;
+            q.opt.forEach(o=>{html+=`<button onclick="checkPrac(this, '${o===q.a}', '${q.a.replace(/'/g,"\\'")}', ${idx})" class="w-full text-left p-3 rounded bg-gray-800 hover:bg-gray-700 border border-gray-600 transition text-gray-200">${o}</button>`});
+            html+=`</div><div id="fb" class="hidden mt-6 p-4 rounded-lg border-l-4"><p class="font-bold mb-1" id="fbt"></p><p class="text-sm text-white">Jawaban: <span class="font-bold">${q.a}</span></p><button onclick="renderPracticeQ(${idx+1})" class="mt-4 bg-green-700 hover:bg-green-600 text-white px-6 py-2 rounded">Lanjut</button></div></div></div>`;
+            content.innerHTML=html;
+        }
+        function checkPrac(btn,isCor,corTxt,idx){
+            const btns=document.getElementById('opts').getElementsByTagName('button');
+            for(let b of btns){b.disabled=true;if(b.innerText===corTxt)b.classList.add('bg-green-900','border-green-500');else b.classList.add('opacity-50');}
+            const fb=document.getElementById('fb'), fbt=document.getElementById('fbt');
+            if(isCor=='true'){btn.classList.remove('opacity-50');btn.classList.add('bg-green-600','!border-green-400');fb.classList.add('bg-green-900/50','border-green-500');fbt.innerText="BENAR! 🎉";fbt.className="font-bold mb-1 text-green-400";}
+            else{btn.classList.remove('opacity-50');btn.classList.add('bg-red-600','!border-red-400');fb.classList.add('bg-red-900/50','border-red-500');fbt.innerText="SALAH 😅";fbt.className="font-bold mb-1 text-red-400";}
+            fb.classList.remove('hidden');
+        }
+
+        function startExamMode(){
+            document.getElementById('homeBtn').classList.remove('hidden');
+            currentExamQ=0;examAnswers=new Array(globalQuestionBank.length).fill(null);renderExamQ();
+        }
+        function renderExamQ(){
+            const content=document.getElementById('content');
+            const q=globalQuestionBank[currentExamQ];
+            let html=`<div class="w-full max-w-2xl text-left animate-fade-in"><div class="flex justify-between mb-2 text-sm text-red-400 font-bold"><span>UJIAN: ${currentExamQ+1}/${globalQuestionBank.length}</span><span class="animate-pulse">LIVE</span></div><div class="bg-black/40 p-6 rounded-xl border border-red-600 mb-6"><h3 class="text-xl font-bold mb-4 text-white">${q.q}</h3><div class="space-y-3">`;
+            q.opt.forEach(o=>{let cls=examAnswers[currentExamQ]===o?'bg-red-700 border-red-400 text-white':'bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700';html+=`<button onclick="selEx('${o.replace(/'/g,"\\'")}')" class="w-full text-left p-3 rounded border transition ${cls}">${o}</button>`});
+            html+=`</div></div><div class="flex justify-between"><button onclick="prevEx()" class="px-4 py-2 bg-gray-700 rounded text-white ${currentExamQ===0?'hidden':''}">Prev</button>${currentExamQ===globalQuestionBank.length-1?`<button onclick="finEx()" class="px-6 py-2 bg-green-600 rounded font-bold hover:bg-green-500 shadow-lg text-white">KUMPULKAN</button>`:`<button onclick="nextEx()" class="px-4 py-2 bg-red-700 rounded hover:bg-red-600 text-white">Next</button>`}</div></div>`;
+            content.innerHTML=html;
+        }
+        function selEx(a){examAnswers[currentExamQ]=a;renderExamQ();}
+        function nextEx(){if(currentExamQ<globalQuestionBank.length-1){currentExamQ++;renderExamQ();}}
+        function prevEx(){if(currentExamQ>0){currentExamQ--;renderExamQ();}}
+        function finEx(){
+            let sc=0;examAnswers.forEach((a,i)=>{if(a===globalQuestionBank[i].a)sc++});
+            let fs=Math.round((sc/globalQuestionBank.length)*100);
+            let msg=fs<=30?"Belajar lagi 🗿":fs<=60?"Tingkatin lagi 🤔":"Mantap 🤩";
+            document.getElementById('content').innerHTML=`<div class="text-center animate-fade-in p-8 bg-black/50 rounded-2xl border border-red-500"><h2 class="text-4xl font-bold mb-4 text-white">Hasil Ujian</h2><div class="text-6xl font-black text-yellow-400 mb-4">${fs}</div><p class="text-xl italic text-gray-300 mb-8">"${msg}"</p><div class="flex gap-4 justify-center"><button onclick="startExamMode()" class="px-6 py-3 bg-red-800 rounded-lg hover:bg-red-700 font-bold text-white">Ujian Lagi</button><button onclick="goToMenu()" class="px-6 py-3 bg-gray-700 rounded-lg hover:bg-gray-600 text-white">Menu</button></div></div>`;
+        }
+
+        goToMenu();
+    </script>
+</body>
+</html>
