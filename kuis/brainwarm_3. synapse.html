@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synapse: The Focus Engine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        body {
+            background-color: #050505;
+            font-family: 'Courier New', Courier, monospace;
+            height: 100vh;
+            width: 100vw;
+            color: white;
+            user-select: none;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        /* Heads Up Display */
+        #hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            pointer-events: none;
+            z-index: 10;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+        }
+
+        #score-board {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px white;
+        }
+
+        #target-display {
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: 2px solid white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            background: rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+        }
+
+        #instructions {
+            position: absolute;
+            bottom: 10%;
+            width: 100%;
+            text-align: center;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9rem;
+            pointer-events: none;
+            animation: pulse 2s infinite;
+        }
+
+        /* Glitch Effect for Rule Switch */
+        .glitch-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 20;
+            mix-blend-mode: exclusion;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+
+        .active-cyan {
+            border-color: #00ffff !important;
+            color: #00ffff !important;
+            box-shadow: 0 0 15px #00ffff, inset 0 0 10px rgba(0,255,255,0.2);
+        }
+
+        .active-magenta {
+            border-color: #ff00ff !important;
+            color: #ff00ff !important;
+            box-shadow: 0 0 15px #ff00ff, inset 0 0 10px rgba(255,0,255,0.2);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="hud">
+        <div id="score-board">FOCUS: 0%</div>
+        <div id="target-display" class="active-cyan">TARGET: CYAN</div>
+    </div>
+
+    <div id="instructions">
+        [LEFT / RIGHT] arrows or Tap Sides to switch lanes<br>
+        Match the TARGET color. Avoid the other.
+    </div>
+
+    <div id="glitch" class="glitch-overlay"></div>
+    <canvas id="game"></canvas>
+
+    <script>
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+        const scoreEl = document.getElementById('score-board');
+        const targetEl = document.getElementById('target-display');
+        const glitchEl = document.getElementById('glitch');
+
+        let width, height;
+        
+        // Game State
+        let frame = 0;
+        let score = 0;
+        let speed = 6;
+        let lanes = [0, 0, 0]; // X positions of lanes
+        let currentTarget = 'cyan'; // 'cyan' or 'magenta'
+        let ruleTimer = 0;
+        let gameActive = true;
+        
+        // Colors
+        const C_CYAN = '#00ffff';
+        const C_MAGENTA = '#ff00ff';
+        const C_GRID = 'rgba(255, 255, 255, 0.1)';
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            // Define 3 lanes
+            lanes = [width * 0.25, width * 0.5, width * 0.75];
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // --- Classes ---
+
+        class Player {
+            constructor() {
+                this.laneIndex = 1; // Start middle (0, 1, 2)
+                this.y = height - 150;
+                this.radius = 15;
+                this.color = '#ffffff';
+                this.trail = [];
+                this.targetX = lanes[1];
+                this.x = lanes[1];
+            }
+
+            move(dir) {
+                if (dir === 'left' && this.laneIndex > 0) this.laneIndex--;
+                if (dir === 'right' && this.laneIndex < 2) this.laneIndex++;
+                this.targetX = lanes[this.laneIndex];
+            }
+
+            update() {
+                // Smooth movement (Linear Interpolation)
+                this.x += (this.targetX - this.x) * 0.2;
+
+                // Trail effect
+                this.trail.push({x: this.x, y: this.y});
+                if (this.trail.length > 10) this.trail.shift();
+            }
+
+            draw(ctx) {
+                // Draw Trail
+                ctx.beginPath();
+                for(let i=0; i<this.trail.length; i++) {
+                    const t = this.trail[i];
+                    const alpha = i / this.trail.length;
+                    ctx.lineTo(t.x, t.y + (10 - i)); // Trail drags behind slightly
+                    ctx.lineWidth = i;
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.5})`;
+                }
+                ctx.stroke();
+
+                // Draw Core
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                // Draw Engine Glow
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius + 5 + Math.sin(frame * 0.2) * 2, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        }
+
+        class Orb {
+            constructor() {
+                this.laneIndex = Math.floor(Math.random() * 3);
+                this.x = lanes[this.laneIndex];
+                this.y = -50;
+                this.type = Math.random() > 0.5 ? 'cyan' : 'magenta';
+                this.size = 20;
+                this.active = true;
+                this.pulsateOffset = Math.random() * 10;
+            }
+
+            update() {
+                this.y += speed;
+                // Deactivate if off screen
+                if (this.y > height + 50) this.active = false;
+            }
+
+            draw(ctx) {
+                const color = this.type === 'cyan' ? C_CYAN : C_MAGENTA;
+                
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                
+                // Pulsating effect
+                const scale = 1 + Math.sin(frame * 0.1 + this.pulsateOffset) * 0.1;
+                ctx.scale(scale, scale);
+
+                // Shape: Diamond
+                ctx.beginPath();
+                ctx.moveTo(0, -this.size);
+                ctx.lineTo(this.size, 0);
+                ctx.lineTo(0, this.size);
+                ctx.lineTo(-this.size, 0);
+                ctx.closePath();
+
+                ctx.fillStyle = color;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = color;
+                ctx.fill();
+
+                // Inner core
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size * 0.4, 0, Math.PI*2);
+                ctx.fill();
+
+                ctx.restore();
+            }
+        }
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 10;
+                this.vy = (Math.random() - 0.5) * 10;
+                this.life = 1.0;
+                this.color = color;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= 0.05;
+            }
+            draw(ctx) {
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, 4, 4);
+                ctx.globalAlpha = 1.0;
+            }
+        }
+
+        // --- Logic ---
+
+        const player = new Player();
+        let orbs = [];
+        let particles = [];
+
+        function triggerGlitch() {
+            // Visual Flash
+            glitchEl.style.opacity = 0.8;
+            setTimeout(() => { glitchEl.style.opacity = 0; }, 100);
+            setTimeout(() => { glitchEl.style.opacity = 0.4; }, 150);
+            setTimeout(() => { glitchEl.style.opacity = 0; }, 250);
+
+            // Change Target
+            currentTarget = currentTarget === 'cyan' ? 'magenta' : 'cyan';
+            
+            // UI Update
+            targetEl.innerText = `TARGET: ${currentTarget.toUpperCase()}`;
+            targetEl.className = currentTarget === 'cyan' ? 'active-cyan' : 'active-magenta';
+        }
+
+        function spawnOrb() {
+            // Prevent impossible walls (3 in a row)
+            // Logic: Randomly spawn, but 10% chance to spawn double
+            orbs.push(new Orb());
+            if (Math.random() < 0.2) {
+                setTimeout(() => orbs.push(new Orb()), 100);
+            }
+        }
+
+        // Inputs
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a') player.move('left');
+            if (e.key === 'ArrowRight' || e.key === 'd') player.move('right');
+        });
+
+        // Touch zones
+        document.addEventListener('touchstart', (e) => {
+            const x = e.touches[0].clientX;
+            if (x < width / 2) player.move('left');
+            else player.move('right');
+        });
+
+        // Game Loop
+        function loop() {
+            frame++;
+            ruleTimer++;
+
+            // 1. Difficulty Ramp & Rule Switching
+            // Speed increases slowly
+            if (frame % 600 === 0) speed += 0.5;
+
+            // Switch rules every 10-15 seconds (60fps * 12s approx)
+            if (ruleTimer > 700) {
+                triggerGlitch();
+                ruleTimer = 0;
+            }
+
+            // Spawn rate based on speed
+            if (frame % Math.max(20, Math.floor(60 - speed * 2)) === 0) {
+                spawnOrb();
+            }
+
+            // 2. Clear & Draw Background
+            ctx.fillStyle = '#050505';
+            ctx.fillRect(0, 0, width, height);
+
+            // 3. Draw Perspective Grid (Tunnel Effect)
+            ctx.strokeStyle = C_GRID;
+            ctx.lineWidth = 1;
+            
+            // Vertical Lane Lines
+            lanes.forEach(bx => {
+                ctx.beginPath();
+                ctx.moveTo(bx, 0);
+                ctx.lineTo(bx, height);
+                ctx.stroke();
+            });
+            // Lane dividers
+            ctx.beginPath();
+            ctx.moveTo(width*0.375, 0); ctx.lineTo(width*0.375, height);
+            ctx.moveTo(width*0.625, 0); ctx.lineTo(width*0.625, height);
+            ctx.stroke();
+
+            // Horizontal Moving Lines
+            const gridOffset = (frame * speed) % 100;
+            for(let y = gridOffset; y < height; y += 100) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+
+            // 4. Update & Draw Player
+            player.update();
+            player.draw(ctx);
+
+            // 5. Update & Draw Orbs
+            for (let i = orbs.length - 1; i >= 0; i--) {
+                let o = orbs[i];
+                o.update();
+                o.draw(ctx);
+
+                // Collision Detection
+                // Check if Y is close to player Y and X matches lane
+                if (o.active && Math.abs(o.y - player.y) < 40 && o.laneIndex === player.laneIndex) {
+                    o.active = false;
+                    
+                    // Logic: Did we collect the right one?
+                    if (o.type === currentTarget) {
+                        // Correct!
+                        score += 10;
+                        // Explosion
+                        for(let k=0; k<8; k++) particles.push(new Particle(player.x, player.y, o.type === 'cyan' ? C_CYAN : C_MAGENTA));
+                    } else {
+                        // Wrong!
+                        score = Math.max(0, score - 20); // Penalty
+                        // Screen shake effect (visual only, simulated by offsetting canvas next frame slightly or just flashy red)
+                        ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
+                        ctx.fillRect(0,0,width,height);
+                        speed = Math.max(6, speed * 0.9); // Slow down slightly on fail to help recover
+                    }
+                    scoreEl.innerText = `FOCUS: ${score}`;
+                }
+
+                if (!o.active) orbs.splice(i, 1);
+            }
+
+            // 6. Particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update();
+                particles[i].draw(ctx);
+                if (particles[i].life <= 0) particles.splice(i, 1);
+            }
+
+            requestAnimationFrame(loop);
+        }
+
+        loop();
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deduksi: The Mind's Eye</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        body {
+            background-color: #0a0a12;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            width: 100vw;
+            color: #e0e0e0;
+            user-select: none;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+        }
+
+        #header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-box {
+            background: rgba(20, 20, 30, 0.8);
+            border: 1px solid #333;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        #timer-bar-container {
+            width: 100%;
+            height: 6px;
+            background: #222;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        #timer-bar {
+            height: 100%;
+            background: #00bcd4;
+            width: 100%;
+            transition: width 0.1s linear;
+        }
+
+        #message-area {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 300;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px black;
+        }
+
+        p {
+            font-size: 1.2rem;
+            color: #aaa;
+        }
+
+        .hidden {
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        
+        .visible {
+            opacity: 1;
+        }
+
+        #overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 20;
+        }
+
+        button {
+            background: transparent;
+            border: 2px solid #00bcd4;
+            color: #00bcd4;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background: #00bcd4;
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 188, 212, 0.5);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="timer-bar-container"><div id="timer-bar"></div></div>
+
+    <div id="ui-layer">
+        <div id="header">
+            <div class="stat-box">
+                <div class="stat-label">Kasus</div>
+                <div class="stat-value" id="level-display">1</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">IQ Score</div>
+                <div class="stat-value" id="score-display">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="message-area" class="hidden">
+        <h1 id="msg-title">ANOMALI DITEMUKAN</h1>
+        <p id="msg-desc">+100 Poin</p>
+    </div>
+
+    <div id="overlay">
+        <h1 style="color: #00bcd4;">DEDUKSI</h1>
+        <p>Temukan 1 simbol yang berbeda (Anomali).</p>
+        <p style="font-size: 0.9rem; margin-top: 10px; color: #666;">Observasi. Analisa. Eksekusi.</p>
+        <button onclick="startGame()">Mulai Investigasi</button>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const levelDisplay = document.getElementById('level-display');
+        const scoreDisplay = document.getElementById('score-display');
+        const timerBar = document.getElementById('timer-bar');
+        const msgArea = document.getElementById('message-area');
+        const msgTitle = document.getElementById('msg-title');
+        const overlay = document.getElementById('overlay');
+
+        let width, height;
+        let items = [];
+        let level = 1;
+        let score = 0;
+        let maxTime = 10000; // ms
+        let currentTime = 10000;
+        let gameActive = false;
+        let animationId;
+        let lastTime = 0;
+        let anomalyIndex = -1;
+
+        // Configuration for difficulties
+        // Traits: Color, Shape, Rotation Direction, Rotation Speed, Pulsing, Size
+        const PALETTES = [
+            ['#00bcd4', '#0097a7'], // Cyan
+            ['#ff4081', '#c2185b'], // Pink
+            ['#76ff03', '#33691e'], // Lime
+            ['#e040fb', '#7b1fa2'], // Purple
+            ['#ffeb3b', '#fbc02d']  // Yellow
+        ];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Item {
+            constructor(x, y, size, traits) {
+                this.x = x;
+                this.y = y;
+                this.size = size;
+                this.baseSize = size;
+                this.traits = traits; 
+                this.angle = 0;
+                this.pulsePhase = Math.random() * Math.PI * 2;
+            }
+
+            update(dt) {
+                // Rotation
+                this.angle += this.traits.rotSpeed * dt * this.traits.rotDir;
+                
+                // Pulsing
+                if (this.traits.pulsing) {
+                    this.pulsePhase += dt * 5;
+                    const scale = 1 + Math.sin(this.pulsePhase) * 0.15;
+                    this.size = this.baseSize * scale;
+                }
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+
+                ctx.fillStyle = this.traits.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.traits.color;
+
+                if (this.traits.shape === 'square') {
+                    ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+                } else if (this.traits.shape === 'triangle') {
+                    ctx.beginPath();
+                    ctx.moveTo(0, -this.size/2);
+                    ctx.lineTo(this.size/2, this.size/2);
+                    ctx.lineTo(-this.size/2, this.size/2);
+                    ctx.fill();
+                } else if (this.traits.shape === 'circle') {
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size/2, 0, Math.PI*2);
+                    ctx.fill();
+                } else if (this.traits.shape === 'diamond') {
+                    ctx.beginPath();
+                    ctx.moveTo(0, -this.size/2);
+                    ctx.lineTo(this.size/2, 0);
+                    ctx.lineTo(0, this.size/2);
+                    ctx.lineTo(-this.size/2, 0);
+                    ctx.fill();
+                } else if (this.traits.shape === 'cross') {
+                    const w = this.size / 4;
+                    const l = this.size / 2;
+                    ctx.fillRect(-w, -l, w*2, l*2);
+                    ctx.fillRect(-l, -w, l*2, w*2);
+                }
+
+                // Inner detail to make rotation visible for circles
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                ctx.beginPath();
+                ctx.arc(this.size/3, 0, this.size/6, 0, Math.PI*2);
+                ctx.fill();
+
+                ctx.restore();
+            }
+
+            contains(mx, my) {
+                // Simple hit box
+                return mx > this.x - this.size && mx < this.x + this.size &&
+                       my > this.y - this.size && my < this.y + this.size;
+            }
+        }
+
+        function generateLevel() {
+            items = [];
+            // Difficulty scaling
+            // Grid size increases with level
+            let cols = Math.min(8, 3 + Math.floor(level / 2));
+            let rows = Math.min(6, 3 + Math.floor(level / 3));
+            let cellSize = Math.min(width/cols, height/rows) * 0.6;
+            let spacingX = width / (cols + 1);
+            let spacingY = height / (rows + 1);
+
+            // 1. Define Normal Traits
+            const palette = PALETTES[Math.floor(Math.random() * PALETTES.length)];
+            const shapes = ['square', 'circle', 'triangle', 'diamond', 'cross'];
+            
+            const normal = {
+                color: palette[0],
+                shape: shapes[Math.floor(Math.random() * shapes.length)],
+                rotSpeed: 0.5 + Math.random(), // rad/s
+                rotDir: Math.random() > 0.5 ? 1 : -1,
+                pulsing: false
+            };
+
+            // 2. Define Anomaly Traits (Differs in exactly ONE aspect usually)
+            // As levels get higher, the difference gets more subtle
+            const anomaly = { ...normal };
+            
+            const difficultyRoll = Math.random() + (level * 0.05);
+            let diffType = 'color'; // default
+
+            if (level === 1) {
+                // Level 1: Distinct Color
+                anomaly.color = '#ffffff'; 
+            } else {
+                // Higher levels: Randomize type of anomaly
+                const types = ['color', 'shape', 'rotDir', 'speed'];
+                if (level > 4) types.push('pulsing');
+                
+                diffType = types[Math.floor(Math.random() * types.length)];
+
+                switch(diffType) {
+                    case 'color':
+                        // Slightly different shade or distinct color depending on level
+                        anomaly.color = palette[1]; 
+                        break;
+                    case 'shape':
+                        let newShape = normal.shape;
+                        while(newShape === normal.shape) newShape = shapes[Math.floor(Math.random() * shapes.length)];
+                        anomaly.shape = newShape;
+                        break;
+                    case 'rotDir':
+                        anomaly.rotDir = normal.rotDir * -1;
+                        break;
+                    case 'speed':
+                        // Moving significantly faster or stopped
+                        anomaly.rotSpeed = normal.rotSpeed * 3;
+                        break;
+                    case 'pulsing':
+                        anomaly.pulsing = true;
+                        break;
+                }
+            }
+
+            // 3. Create Grid
+            let totalItems = cols * rows;
+            anomalyIndex = Math.floor(Math.random() * totalItems);
+
+            let index = 0;
+            for(let r=1; r<=rows; r++) {
+                for(let c=1; c<=cols; c++) {
+                    let traits = (index === anomalyIndex) ? anomaly : normal;
+                    // Jitter position slightly for organic feel
+                    let x = c * spacingX + (Math.random() - 0.5) * 10;
+                    let y = r * spacingY + (Math.random() - 0.5) * 10;
+                    items.push(new Item(x, y, cellSize, traits));
+                    index++;
+                }
+            }
+
+            // Reset Time
+            maxTime = Math.max(3000, 10000 - (level * 500)); // Time gets shorter
+            currentTime = maxTime;
+        }
+
+        function startGame() {
+            overlay.style.display = 'none';
+            level = 1;
+            score = 0;
+            scoreDisplay.innerText = score;
+            levelDisplay.innerText = level;
+            gameActive = true;
+            generateLevel();
+            lastTime = performance.now();
+            requestAnimationFrame(loop);
+        }
+
+        function gameOver() {
+            gameActive = false;
+            overlay.style.display = 'flex';
+            overlay.querySelector('h1').innerText = "KASUS DITUTUP";
+            overlay.querySelector('p').innerText = `Skor Akhir: ${score} | Level: ${level}`;
+            overlay.querySelector('button').innerText = "Coba Lagi";
+        }
+
+        function handleInput(e) {
+            if (!gameActive) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+
+            let clickedItem = -1;
+            for(let i=0; i<items.length; i++) {
+                if (items[i].contains(mx, my)) {
+                    clickedItem = i;
+                    break;
+                }
+            }
+
+            if (clickedItem !== -1) {
+                if (clickedItem === anomalyIndex) {
+                    // CORRECT
+                    const timeBonus = Math.floor((currentTime / maxTime) * 50);
+                    const levelBonus = level * 10;
+                    score += 100 + timeBonus + levelBonus;
+                    level++;
+                    
+                    // Feedback
+                    showFeedback("BENAR", `+${100 + timeBonus} Poin`);
+                    
+                    scoreDisplay.innerText = score;
+                    levelDisplay.innerText = level;
+                    generateLevel();
+                } else {
+                    // WRONG
+                    currentTime -= 2000; // Penalty
+                    showFeedback("SALAH", "-2 Detik");
+                    // Screen shake
+                    const shake = setInterval(() => {
+                        canvas.style.transform = `translate(${Math.random()*10-5}px, ${Math.random()*10-5}px)`;
+                    }, 50);
+                    setTimeout(() => {
+                        clearInterval(shake);
+                        canvas.style.transform = 'none';
+                    }, 200);
+                }
+            }
+        }
+
+        function showFeedback(title, desc) {
+            msgTitle.innerText = title;
+            msgTitle.style.color = title === "BENAR" ? "#00bcd4" : "#ff4081";
+            msgTitle.style.textShadow = title === "BENAR" ? "0 0 20px #00bcd4" : "0 0 20px #ff4081";
+            document.getElementById('msg-desc').innerText = desc;
+            
+            msgArea.classList.remove('hidden');
+            msgArea.classList.add('visible');
+            
+            setTimeout(() => {
+                msgArea.classList.remove('visible');
+                msgArea.classList.add('hidden');
+            }, 800);
+        }
+
+        window.addEventListener('mousedown', handleInput);
+
+        function loop(now) {
+            if (!gameActive) return;
+            const dt = (now - lastTime) / 1000;
+            lastTime = now;
+
+            // Update Timer
+            currentTime -= dt * 1000;
+            if (currentTime <= 0) {
+                gameOver();
+                return;
+            }
+            
+            const pct = Math.max(0, currentTime / maxTime);
+            timerBar.style.width = `${pct * 100}%`;
+            timerBar.style.backgroundColor = pct < 0.3 ? '#ff4081' : '#00bcd4';
+
+            // Draw
+            ctx.fillStyle = '#0a0a12';
+            ctx.fillRect(0, 0, width, height);
+
+            items.forEach(item => {
+                item.update(dt);
+                item.draw(ctx);
+            });
+
+            requestAnimationFrame(loop);
+        }
+
+    </script>
+</body>
+</html>

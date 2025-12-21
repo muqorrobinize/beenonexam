@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mind Palace: The Rotating Archive</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        body {
+            background-color: #050505;
+            font-family: 'Cinzel', serif;
+            height: 100vh;
+            width: 100vw;
+            color: #d4af37; /* Gold */
+            user-select: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* UI Overlay */
+        #ui {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px;
+        }
+
+        .hud-top {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        #message-display {
+            position: absolute;
+            top: 15%;
+            width: 100%;
+            text-align: center;
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            transition: opacity 0.3s;
+            opacity: 0;
+        }
+
+        #start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 5, 5, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            color: #d4af37;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+
+        p {
+            color: #888;
+            margin-bottom: 30px;
+            font-family: 'Segoe UI', sans-serif;
+            max-width: 500px;
+            line-height: 1.5;
+        }
+
+        button {
+            background: transparent;
+            border: 2px solid #d4af37;
+            color: #d4af37;
+            padding: 15px 40px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #d4af37;
+            color: #000;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
+        }
+
+        canvas {
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+
+    </style>
+    <!-- Import Google Font for aesthetic -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="ui">
+        <div class="hud-top">
+            <div>Archive Level<span class="stat-value" id="level-el">1</span></div>
+            <div>Stability<span class="stat-value" id="lives-el">3</span></div>
+        </div>
+        <div id="message-display">MEMORIZE THE SEQUENCE</div>
+    </div>
+
+    <div id="start-screen">
+        <h1>Mind Palace</h1>
+        <p>
+            Working Memory & Mental Rotation Test.<br><br>
+            1. Watch the <strong>Golden Triangle</strong> for orientation.<br>
+            2. Memorize the tile sequence.<br>
+            3. The board rotates. Click tiles in their new positions.
+        </p>
+        <button onclick="startGame()">Open Archive</button>
+    </div>
+
+    <canvas id="game"></canvas>
+
+    <script>
+        const canvas = document.getElementById('game');
+        const ctx = canvas.getContext('2d');
+        const levelEl = document.getElementById('level-el');
+        const livesEl = document.getElementById('lives-el');
+        const msgEl = document.getElementById('message-display');
+        const startScreen = document.getElementById('start-screen');
+
+        // Game State
+        let level = 1;
+        let lives = 3;
+        let gridSize = 3; // 3x3 starts
+        let sequence = [];
+        let playerSequence = [];
+        let currentState = 'IDLE'; 
+        
+        // Animation
+        let rotationAngle = 0;
+        let targetRotation = 0;
+        let rotationSpeed = 0;
+        let showIndex = -1; 
+        
+        // Visuals
+        let cellSize = 80;
+        let gap = 10;
+        let boardSize = 0;
+        const COLORS = {
+            bg: '#1a1a1a',
+            cell: '#2a2a2a',
+            active: '#d4af37', // Gold
+            wrong: '#ff3333',
+            correct: '#33ff33',
+            border: '#444'
+        };
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            // Adjust size to make room for the marker
+            cellSize = Math.min(canvas.width, canvas.height) / (gridSize + 5); 
+            boardSize = (cellSize * gridSize) + (gap * (gridSize - 1));
+        }
+        window.addEventListener('resize', resize);
+        
+        // --- Core Logic ---
+
+        function startGame() {
+            startScreen.style.display = 'none';
+            level = 1;
+            lives = 3;
+            gridSize = 3;
+            updateUI();
+            resize();
+            nextLevel();
+            loop();
+        }
+
+        function updateUI() {
+            levelEl.innerText = level;
+            livesEl.innerText = lives;
+        }
+
+        function showMessage(text, duration = 1000) {
+            msgEl.innerText = text;
+            msgEl.style.opacity = 1;
+            if (duration > 0) {
+                setTimeout(() => { msgEl.style.opacity = 0; }, duration);
+            }
+        }
+
+        async function nextLevel() {
+            // Difficulty scaling
+            if (level % 3 === 0 && gridSize < 6) gridSize++;
+            resize();
+
+            const length = 2 + Math.floor(level / 2);
+            sequence = [];
+            playerSequence = [];
+            
+            for(let i=0; i<length; i++) {
+                let x = Math.floor(Math.random() * gridSize);
+                let y = Math.floor(Math.random() * gridSize);
+                sequence.push({x, y});
+            }
+
+            // Start Flow
+            currentState = 'MEMORIZE';
+            showMessage("MEMORIZE", 2000);
+            
+            await wait(1000);
+            
+            // Play Sequence
+            for(let i=0; i<sequence.length; i++) {
+                showIndex = i;
+                await wait(600 - Math.min(300, level * 20)); 
+                showIndex = -1;
+                await wait(200);
+            }
+
+            // Rotate
+            currentState = 'ROTATING';
+            
+            // Logic: Rotate 90, 180, or 270 degrees
+            const turns = Math.floor(Math.random() * 3) + 1; // 1, 2, 3
+            // Alternate direction randomly
+            const dir = Math.random() > 0.5 ? 1 : -1;
+            
+            targetRotation = rotationAngle + (turns * (Math.PI / 2) * dir);
+            
+            showMessage("ROTATING...", 1500);
+            
+            await waitForRotation();
+            
+            currentState = 'INPUT';
+            showMessage("RECALL");
+        }
+
+        function wait(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function waitForRotation() {
+            return new Promise(resolve => {
+                const check = setInterval(() => {
+                    // Check if close enough
+                    if (Math.abs(targetRotation - rotationAngle) < 0.01) {
+                        clearInterval(check);
+                        resolve();
+                    }
+                }, 50);
+            });
+        }
+
+        // --- Interaction ---
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (currentState !== 'INPUT') return;
+
+            const rect = canvas.getBoundingClientRect();
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            
+            const rawX = e.clientX - rect.left - cx;
+            const rawY = e.clientY - rect.top - cy;
+
+            // Apply Inverse Rotation to mouse click to find grid cell
+            const cos = Math.cos(-rotationAngle);
+            const sin = Math.sin(-rotationAngle);
+            
+            const rx = rawX * cos - rawY * sin;
+            const ry = rawX * sin + rawY * cos;
+
+            const startOffset = -boardSize / 2;
+            
+            if (rx < startOffset || rx > -startOffset || ry < startOffset || ry > -startOffset) return;
+
+            const col = Math.floor((rx - startOffset) / (cellSize + gap));
+            const row = Math.floor((ry - startOffset) / (cellSize + gap));
+
+            // Bounds check just in case
+            if (col < 0 || col >= gridSize || row < 0 || row >= gridSize) return;
+
+            handleInput(col, row);
+        });
+
+        function handleInput(x, y) {
+            const target = sequence[playerSequence.length];
+            
+            if (x === target.x && y === target.y) {
+                // Correct
+                playerSequence.push({x, y});
+                
+                if (playerSequence.length === sequence.length) {
+                    level++;
+                    updateUI();
+                    currentState = 'SUCCESS';
+                    showMessage("PERFECT");
+                    setTimeout(nextLevel, 1000);
+                }
+            } else {
+                // Wrong
+                lives--;
+                updateUI();
+                
+                // Shake effect (Visual punishment)
+                const shakeAmount = 0.2;
+                rotationAngle += (Math.random() > 0.5 ? 1 : -1) * shakeAmount;
+                
+                if (lives <= 0) {
+                    gameOver();
+                } else {
+                    showMessage("MISTAKE!", 500);
+                    playerSequence = []; // Reset current attempt
+                    // Flash red
+                    document.body.style.backgroundColor = '#330000';
+                    setTimeout(() => document.body.style.backgroundColor = '#050505', 200);
+                }
+            }
+        }
+
+        function gameOver() {
+            currentState = 'GAMEOVER';
+            startScreen.style.display = 'flex';
+            startScreen.querySelector('h1').innerText = "MEMORY COLLAPSE";
+            startScreen.querySelector('p').innerHTML = `System Failed at Level ${level}.<br>Mental Stability Lost.`;
+            startScreen.querySelector('button').innerText = "RECONSTRUCT";
+        }
+
+        // --- Render Loop ---
+
+        function drawRoundedRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + w - r, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+            ctx.lineTo(x + w, y + h - r);
+            ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+            ctx.lineTo(x + r, y + h);
+            ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+            ctx.lineTo(x, y + r);
+            ctx.quadraticCurveTo(x, y, x + r, y);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        function loop() {
+            // Slower Lerp for visible rotation (0.05 factor)
+            rotationAngle += (targetRotation - rotationAngle) * 0.05;
+
+            // Background
+            ctx.fillStyle = '#050505';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Static Decoration (Fixed Reference Frame)
+            ctx.strokeStyle = '#222';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(canvas.width/2, canvas.height/2, boardSize * 0.9, 0, Math.PI*2);
+            ctx.stroke();
+
+            // Setup Rotated Board Context
+            ctx.save();
+            ctx.translate(canvas.width/2, canvas.height/2);
+            ctx.rotate(rotationAngle);
+            
+            // --- DRAW ORIENTATION MARKER (The "North" Pointer) ---
+            // Draw this BEFORE translating to grid top-left, relative to center
+            const markerY = -boardSize/2 - 25; // Just above the grid
+            ctx.fillStyle = COLORS.active; // Gold
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = COLORS.active;
+            ctx.beginPath();
+            ctx.moveTo(0, markerY);          // Tip pointing away? Or pointing to board?
+            ctx.lineTo(-10, markerY - 15);   // Pointing towards board looks better as "This is Top"
+            ctx.lineTo(10, markerY - 15);
+            ctx.closePath();
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Translate to Grid Origin (Top-Left)
+            ctx.translate(-boardSize/2, -boardSize/2);
+
+            // Draw Grid
+            for(let y=0; y<gridSize; y++) {
+                for(let x=0; x<gridSize; x++) {
+                    const px = x * (cellSize + gap);
+                    const py = y * (cellSize + gap);
+
+                    let color = COLORS.cell;
+                    let borderColor = COLORS.border;
+                    let scale = 1;
+
+                    // 1. Sequence Highlight
+                    if (showIndex !== -1 && sequence[showIndex].x === x && sequence[showIndex].y === y) {
+                        color = COLORS.active;
+                        scale = 1.1;
+                        borderColor = '#fff';
+                        ctx.shadowBlur = 20;
+                        ctx.shadowColor = COLORS.active;
+                    } else {
+                        ctx.shadowBlur = 0;
+                    }
+
+                    // 2. Player Input Feedback (Correctly clicked items stay lit?)
+                    for(let p of playerSequence) {
+                        if (p.x === x && p.y === y) {
+                             borderColor = COLORS.correct;
+                             color = '#1a331a'; // Dark green tint
+                        }
+                    }
+
+                    ctx.fillStyle = color;
+                    ctx.strokeStyle = borderColor;
+                    ctx.lineWidth = 2;
+                    
+                    const offset = (cellSize * (1-scale))/2;
+                    drawRoundedRect(ctx, px + offset, py + offset, cellSize*scale, cellSize*scale, 5);
+                }
+            }
+
+            ctx.restore();
+            requestAnimationFrame(loop);
+        }
+
+    </script>
+</body>
+</html>

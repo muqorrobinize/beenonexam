@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumina: The Art of Slowing Down</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        body {
+            background-color: #050505;
+            color: #888;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            width: 100vw;
+            cursor: none; /* Hide default cursor */
+            user-select: none;
+        }
+
+        canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s ease;
+        }
+
+        #message {
+            font-size: 1.5rem;
+            letter-spacing: 0.2rem;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            font-weight: 300;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        #guide {
+            position: absolute;
+            bottom: 30px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.3);
+            text-align: center;
+        }
+
+        /* Custom Cursor */
+        #cursor-dot {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 3;
+            mix-blend-mode: difference;
+            transition: width 0.2s, height 0.2s;
+        }
+
+        .stress-mode #cursor-dot {
+            width: 4px;
+            height: 4px;
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="cursor-dot"></div>
+    
+    <div id="ui-layer">
+        <div id="message">Slow down...</div>
+        <div id="guide">Move gently to create light. Speed creates chaos.</div>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const cursorDot = document.getElementById('cursor-dot');
+        const messageEl = document.getElementById('message');
+        const body = document.body;
+
+        let width, height;
+        let particles = [];
+        
+        // Mouse state
+        let mouse = { x: -100, y: -100 };
+        let lastMouse = { x: -100, y: -100 };
+        let velocity = 0;
+        let isMoving = false;
+        let inactivityTimer = 0;
+
+        // Configuration
+        const MAX_PARTICLES = 150; // Cap for performance and visuals
+        const SLOW_THRESHOLD = 15; // Speed below this is "calm"
+        const FAST_THRESHOLD = 40; // Speed above this is "chaos"
+        
+        // Color Palettes
+        const CALM_COLORS = [
+            'hsla(180, 70%, 60%, ', // Cyan
+            'hsla(280, 60%, 65%, ', // Lavender
+            'hsla(220, 80%, 70%, ', // Blue
+            'hsla(150, 60%, 70%, '  // Mint
+        ];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Particle Class
+        class Particle {
+            constructor(x, y, type) {
+                this.x = x;
+                this.y = y;
+                this.type = type; // 'calm' or 'chaos'
+                this.life = 1;
+                this.decay = Math.random() * 0.01 + 0.005;
+                
+                if (type === 'calm') {
+                    // Calm particles float gently out
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 0.5;
+                    this.vx = Math.cos(angle) * speed;
+                    this.vy = Math.sin(angle) * speed;
+                    this.size = Math.random() * 30 + 10;
+                    this.colorPrefix = CALM_COLORS[Math.floor(Math.random() * CALM_COLORS.length)];
+                } else {
+                    // Chaos particles are jagged and fast
+                    this.vx = (Math.random() - 0.5) * 5;
+                    this.vy = (Math.random() - 0.5) * 5;
+                    this.size = Math.random() * 3 + 1;
+                    this.decay = 0.05; // Fade fast
+                }
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.life -= this.decay;
+
+                // Calm particles slow down over time
+                if (this.type === 'calm') {
+                    this.vx *= 0.98;
+                    this.vy *= 0.98;
+                    this.size *= 0.99; // Shrink slightly
+                }
+            }
+
+            draw(ctx) {
+                ctx.beginPath();
+                if (this.type === 'calm') {
+                    // Soft glowing orb
+                    ctx.fillStyle = this.colorPrefix + this.life + ')';
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    // Jagged static
+                    ctx.fillStyle = `rgba(100, 100, 100, ${this.life})`;
+                    ctx.fillRect(this.x, this.y, this.size, this.size);
+                }
+            }
+        }
+
+        // Interaction Handling
+        function handleMove(e) {
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+            // Update custom cursor
+            cursorDot.style.left = clientX + 'px';
+            cursorDot.style.top = clientY + 'px';
+
+            mouse.x = clientX;
+            mouse.y = clientY;
+
+            // Calculate velocity
+            const dx = mouse.x - lastMouse.x;
+            const dy = mouse.y - lastMouse.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            // Smoothing velocity reading
+            velocity = velocity * 0.8 + dist * 0.2;
+
+            isMoving = true;
+            inactivityTimer = 0;
+
+            // Logic: Spawn particles based on speed
+            if (velocity > FAST_THRESHOLD) {
+                // Too fast - Stress Mode
+                body.classList.add('stress-mode');
+                messageEl.style.opacity = 1; // Show "Slow down"
+                messageEl.innerText = "Too fast...";
+                
+                // Spawn chaos
+                for(let i=0; i<3; i++) {
+                    particles.push(new Particle(mouse.x, mouse.y, 'chaos'));
+                }
+            } else if (velocity < SLOW_THRESHOLD && velocity > 0.5) {
+                // Good speed - Zen Mode
+                body.classList.remove('stress-mode');
+                messageEl.style.opacity = 0;
+                
+                // Spawn beauty (less frequent to avoid clutter)
+                if (Math.random() > 0.2) {
+                    particles.push(new Particle(mouse.x, mouse.y, 'calm'));
+                }
+            } else if (velocity >= SLOW_THRESHOLD && velocity <= FAST_THRESHOLD) {
+                // Middle ground - Transition
+                body.classList.remove('stress-mode');
+                messageEl.innerText = "Slower...";
+                messageEl.style.opacity = 0.5;
+            }
+
+            lastMouse.x = mouse.x;
+            lastMouse.y = mouse.y;
+        }
+
+        window.addEventListener('mousemove', handleMove);
+        window.addEventListener('touchmove', handleMove);
+        window.addEventListener('touchstart', (e) => {
+            lastMouse.x = e.touches[0].clientX;
+            lastMouse.y = e.touches[0].clientY;
+        });
+
+
+        // Animation Loop
+        function animate() {
+            // Create trails effect
+            // If chaos mode, clear screen harshly. If calm mode, leave trails.
+            if (velocity > FAST_THRESHOLD) {
+                ctx.fillStyle = 'rgba(5, 5, 5, 0.3)'; // Fast fade
+            } else {
+                ctx.fillStyle = 'rgba(5, 5, 5, 0.1)'; // Slow fade (trails)
+            }
+            ctx.fillRect(0, 0, width, height);
+
+            // Update and draw particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.update();
+                p.draw(ctx);
+                
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+
+            // Inactivity Breather
+            // If user stops moving, show a gentle breathing guide pulse
+            if (!isMoving) {
+                inactivityTimer++;
+                if (inactivityTimer > 100) { // After ~1.5 seconds of stillness
+                    const time = Date.now() / 2000;
+                    const size = 50 + Math.sin(time) * 20; // Breathe in/out
+                    const alpha = (Math.sin(time) + 1) / 4; // Opacity pulse
+                    
+                    ctx.beginPath();
+                    ctx.arc(width/2, height/2, size, 0, Math.PI * 2);
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+
+                    // Optional text update
+                    if (Math.sin(time) < -0.9) messageEl.innerText = "Breathe In";
+                    if (Math.sin(time) > 0.9) messageEl.innerText = "Breathe Out";
+                    messageEl.style.opacity = Math.max(0, alpha - 0.2);
+                }
+            } else {
+                isMoving = false; // Reset for next frame check
+            }
+
+            // Cap velocity decay when not moving so it doesn't get stuck
+            velocity *= 0.9;
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>

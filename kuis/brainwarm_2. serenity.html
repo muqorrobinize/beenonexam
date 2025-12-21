@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serenity: The Digital Pond</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        body {
+            background-color: #020406; /* Deepest water dark */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            width: 100vw;
+            user-select: none;
+            cursor: pointer;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        #ui {
+            position: absolute;
+            bottom: 30px;
+            width: 100%;
+            text-align: center;
+            pointer-events: none;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            animation: fadeHint 5s ease-in-out infinite;
+        }
+
+        @keyframes fadeHint {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ui">Click to ripple. Hold to feed.</div>
+    <canvas id="pond"></canvas>
+
+    <script>
+        const canvas = document.getElementById('pond');
+        const ctx = canvas.getContext('2d');
+        
+        let width, height;
+        let ripples = [];
+        let food = [];
+        let fish = [];
+
+        // Colors
+        const WATER_BASE = '#05111a';
+        const WATER_HIGHLIGHT = '#0a202e';
+        const RIPPLE_COLOR = 'rgba(100, 150, 200, ';
+        
+        // Koi Palettes
+        const KOI_COLORS = [
+            { body: '#E65100', pattern: '#FFFFFF' }, // Orange/White
+            { body: '#FFFFFF', pattern: '#D84315' }, // White/Red
+            { body: '#FFD600', pattern: '#212121' }, // Gold/Black
+            { body: '#F5F5F5', pattern: '#CFD8DC' }, // Platinum
+            { body: '#212121', pattern: '#E65100' }  // Black/Orange
+        ];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        // --- Utility ---
+        function distance(p1, p2) {
+            const dx = p1.x - p2.x;
+            const dy = p1.y - p2.y;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        function lerp(start, end, amt) {
+            return (1 - amt) * start + amt * end;
+        }
+
+        function angleDiff(a1, a2) {
+            let diff = a2 - a1;
+            while (diff < -Math.PI) diff += Math.PI * 2;
+            while (diff > Math.PI) diff -= Math.PI * 2;
+            return diff;
+        }
+
+        // --- Classes ---
+
+        class Ripple {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = 0;
+                this.alpha = 0.6;
+                this.speed = 2;
+                this.life = 100;
+            }
+
+            update() {
+                this.radius += this.speed;
+                this.alpha -= 0.006;
+                this.life--;
+                this.speed *= 0.98; // Slow down expansion
+            }
+
+            draw(ctx) {
+                if (this.alpha <= 0) return;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = RIPPLE_COLOR + this.alpha + ')';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        }
+
+        class Pellet {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = 3;
+                this.life = 300; // Lasts 5 seconds
+            }
+            
+            update() {
+                this.life--;
+                this.size = 3 * (this.life / 300);
+            }
+
+            draw(ctx) {
+                ctx.fillStyle = '#8D6E63';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        class Koi {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.angle = Math.random() * Math.PI * 2;
+                this.speed = 1 + Math.random();
+                this.maxSpeed = 2.5;
+                this.turnSpeed = 0.05;
+                
+                // Appearance
+                this.size = 15 + Math.random() * 10;
+                this.color = KOI_COLORS[Math.floor(Math.random() * KOI_COLORS.length)];
+                
+                // Animation state
+                this.tailAngle = 0;
+                this.finAngle = 0;
+                this.waggelSpeed = 0.2;
+            }
+
+            update() {
+                // 1. Environmental Awareness
+                let targetAngle = this.angle;
+                let seekingFood = false;
+
+                // Check Walls
+                const margin = 100;
+                if (this.x < margin) targetAngle = 0;
+                else if (this.x > width - margin) targetAngle = Math.PI;
+                if (this.y < margin) targetAngle = Math.PI / 2;
+                else if (this.y > height - margin) targetAngle = -Math.PI / 2;
+
+                // Check Food (Highest priority attraction)
+                let closestFood = null;
+                let minDist = 300;
+                
+                for (let p of food) {
+                    let d = distance(this, p);
+                    if (d < minDist) {
+                        minDist = d;
+                        closestFood = p;
+                    }
+                }
+
+                if (closestFood) {
+                    if (minDist < 10) {
+                        // Eat food
+                        food = food.filter(f => f !== closestFood);
+                        this.size = Math.min(this.size + 0.5, 35); // Grow slightly
+                    } else {
+                        // Seek food
+                        targetAngle = Math.atan2(closestFood.y - this.y, closestFood.x - this.x);
+                        seekingFood = true;
+                    }
+                }
+
+                // Check Ripples (Repulsion)
+                for (let r of ripples) {
+                    let d = distance(this, r);
+                    if (d < r.radius + 50 && d > r.radius - 20) {
+                        // If near the ripple ring, turn away
+                        let angleToRipple = Math.atan2(r.y - this.y, r.x - this.x);
+                        targetAngle = angleToRipple + Math.PI; // Turn 180 away
+                        this.speed = Math.min(this.speed + 0.5, 4); // Spook burst
+                    }
+                }
+
+                // Random wandering if nothing else
+                if (!closestFood && Math.random() < 0.02) {
+                    targetAngle += (Math.random() - 0.5) * 2;
+                }
+
+                // 2. Physics & Movement
+                let diff = angleDiff(this.angle, targetAngle);
+                
+                // Smooth turning
+                if (Math.abs(diff) > 0.1) {
+                    this.angle += Math.sign(diff) * this.turnSpeed;
+                }
+                
+                // Speed regulation
+                if (seekingFood) {
+                    this.speed = lerp(this.speed, this.maxSpeed, 0.05);
+                    this.waggelSpeed = 0.4;
+                } else {
+                    this.speed = lerp(this.speed, 1.5, 0.02);
+                    this.waggelSpeed = 0.15;
+                }
+                
+                // Apply velocity
+                this.x += Math.cos(this.angle) * this.speed;
+                this.y += Math.sin(this.angle) * this.speed;
+
+                // Wrap around loosely if missed wall check
+                if (this.x < -50) this.x = width + 50;
+                if (this.x > width + 50) this.x = -50;
+                if (this.y < -50) this.y = height + 50;
+                if (this.y > height + 50) this.y = -50;
+
+                // Animation
+                this.tailAngle += this.waggelSpeed;
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+
+                // Draw Shadows
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                this.drawBodyPath(ctx, 10); // Offset shadow
+                ctx.fill();
+
+                // Draw Body
+                ctx.fillStyle = this.color.body;
+                this.drawBodyPath(ctx, 0);
+                ctx.fill();
+
+                // Draw Pattern (Simple stripe for style)
+                ctx.fillStyle = this.color.pattern;
+                ctx.beginPath();
+                ctx.ellipse(0, 0, this.size * 0.6, this.size * 0.3, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Eyes
+                ctx.fillStyle = '#000';
+                ctx.beginPath();
+                ctx.arc(this.size * 0.5, -this.size * 0.3, 2, 0, Math.PI * 2);
+                ctx.arc(this.size * 0.5, this.size * 0.3, 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.restore();
+            }
+
+            drawBodyPath(ctx, offset) {
+                const w = this.size; // Width scale
+                const tailWag = Math.sin(this.tailAngle) * (w * 0.5);
+                
+                ctx.beginPath();
+                // Nose
+                ctx.moveTo(w, offset);
+                
+                // Right side
+                ctx.bezierCurveTo(w * 0.5, w * 0.8 + offset, -w * 0.5, w * 0.6 + offset, -w + tailWag, offset);
+                
+                // Tail fin
+                ctx.lineTo(-w * 1.8 + tailWag, w * 0.5 + offset);
+                ctx.lineTo(-w * 1.5 + tailWag, offset);
+                ctx.lineTo(-w * 1.8 + tailWag, -w * 0.5 + offset);
+                ctx.lineTo(-w + tailWag, offset);
+
+                // Left side
+                ctx.bezierCurveTo(-w * 0.5, -w * 0.6 + offset, w * 0.5, -w * 0.8 + offset, w, offset);
+                ctx.closePath();
+            }
+        }
+
+        // --- Initialization ---
+
+        function init() {
+            for (let i = 0; i < 12; i++) {
+                fish.push(new Koi());
+            }
+        }
+
+        // --- Inputs ---
+
+        let isMouseDown = false;
+        let pressTimer = 0;
+
+        // Mouse & Touch Unified
+        function handleStart(e) {
+            isMouseDown = true;
+            pressTimer = 0;
+            const x = e.touches ? e.touches[0].clientX : e.clientX;
+            const y = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            // Immediate feedback: Ripple
+            ripples.push(new Ripple(x, y));
+        }
+
+        function handleEnd() {
+            isMouseDown = false;
+        }
+
+        function handleMove(e) {
+            if (isMouseDown) {
+                pressTimer++;
+                // If holding and moving, create feed trail
+                if (pressTimer > 10 && pressTimer % 5 === 0) {
+                    const x = e.touches ? e.touches[0].clientX : e.clientX;
+                    const y = e.touches ? e.touches[0].clientY : e.clientY;
+                    food.push(new Pellet(x, y));
+                }
+            }
+        }
+
+        window.addEventListener('mousedown', handleStart);
+        window.addEventListener('mouseup', handleEnd);
+        window.addEventListener('mousemove', handleMove);
+
+        window.addEventListener('touchstart', handleStart);
+        window.addEventListener('touchend', handleEnd);
+        window.addEventListener('touchmove', handleMove);
+        
+        // Right click to feed
+        window.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            food.push(new Pellet(e.clientX, e.clientY));
+        });
+
+
+        // --- Loop ---
+
+        function animate() {
+            // Draw Background (Deep water gradient)
+            const gradient = ctx.createLinearGradient(0, 0, 0, height);
+            gradient.addColorStop(0, WATER_BASE);
+            gradient.addColorStop(1, WATER_HIGHLIGHT);
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+
+            // Update & Draw Food
+            for (let i = food.length - 1; i >= 0; i--) {
+                const p = food[i];
+                p.update();
+                p.draw(ctx);
+                if (p.life <= 0) food.splice(i, 1);
+            }
+
+            // Update & Draw Fish
+            fish.forEach(f => {
+                f.update();
+                f.draw(ctx);
+            });
+
+            // Update & Draw Ripples (Top layer)
+            for (let i = ripples.length - 1; i >= 0; i--) {
+                const r = ripples[i];
+                r.update();
+                r.draw(ctx);
+                if (r.life <= 0) ripples.splice(i, 1);
+            }
+
+            // Feeding logic for hold
+            if (isMouseDown) {
+                pressTimer++;
+                // Drop food every 10 frames if holding
+                if (pressTimer > 20 && pressTimer % 8 === 0) {
+                    // We need mouse pos, but event listeners are separate. 
+                    // Simplified: requires move to drop trails, click for single.
+                    // This block handles stationary hold feeding if we tracked mouse pos globally.
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
+
+    </script>
+</body>
+</html>
