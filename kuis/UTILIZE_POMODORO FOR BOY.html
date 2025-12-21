@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Pookie: Pomodoro</title>
+    <style>
+        :root {
+            --bg-work: #f48fb1; /* Pink Manja */
+            --bg-break: #ce93d8; /* Ungu Santai */
+            --text-color: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.25); /* Glassy look */
+        }
+
+        body {
+            background-color: var(--bg-work);
+            color: var(--text-color);
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; /* Playful font */
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.5s ease;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        /* Main Container */
+        .container {
+            text-align: center;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 30px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.3); /* Pink glow */
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+        }
+
+        /* Avatar */
+        #avatar {
+            font-size: 5rem;
+            margin-bottom: 10px;
+            display: inline-block;
+            transition: transform 0.2s;
+            cursor: pointer;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+        }
+
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both infinite;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0) rotate(-5deg); }
+            20%, 80% { transform: translate3d(4px, 0, 0) rotate(5deg); }
+            30%, 50%, 70% { transform: translate3d(-8px, 0, 0) rotate(-5deg); }
+            40%, 60% { transform: translate3d(8px, 0, 0) rotate(5deg); }
+        }
+
+        /* Speech Bubble */
+        #speech-bubble {
+            background: white;
+            color: #d81b60; /* Dark pink text */
+            padding: 15px;
+            border-radius: 20px;
+            border-bottom-left-radius: 5px; /* Comic style */
+            position: relative;
+            margin-bottom: 30px;
+            font-weight: bold;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Timer Display */
+        #timer-display {
+            font-size: 5rem;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 2px;
+            margin: 20px 0;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+            text-transform: uppercase;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        #btn-main {
+            background: white;
+            color: var(--bg-work); /* Follows bg color */
+            flex: 2;
+        }
+
+        #btn-reset {
+            background: rgba(255,255,255,0.4);
+            color: white;
+            flex: 1;
+        }
+
+        /* Inputs */
+        .settings-row {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 2px dashed rgba(255,255,255,0.5);
+        }
+
+        .setting-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.8rem;
+            color: white;
+        }
+
+        .setting-item input, .setting-item select {
+            background: rgba(255,255,255,0.3);
+            border: 1px solid white;
+            color: white;
+            padding: 8px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 5px;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .setting-item select {
+            width: 150px;
+            text-align: left;
+            color: #d81b60; /* Dark pink for readability */
+            background: white;
+            cursor: pointer;
+        }
+        
+        .setting-item input:focus {
+            outline: none;
+            background: rgba(255,255,255,0.5);
+        }
+
+        .mode-switch {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            opacity: 0.9;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .mode-switch label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Chatty Area -->
+        <div id="speech-bubble">Let's work babe, so we can buy skincare! 💕</div>
+        
+        <!-- Avatar -->
+        <div id="avatar" onclick="testSound()">🥺</div>
+
+        <!-- Timer -->
+        <div id="timer-display">25:00</div>
+
+        <!-- Buttons -->
+        <div class="controls">
+            <button id="btn-main" onclick="toggleTimer()">Let's Start</button>
+            <button id="btn-reset" onclick="resetTimer()">Reset</button>
+        </div>
+
+        <!-- Custom Time Inputs -->
+        <div class="settings-row">
+            <div class="setting-item">
+                <label>Focus (min)</label>
+                <input type="number" id="work-input" value="25" min="1" max="120" onchange="updateCustomTime()">
+            </div>
+            <div class="setting-item">
+                <label>Relax (min)</label>
+                <input type="number" id="break-input" value="5" min="1" max="60" onchange="updateCustomTime()">
+            </div>
+            <div class="setting-item" style="width: 100%;">
+                <label>Alarm Sound</label>
+                <select id="alarm-select" onchange="previewAlarm()">
+                    <option value="tts">🗣️ My Pookie (Voice)</option>
+                    <option value="bell">🔔 Cute Bell</option>
+                    <option value="arcade">👾 Fun Game</option>
+                    <option value="beep">⏰ Digital Beep</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="mode-switch">
+            <label title="Enable my clingy voice">
+                <input type="checkbox" id="voice-toggle" checked> Clingy Voice Active
+            </label>
+        </div>
+    </div>
+
+    <script>
+        // --- Clingy Voice Configuration ---
+        const PHRASES = {
+            startWork: [
+                "Let's go babe! Making money for our future~", 
+                "Focus okay honey? Don't look at other girls!", 
+                "Work hard handsome! Make me proud!", 
+                "You can do it pookie! I'll give you a treat later."
+            ],
+            pauseWork: [
+                "Why did you stop? Miss me already?", 
+                "Don't be lazy, or I'll get mad!", 
+                "Come on continue, it's almost done babe.", 
+                "Tired already? You're so weak~"
+            ],
+            finishWork: [
+                "Yaaay finished! Hug me~ 🤗", 
+                "So proud of you honey! Now rest.", 
+                "Stop working now, I'm bored being ignored.", 
+                "Done! Let's play with me for a bit."
+            ],
+            startBreak: [
+                "Relax babe. Drink water so you stay healthy.", 
+                "Scrolling TikTok is okay, but not too long!", 
+                "Go lie down, I'll keep you company.", 
+                "Don't think about work, think about me instead?"
+            ],
+            finishBreak: [
+                "Break is over, let's work again!", 
+                "Babe, your boss is looking for you. Back to work.", 
+                "Miss your laptop? Let's be productive!", 
+                "Enough playing, or we won't get rich."
+            ],
+            nagging: [
+                "Eeeek it's so louuud!", 
+                "Turn off the alaaaarm!", 
+                "I'm gonna be mad if you don't click it!", 
+                "Hurry up baaabe!",
+                "So noisy! Press the button!"
+            ]
+        };
+
+        // --- Global Variables ---
+        let timer;
+        let timeLeft = 25 * 60; 
+        let isRunning = false;
+        let isWorkMode = true; 
+        let naggingInterval; 
+        let audioCtx;
+
+        // DOM Elements
+        const timerDisplay = document.getElementById('timer-display');
+        const btnMain = document.getElementById('btn-main');
+        const avatar = document.getElementById('avatar');
+        const bubble = document.getElementById('speech-bubble');
+        const body = document.body;
+        const voiceToggle = document.getElementById('voice-toggle');
+        const workInput = document.getElementById('work-input');
+        const breakInput = document.getElementById('break-input');
+        const alarmSelect = document.getElementById('alarm-select');
+
+        // --- Web Audio API ---
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSynthesizedSound(type) {
+            initAudio();
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'beep') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, now);
+                osc.frequency.setValueAtTime(880, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            } else if (type === 'bell') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(600, now); // Softer tone
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(0.2, now + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 2);
+                osc.start(now);
+                osc.stop(now + 2);
+            } else if (type === 'arcade') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.linearRampToValueAtTime(800, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            }
+        }
+
+        // --- Core Logic ---
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function updateDisplay() {
+            timerDisplay.innerText = formatTime(timeLeft);
+            document.title = `(${formatTime(timeLeft)}) My Pookie`;
+        }
+
+        function updateCustomTime() {
+            if (!isRunning) {
+                const w = Math.max(1, parseInt(workInput.value));
+                const b = Math.max(1, parseInt(breakInput.value));
+                timeLeft = isWorkMode ? w * 60 : b * 60;
+                updateDisplay();
+            }
+        }
+
+        function speak(text, isAlarm = false) {
+            if (!voiceToggle.checked && !isAlarm) {
+                bubble.innerText = text; 
+                return;
+            }
+            
+            bubble.innerText = text;
+
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US'; // English US
+                utterance.rate = 1.2; // Slightly fast to sound excited/chatty
+                utterance.pitch = 1.4; // Higher pitch (cute voice)
+                
+                const voices = window.speechSynthesis.getVoices();
+                // Find English voice, prefer female sounding ones if distinguishable by name (not reliable but worth a shot)
+                const engVoice = voices.find(v => v.lang.includes('en-US') && (v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Zira') || v.name.includes('Google US English')));
+                
+                if (engVoice) utterance.voice = engVoice;
+                // Fallback to any English voice
+                else if (voices.find(v => v.lang.includes('en'))) utterance.voice = voices.find(v => v.lang.includes('en'));
+
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function getRandomPhrase(type) {
+            const list = PHRASES[type];
+            return list[Math.floor(Math.random() * list.length)];
+        }
+
+        function toggleTimer() {
+            if (isRunning) pauseTimer();
+            else startTimer();
+        }
+
+        function startTimer() {
+            initAudio(); 
+            isRunning = true;
+            btnMain.innerText = "Pause Babe";
+            workInput.disabled = true;
+            breakInput.disabled = true;
+            alarmSelect.disabled = true;
+            
+            if (isWorkMode) {
+                avatar.innerText = "😘"; 
+                body.style.backgroundColor = "var(--bg-work)";
+                btnMain.style.color = "var(--bg-work)";
+            } else {
+                avatar.innerText = "🥰"; 
+                body.style.backgroundColor = "var(--bg-break)";
+                btnMain.style.color = "var(--bg-break)";
+            }
+
+            stopNagging();
+
+            const msg = isWorkMode ? getRandomPhrase('startWork') : getRandomPhrase('startBreak');
+            speak(msg);
+
+            timer = setInterval(() => {
+                if (timeLeft > 0) {
+                    timeLeft--;
+                    updateDisplay();
+                } else {
+                    timerFinished();
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            clearInterval(timer);
+            isRunning = false;
+            btnMain.innerText = "Resume Honey";
+            workInput.disabled = false;
+            breakInput.disabled = false;
+            alarmSelect.disabled = false;
+            
+            if (isWorkMode) {
+                avatar.innerText = "🥺"; // Pouting face
+                speak(getRandomPhrase('pauseWork'));
+            } else {
+                avatar.innerText = "😴";
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            stopNagging();
+            isRunning = false;
+            isWorkMode = true; 
+            
+            workInput.disabled = false;
+            breakInput.disabled = false;
+            alarmSelect.disabled = false;
+
+            timeLeft = parseInt(workInput.value) * 60;
+            
+            updateDisplay();
+            body.style.backgroundColor = "var(--bg-work)";
+            btnMain.style.color = "var(--bg-work)";
+            btnMain.innerText = "Let's Start";
+            avatar.innerText = "😉";
+            bubble.innerText = "Want to start over pookie?";
+            window.speechSynthesis.cancel();
+        }
+
+        function timerFinished() {
+            clearInterval(timer);
+            isRunning = false;
+            
+            workInput.disabled = false;
+            breakInput.disabled = false;
+            alarmSelect.disabled = false;
+            
+            if (isWorkMode) {
+                // Work Finished
+                timeLeft = parseInt(breakInput.value) * 60; 
+                body.style.backgroundColor = "var(--bg-break)"; 
+                startNagging(getRandomPhrase('finishWork')); 
+                isWorkMode = false;
+                btnMain.innerText = "Start Relaxing";
+                btnMain.style.color = "var(--bg-break)";
+                avatar.innerText = "🥳";
+            } else {
+                // Break Finished
+                timeLeft = parseInt(workInput.value) * 60; 
+                body.style.backgroundColor = "var(--bg-work)";
+                startNagging(getRandomPhrase('finishBreak'));
+                isWorkMode = true;
+                btnMain.innerText = "Start Working";
+                btnMain.style.color = "var(--bg-work)";
+                avatar.innerText = "😤";
+            }
+            updateDisplay();
+        }
+
+        function startNagging(initialMessage) {
+            avatar.classList.add('shake');
+            const alarmType = alarmSelect.value;
+            
+            if (alarmType === 'tts') {
+                speak(initialMessage, true);
+                let counter = 0;
+                naggingInterval = setInterval(() => {
+                    counter++;
+                    const nagText = counter % 2 === 0 ? getRandomPhrase('nagging') : initialMessage;
+                    speak(nagText, true);
+                }, 3500); 
+            } else {
+                bubble.innerText = "TIME IS UP BABY! CLICK THE BUTTON!";
+                playSynthesizedSound(alarmType);
+                
+                naggingInterval = setInterval(() => {
+                    playSynthesizedSound(alarmType);
+                }, 800);
+            }
+        }
+
+        function stopNagging() {
+            if (naggingInterval) {
+                clearInterval(naggingInterval);
+                naggingInterval = null;
+            }
+            avatar.classList.remove('shake');
+            window.speechSynthesis.cancel();
+        }
+
+        function testSound() {
+            const type = alarmSelect.value;
+            if (type !== 'tts') {
+                playSynthesizedSound(type);
+            } else {
+                speak("I love you! But let's work first.");
+            }
+        }
+
+        function previewAlarm() {
+            const type = alarmSelect.value;
+            if (type !== 'tts') {
+                playSynthesizedSound(type);
+            }
+        }
+
+        window.speechSynthesis.getVoices();
+
+    </script>
+</body>
+</html>
