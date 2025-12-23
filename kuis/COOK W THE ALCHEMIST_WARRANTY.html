@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE ALCHEMIST: AUTHORITY CHECK</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        void: '#050505',
+                        surface: '#0a0a0a',
+                        border: '#27272a',
+                        gold: '#fbbf24',
+                        toxic: '#4ade80',
+                        mist: '#a1a1aa',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        serif: ['Cinzel', 'serif'],
+                    },
+                    animation: {
+                        'scan': 'scan 2s linear infinite',
+                    },
+                    keyframes: {
+                        scan: {
+                            '0%': { transform: 'translateY(-100%)' },
+                            '100%': { transform: 'translateY(100%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #050505; color: #e4e4e7; }
+        .input-focus:focus { outline: none; border-color: #fbbf24; box-shadow: 0 0 15px rgba(251, 191, 36, 0.2); }
+        .glass-panel { background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(10px); border: 1px solid #27272a; }
+        
+        /* ID Card Style */
+        .id-card {
+            background: linear-gradient(135deg, #111 0%, #050505 100%);
+            border: 1px solid #333;
+            position: relative;
+            overflow: hidden;
+        }
+        .id-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, #fbbf24, #b45309);
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col font-sans selection:bg-gold selection:text-black overflow-x-hidden">
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 w-full z-50 border-b border-border bg-void/90 backdrop-blur">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="font-bold tracking-tight text-lg text-gold flex items-center gap-2">
+                <span class="text-xl border border-gold px-2 py-0.5 rounded-sm font-serif text-black bg-gold">Ta</span>
+                AUTHORITY
+            </div>
+            <div class="text-[10px] uppercase tracking-[0.2em] text-mist font-mono">
+                System v1.0
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow pt-32 pb-20 px-4 md:px-0">
+        <div class="max-w-2xl mx-auto space-y-16">
+
+            <!-- HERO: INPUT -->
+            <section id="scanner-section" class="text-center space-y-8 animate-fade-in">
+                <div class="relative w-24 h-24 mx-auto border border-border rounded-full flex items-center justify-center overflow-hidden">
+                    <div class="absolute inset-0 bg-gold/10 animate-pulse"></div>
+                    <div class="w-full h-[2px] bg-gold absolute top-0 animate-scan shadow-[0_0_10px_#fbbf24]"></div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gold relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                
+                <div class="space-y-2">
+                    <h1 class="text-3xl md:text-4xl font-bold text-white font-serif">Verifikasi Identitas</h1>
+                    <p class="text-mist text-sm max-w-md mx-auto">
+                        Masukkan <span class="text-gold font-mono">Philosopher's Stone Key</span> dari sertifikat Anda untuk membuka arsip data lengkap.
+                    </p>
+                </div>
+
+                <div class="w-full max-w-md mx-auto space-y-4">
+                    <input type="text" id="verify-input" placeholder="Paste Key (Example: A1B2-C3D4...)" class="w-full bg-void border border-border p-4 text-center text-white rounded-sm input-focus transition-all font-mono text-sm uppercase tracking-widest">
+                    <button onclick="verifyKey()" class="w-full bg-white text-black px-8 py-3 font-bold text-sm hover:bg-gray-200 transition-all rounded-sm uppercase tracking-widest shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+                        DECODE & VERIFY
+                    </button>
+                    <p id="verify-error" class="text-red-500 text-xs font-mono hidden">Error: Invalid Data Integrity.</p>
+                </div>
+            </section>
+
+            <!-- RESULT: DASHBOARD (HIDDEN) -->
+            <div id="dashboard-section" class="hidden space-y-12">
+                
+                <!-- Status Banner -->
+                <div class="glass-panel p-6 rounded-lg border-l-4 border-l-gold flex justify-between items-center">
+                    <div>
+                        <div class="text-[10px] uppercase text-mist tracking-widest mb-1">Status Verifikasi</div>
+                        <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                            AUTHENTIC
+                        </h2>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-[10px] uppercase text-mist tracking-widest mb-1">Time Stamp</div>
+                        <div id="data-date" class="font-mono text-gold text-sm">--/--/----</div>
+                    </div>
+                </div>
+
+                <!-- Identity Card -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-bold text-white border-b border-border pb-2">Kartu Identitas Digital</h3>
+                    
+                    <div class="id-card p-8 rounded-lg max-w-md mx-auto shadow-2xl transform hover:scale-[1.02] transition-transform duration-500">
+                        <div class="flex justify-between items-start mb-8">
+                            <div class="space-y-1">
+                                <div class="text-[10px] uppercase text-gray-500 tracking-[0.2em]">Codename</div>
+                                <div id="card-name" class="text-2xl font-serif font-bold text-white uppercase tracking-wide">UNKNOWN</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-3xl font-serif text-gold font-bold">Ta</div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-6 mb-8">
+                            <div>
+                                <div class="text-[9px] uppercase text-gray-600 mb-1">Rank Class</div>
+                                <div id="card-rank" class="text-xs font-mono text-gold border border-gold/30 px-2 py-1 inline-block rounded bg-gold/5">VERIFIED</div>
+                            </div>
+                            <div>
+                                <div class="text-[9px] uppercase text-gray-600 mb-1">ID Hash</div>
+                                <div id="card-id" class="text-xs font-mono text-mist truncate">---</div>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-gray-800 pt-4 flex justify-between items-end">
+                            <div class="text-[8px] text-gray-600 font-mono max-w-[150px]">
+                                This credential is cryptographically verified by The Alchemist Protocol.
+                            </div>
+                            <div class="text-right">
+                                <div class="font-serif text-white text-xs">COOKING WITH THE ALCHEMIST</div>
+                                <div class="text-[8px] text-gray-500 uppercase tracking-widest">Holiday School 2025</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Evolution Chart -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-bold text-white border-b border-border pb-2">Analisis Evolusi</h3>
+                    <div class="bg-surface border border-border p-4 rounded-lg">
+                        <canvas id="evolutionChart" height="200"></canvas>
+                    </div>
+                    <p class="text-xs text-mist italic text-center">
+                        "Grafik ini menunjukkan perjalanan kognitif lo dari seorang turis menjadi arsitek."
+                    </p>
+                </div>
+
+                <!-- Raw Data Log -->
+                <div class="space-y-4">
+                    <h3 class="text-lg font-bold text-white border-b border-border pb-2">Log Data (Raw)</h3>
+                    <div class="bg-black border border-border p-4 rounded font-mono text-xs text-green-500 overflow-x-auto">
+                        <pre id="raw-data-display">// Decrypted payload will appear here...</pre>
+                    </div>
+                </div>
+
+                <div class="text-center pt-10">
+                    <button onclick="location.reload()" class="text-xs text-gray-500 hover:text-white underline">Scan ID Lain</button>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-border bg-black py-8">
+        <div class="max-w-2xl mx-auto px-6 text-center">
+            <div class="text-xs text-gray-600 font-mono">
+                &copy; 2025 THE ALCHEMIST AUTHORITY.<br>
+                <span class="text-[10px]">Data is stored in the key, not on our servers. You own your identity.</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function verifyKey() {
+            const rawInput = document.getElementById('verify-input').value.trim();
+            const cleanInput = rawInput.split('-').slice(0, -1).join('').replace(/-/g, ''); // Remove trailing timestamp hash if present for decoding
+            
+            // Note: The Key format in Cert was Base64 + "-TIMEHASH". 
+            // We need to handle both raw Base64 and formatted key.
+            // Let's try a robust approach: extract the Base64 part.
+            
+            // Heuristic: Base64 usually ends with '=', or alphanumeric. 
+            // The timestamp hash was appended after a dash.
+            // Let's grab the first part before the last dash if it looks like a hash format
+            
+            let payloadPart = rawInput;
+            if (rawInput.includes('-')) {
+                // Remove dashes used for formatting
+                const parts = rawInput.split('-');
+                // If the last part is short (timestamp hex), remove it?
+                // Actually the encryption in Ch3 generated a pure Base64 string split by dashes.
+                // In the Cert update, we appended "-TIMEHASH".
+                // So we need to reconstruct the original Base64.
+                
+                // Let's assume the user pastes exactly what was on the certificate
+                // Format: AAAA-BBBB-CCCC-DDDD-TIMEHASH
+                
+                // Try to assemble base64
+                // Check if last part is the timestamp hash (length usually ~8-10 chars hex)
+                
+                // Simple strategy: Join all, try decode. If fail, remove last chunk, try decode.
+                
+                const chunks = rawInput.split('-');
+                const possibleBase64 = chunks.join('');
+                
+                // Try decoding full string first (in case it's just chunks)
+                if(tryDecode(possibleBase64)) return;
+
+                // Try removing last chunk (assuming it's timestamp suffix)
+                const withoutSuffix = chunks.slice(0, -1).join('');
+                if(tryDecode(withoutSuffix)) return;
+                
+                // If user pasted raw base64 without dashes
+                if(tryDecode(rawInput)) return;
+
+                // If failed
+                showError();
+            } else {
+                if(!tryDecode(rawInput)) showError();
+            }
+        }
+
+        function tryDecode(str) {
+            try {
+                // Decode Logic (Reverse of Ch3)
+                const decodedStr = atob(str);
+                let jsonStr = "";
+                for (let i = 0; i < decodedStr.length; i++) {
+                    jsonStr += String.fromCharCode(decodedStr.charCodeAt(i) - 1);
+                }
+                const data = JSON.parse(jsonStr);
+
+                if (!data.n || !data.rank) return false;
+
+                renderDashboard(data);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function showError() {
+            const err = document.getElementById('verify-error');
+            err.classList.remove('hidden');
+            err.classList.add('animate-pulse');
+        }
+
+        function renderDashboard(data) {
+            // Hide Scanner
+            document.getElementById('scanner-section').classList.add('hidden');
+            document.getElementById('dashboard-section').classList.remove('hidden');
+
+            // Populate Data
+            document.getElementById('card-name').innerText = data.n;
+            document.getElementById('card-rank').innerText = data.rank.replace(/_/g, ' ');
+            document.getElementById('card-id').innerText = `ID-${data.t.toString(16).toUpperCase()}`;
+            
+            const dateObj = new Date(data.t);
+            document.getElementById('data-date').innerText = dateObj.toLocaleString('id-ID');
+
+            document.getElementById('raw-data-display').innerText = JSON.stringify(data, null, 2);
+
+            // Chart Data
+            // Calc Averages for Chart Points
+            const s1 = Math.round((data.c1[1]/3)*100); 
+            const s2 = Math.round((data.c2[1]/3)*100); 
+            const s3 = Math.round((data.c3[1]/3)*100); 
+
+            // Render Chart
+            const ctx = document.getElementById('evolutionChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Start (0%)', 'Chapter 1 (Structure)', 'Chapter 2 (Logic)', 'Chapter 3 (Ascension)'],
+                    datasets: [{
+                        label: 'Tingkat Kompetensi (%)',
+                        data: [0, s1, s2, s3],
+                        borderColor: '#fbbf24',
+                        backgroundColor: 'rgba(251, 191, 36, 0.1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#fff',
+                        pointRadius: 4,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: '#a1a1aa' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#a1a1aa' }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

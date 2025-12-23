@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE ALCHEMIST: FINAL TRANSCRIPT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts: Serif for headers, Mono for data, Script for signature -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;700&family=Cinzel:wght@700;900&family=Pinyon+Script&display=swap" rel="stylesheet">
+    <!-- html2pdf -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        void: '#050505',
+                        surface: '#0a0a0a',
+                        border: '#27272a',
+                        gold: '#fbbf24',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        serif: ['Cinzel', 'serif'],
+                        script: ['Pinyon Script', 'cursive'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #050505; color: #e4e4e7; }
+        .input-focus:focus { outline: none; border-color: #fbbf24; box-shadow: 0 0 15px rgba(251, 191, 36, 0.2); }
+        
+        /* --- PRINT VARIABLES --- */
+        :root {
+            --c-bg: #ffffff;       /* Paper White for Document Style */
+            --c-text: #1a1a1a;     /* Ink Black */
+            --c-accent: #000000;   /* Formal Black */
+            --c-stamp: #d97706;    /* Stamp Color (Amber) */
+        }
+
+        /* --- CONTAINER: A4 Portrait EXACT (210mm x 297mm) --- */
+        #transcript-container {
+            width: 210mm;
+            height: 296mm; /* -1mm to prevent overflow */
+            background-color: var(--c-bg);
+            color: var(--c-text);
+            position: relative;
+            box-sizing: border-box;
+            overflow: hidden; 
+            font-family: 'Inter', sans-serif;
+            margin: 0 auto;
+            padding: 20mm;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- DOCUMENT STYLING --- */
+        .doc-header {
+            text-align: center;
+            border-bottom: 2px solid var(--c-accent);
+            padding-bottom: 5mm;
+            margin-bottom: 10mm;
+        }
+
+        .doc-title {
+            font-family: 'Cinzel', serif;
+            font-size: 24pt;
+            font-weight: 900;
+            color: var(--c-accent);
+            letter-spacing: 0.05em;
+            line-height: 1.2;
+        }
+
+        .doc-subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: 10pt;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-top: 2mm;
+        }
+
+        .student-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10mm;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9pt;
+            border-bottom: 1px dashed #ccc;
+            padding-bottom: 5mm;
+        }
+
+        /* --- GRADES TABLE --- */
+        .grades-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10mm;
+        }
+
+        .grades-table th {
+            text-align: left;
+            border-bottom: 2px solid var(--c-accent);
+            padding: 3mm 0;
+            font-family: 'Cinzel', serif;
+            font-size: 10pt;
+        }
+
+        .grades-table td {
+            padding: 4mm 0;
+            border-bottom: 1px solid #eee;
+            font-size: 10pt;
+        }
+
+        .grade-score {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        /* --- FINAL VERDICT --- */
+        .verdict-box {
+            border: 2px solid var(--c-accent);
+            padding: 5mm;
+            text-align: center;
+            margin-bottom: 10mm;
+            background-color: #f9fafb;
+        }
+
+        .verdict-title {
+            font-size: 8pt;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            margin-bottom: 2mm;
+        }
+
+        .verdict-rank {
+            font-family: 'Cinzel', serif;
+            font-size: 18pt;
+            font-weight: bold;
+        }
+
+        /* --- KEY SECTION --- */
+        .key-section {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 8pt;
+            text-align: center;
+            margin-bottom: 10mm;
+            color: #666;
+        }
+
+        .key-code {
+            display: block;
+            margin-top: 2mm;
+            padding: 3mm;
+            background: #eee;
+            border: 1px dashed #999;
+            color: #000;
+            font-weight: bold;
+        }
+
+        /* --- FOOTER & SIGNATURE --- */
+        .footer-section {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .signature-block {
+            text-align: center;
+            width: 60mm;
+        }
+
+        .signature-img {
+            font-family: 'Pinyon Script', cursive;
+            font-size: 36pt;
+            color: var(--c-accent);
+            margin-bottom: -5mm;
+            display: block;
+        }
+
+        .signature-line {
+            border-top: 1px solid var(--c-accent);
+            padding-top: 2mm;
+            font-size: 8pt;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .disclaimer {
+            font-size: 7pt;
+            color: #666;
+            text-align: center;
+            margin-top: 5mm;
+            line-height: 1.4;
+            font-style: italic;
+        }
+
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col items-center justify-center p-6 bg-neutral-900">
+
+    <!-- LOGIN -->
+    <div id="gate-section" class="w-full max-w-md space-y-8 text-center animate-fade-in">
+        <div class="space-y-4">
+            <h1 class="text-3xl font-serif text-white tracking-widest text-gold">OFFICIAL TRANSCRIPT</h1>
+            <p class="text-gray-400 text-xs">Access Restricted. Enter Final Key.</p>
+        </div>
+        <div class="space-y-4">
+            <input type="text" id="master-key-input" placeholder="PASTE KEY..." class="w-full bg-black border border-gray-800 p-4 text-center text-white rounded-sm font-mono text-sm uppercase tracking-widest focus:border-gold">
+            <button onclick="unlockTranscript()" class="w-full bg-white text-black px-8 py-3 font-bold text-sm hover:bg-gray-200 transition-all rounded-sm uppercase tracking-widest">Access Records</button>
+            <p id="gate-error" class="text-red-500 text-xs font-mono hidden">Invalid Key.</p>
+        </div>
+    </div>
+
+    <!-- PREVIEW AREA -->
+    <div id="cert-section" class="hidden flex-col items-center space-y-8 w-full pb-20">
+        
+        <div class="w-full max-w-[210mm] flex justify-between items-center text-white">
+            <div class="text-xs font-mono text-gray-500">Document Ready.</div>
+            <button onclick="downloadPDF()" class="bg-gold text-black px-6 py-2 rounded-sm font-bold text-xs uppercase tracking-widest hover:bg-yellow-500 shadow-lg">
+                Download Official PDF
+            </button>
+        </div>
+
+        <!-- === THE TRANSCRIPT NODE (A4 PORTRAIT) === -->
+        <div class="overflow-auto max-w-full bg-gray-800 p-4 rounded-lg border border-gray-700">
+            <div style="transform: scale(0.65); transform-origin: top center;">
+                
+                <div id="transcript-container">
+                    
+                    <!-- HEADER -->
+                    <div class="doc-header">
+                        <div class="doc-title">COOKING WITH THE ALCHEMIST</div>
+                        <div class="doc-subtitle">Holiday School 2025 - Official Transcript</div>
+                    </div>
+
+                    <!-- STUDENT INFO -->
+                    <div class="student-info">
+                        <div>
+                            <strong>NAME:</strong> <span id="student-name">UNKNOWN</span><br>
+                            <strong>ID:</strong> <span id="student-id">---</span>
+                        </div>
+                        <div style="text-align: right;">
+                            <strong>DATE:</strong> <span id="doc-date">--/--/----</span><br>
+                            <strong>STATUS:</strong> COMPLETED
+                        </div>
+                    </div>
+
+                    <!-- GRADES -->
+                    <table class="grades-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 15%">CODE</th>
+                                <th style="width: 65%">SUBJECT MODULE</th>
+                                <th style="width: 20%; text-align: right;">SCORE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="font-mono text-sm">ARC-101</td>
+                                <td>
+                                    <strong>Structural Architecture</strong><br>
+                                    <span class="text-xs text-gray-500">Single File HTML Philosophy, DOM Structure</span>
+                                </td>
+                                <td class="grade-score" id="score-1">0%</td>
+                            </tr>
+                            <tr>
+                                <td class="font-mono text-sm">LOG-202</td>
+                                <td>
+                                    <strong>Digital Logic Systems</strong><br>
+                                    <span class="text-xs text-gray-500">State Management, API Integration (No-DB)</span>
+                                </td>
+                                <td class="grade-score" id="score-2">0%</td>
+                            </tr>
+                            <tr>
+                                <td class="font-mono text-sm">PRM-303</td>
+                                <td>
+                                    <strong>Advanced Prompt Engineering</strong><br>
+                                    <span class="text-xs text-gray-500">Reasoning Models, Meta-Prompting, Context Optimization</span>
+                                </td>
+                                <td class="grade-score" id="score-3">0%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- FINAL VERDICT -->
+                    <div class="verdict-box">
+                        <div class="verdict-title">Final Classification Rank</div>
+                        <div class="verdict-rank" id="final-rank">VERIFIED HUMAN</div>
+                    </div>
+
+                    <!-- KEY -->
+                    <div class="key-section">
+                        <div>ENCRYPTED RECOVERY KEY (PHILOSOPHER'S STONE)</div>
+                        <div class="key-code" id="key-display">XXXX-XXXX-XXXX-XXXX</div>
+                        <div style="font-size: 7pt; margin-top: 2mm;">TIMESTAMP HASH: <span id="time-hash">---</span></div>
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div class="footer-section">
+                        <div style="text-align: left; width: 40%;">
+                            <div style="font-size: 8pt; font-weight: bold; margin-bottom: 10mm;">AUTHORIZED BY:</div>
+                            <div style="font-family: 'Cinzel', serif; font-size: 10pt;">THE HIGH COUNCIL</div>
+                        </div>
+
+                        <div class="signature-block">
+                            <div class="signature-img">Been</div>
+                            <div class="signature-line">HEADMASTER</div>
+                        </div>
+                    </div>
+
+                    <!-- DISCLAIMER -->
+                    <div class="disclaimer">
+                        <strong>WARNING & DISCLAIMER:</strong><br>
+                        This document certifies completion of the Alchemist's curriculum. It currently holds NO academic or legal value in the known world. It serves only as a proof of competence in digital alchemy. However, should "Cooking With The Alchemist" become a globally recognized entity or cult in the future, this document may grant special privileges. Until then, it is just a PDF. Do not try to use this to apply for a bank loan.
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        
+        <button onclick="location.reload()" class="text-xs text-gray-500 hover:text-white underline font-mono pb-10">[ LOGOUT ]</button>
+    </div>
+
+    <script>
+        function unlockTranscript() {
+            const inputEl = document.getElementById('master-key-input');
+            const rawInput = inputEl.value.trim();
+            const cleanInput = rawInput.replace(/-/g, ''); 
+            const errorMsg = document.getElementById('gate-error');
+            
+            if (!cleanInput) { errorMsg.classList.remove('hidden'); return; }
+
+            try {
+                const decodedStr = atob(cleanInput);
+                let jsonStr = "";
+                for (let i = 0; i < decodedStr.length; i++) {
+                    jsonStr += String.fromCharCode(decodedStr.charCodeAt(i) - 1);
+                }
+                const data = JSON.parse(jsonStr);
+
+                if (!data.n) throw new Error("Invalid Data");
+
+                // Populate
+                document.getElementById('student-name').innerText = data.n.toUpperCase();
+                document.getElementById('student-id').innerText = `ID-${data.t.toString(16).toUpperCase()}`;
+                document.getElementById('final-rank').innerText = data.rank.replace(/_/g, ' ');
+                
+                const dateObj = new Date(data.t);
+                document.getElementById('doc-date').innerText = dateObj.toLocaleDateString('en-GB').toUpperCase();
+                
+                // Key Display & Hash
+                const timeHex = Math.floor(dateObj.getTime() / 1000).toString(16).toUpperCase();
+                let formattedKey = cleanInput.match(/.{1,4}/g)?.join('-') || cleanInput;
+                document.getElementById('key-display').innerText = formattedKey;
+                document.getElementById('time-hash').innerText = timeHex;
+
+                // Scores
+                document.getElementById('score-1').innerText = Math.round((data.c1[1]/3)*100) + "%";
+                document.getElementById('score-2').innerText = Math.round((data.c2[1]/3)*100) + "%";
+                document.getElementById('score-3').innerText = Math.round((data.c3[1]/3)*100) + "%";
+
+                document.getElementById('gate-section').classList.add('hidden');
+                document.getElementById('cert-section').classList.remove('hidden');
+                document.getElementById('cert-section').classList.add('flex');
+
+            } catch (e) {
+                console.error(e);
+                errorMsg.innerText = "Error: Key Invalid.";
+                errorMsg.classList.remove('hidden');
+            }
+        }
+
+        function downloadPDF() {
+            const element = document.getElementById('transcript-container');
+            const name = document.getElementById('student-name').innerText.replace(/\s+/g, '_'); // Replace spaces with underscores
+            const id = document.getElementById('student-id').innerText.replace('ID-', '');
+            
+            const btn = document.querySelector('button[onclick="downloadPDF()"]');
+            const originalText = btn.innerText;
+            
+            btn.innerText = "GENERATING...";
+
+            setTimeout(() => {
+                const opt = {
+                    margin: 0,
+                    filename: `OFFICIAL_TRANSCRIPT_${id}_${name}.pdf`, // Formal filename
+                    image: { type: 'jpeg', quality: 1.0 },
+                    html2canvas: { 
+                        scale: 3, 
+                        useCORS: true,
+                        logging: false,
+                        letterRendering: true,
+                        scrollY: 0
+                    },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+                
+                html2pdf().set(opt).from(element).save().then(() => {
+                    btn.innerText = originalText;
+                });
+            }, 500);
+        }
+    </script>
+</body>
+</html>

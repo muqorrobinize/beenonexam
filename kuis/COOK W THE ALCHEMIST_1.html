@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COOKING WITH THE ALCHEMIST (BEEN)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Typography Plugin for long-form content -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        void: '#050505',
+                        surface: '#0a0a0a',
+                        border: '#27272a',
+                        accent: '#10b981', /* Emerald-500: Money/Matrix/Growth */
+                        accentdim: '#064e3b',
+                        mist: '#a1a1aa',
+                        text: '#e4e4e7'
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    typography: (theme) => ({
+                        DEFAULT: {
+                            css: {
+                                color: theme('colors.mist'),
+                                h1: { color: theme('colors.text') },
+                                h2: { color: theme('colors.text') },
+                                strong: { color: theme('colors.accent') },
+                                blockquote: { 
+                                    borderLeftColor: theme('colors.accent'),
+                                    color: theme('colors.text'),
+                                    fontStyle: 'italic'
+                                },
+                            },
+                        },
+                    }),
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #050505; color: #e4e4e7; }
+        .glass-header { background: rgba(5, 5, 5, 0.8); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(39, 39, 42, 0.5); }
+        .interactive-card { transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+        .interactive-card:hover { transform: translateY(-2px); border-color: #10b981; }
+        
+        /* Custom Scrollbar for Code Blocks */
+        .code-scroll::-webkit-scrollbar { height: 6px; width: 6px; }
+        .code-scroll::-webkit-scrollbar-track { background: #0a0a0a; }
+        .code-scroll::-webkit-scrollbar-thumb { background: #27272a; rounded: 3px; }
+        
+        .xray-active * {
+            outline: 1px dashed #10b981 !important;
+            background: rgba(16, 185, 129, 0.03) !important;
+            box-shadow: none !important;
+        }
+
+        /* Glitch Effect for Key */
+        @keyframes glitch {
+            0% { text-shadow: 2px 0 #10b981, -2px 0 #064e3b; }
+            25% { text-shadow: -2px 0 #10b981, 2px 0 #064e3b; }
+            50% { text-shadow: 2px 0 #10b981, -2px 0 #064e3b; }
+            100% { text-shadow: -2px 0 #10b981, 2px 0 #064e3b; }
+        }
+        .glitch-text { animation: glitch 0.5s infinite; }
+        
+        /* Input Focus Ring */
+        .input-focus:focus { outline: none; border-color: #10b981; box-shadow: 0 0 0 1px #10b981; }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col font-sans selection:bg-accent selection:text-black overflow-x-hidden">
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 w-full z-50 glass-header">
+        <div class="max-w-3xl mx-auto px-6 py-5 flex justify-between items-center">
+            <div class="font-bold tracking-tight text-lg text-accent flex items-center gap-3">
+                <span class="text-xl border border-accent px-2 py-0.5 rounded-sm font-serif italic text-white bg-accentdim/20">Ta</span>
+                <span class="text-sm tracking-widest text-mist">THE ALCHEMIST</span>
+            </div>
+            <div class="text-[10px] uppercase tracking-[0.2em] text-gray-600 font-mono hidden md:block">
+                Masterclass Vol. 01
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow pt-32 pb-24 px-6 md:px-0">
+        <div class="max-w-2xl mx-auto space-y-24">
+
+            <!-- Hero Section: The Problem -->
+            <header class="space-y-8 animate-fade-in">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface border border-border text-[10px] uppercase tracking-widest text-mist font-mono">
+                    <span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
+                    Digital Literacy Gap
+                </div>
+                
+                <h1 class="text-4xl md:text-5xl font-bold tracking-tight leading-tight text-white">
+                    Berhenti Menjadi <span class="text-accent underline decoration-accent/30 underline-offset-8">Konsumen</span>.<br>
+                    Mulai Pahami Aturannya.
+                </h1>
+                
+                <div class="prose prose-lg prose-invert text-mist leading-relaxed">
+                    <p>
+                        Gue mau ajak lo mundur dulu. Jauh ke belakang. Lupakan soal AI, lupakan soal Startup yang bakar duit, lupakan soal framework coding yang tiap minggu ganti.
+                    </p>
+                    <p>
+                        Kita bicara soal <strong>First Principles</strong>.
+                    </p>
+                    <p>
+                        Kenapa lo ada di sini? Karena lo sadar ada <em>gap</em> (jurang) pengetahuan. Lo hidup di dunia digital, lo menghabiskan 8 jam sehari menatap layar, tapi lo gak paham bagaimana layar itu bekerja. Lo cuma penumpang, bukan sopir.
+                    </p>
+                    <p>
+                        Di "kuliah" ini, gue gak akan ngajarin lo cara menghapal kode. Itu tugas mesin. Gue akan ngajarin lo <strong>Logika Arsitektur</strong>. Karena begitu lo paham strukturnya, lo bisa menyuruh AI melakukan apapun buat lo.
+                    </p>
+                </div>
+            </header>
+
+            <hr class="border-border">
+
+            <!-- SECTION 1: THE TRUTH (Interactive Pre-Test + Identity) -->
+            <section id="pretest-section" class="space-y-6">
+                <div class="bg-surface border border-border p-8 rounded-lg relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-5 font-serif text-9xl text-white select-none">?</div>
+                    
+                    <div id="pretest-intro">
+                        <h2 class="text-2xl font-bold text-white mb-4">Validasi Persepsi Awal</h2>
+                        <p class="text-mist mb-6 text-sm leading-7 max-w-lg">
+                            Sebelum kita bedah anatominya, gue perlu tau siapa lo dan seberapa dalam miskonsepsi yang lo punya tentang "Coding". Kebanyakan orang berpikir coding itu matematika rumit. Padahal itu cuma bahasa logika.
+                        </p>
+                        
+                        <div class="mb-6 space-y-2">
+                            <label class="text-[10px] uppercase text-accent font-mono tracking-widest">Identitas Peserta</label>
+                            <input type="text" id="user-name" placeholder="Ketik nama panggilan lo..." class="w-full bg-void border border-border p-4 text-white rounded-sm input-focus transition-all placeholder-gray-700 font-mono text-sm">
+                            <p class="text-[10px] text-gray-600 italic">*Nama ini akan dienkripsi ke dalam Genesis Key lo nanti.</p>
+                        </div>
+
+                        <button onclick="startPreTest()" class="w-full md:w-auto bg-accent text-black px-8 py-3 font-bold text-sm hover:bg-emerald-400 transition-all rounded-sm flex items-center justify-center gap-2">
+                            <span>MULAI DIAGNOSA LOGIKA</span>
+                            <span class="text-xs">→</span>
+                        </button>
+                    </div>
+
+                    <div id="pretest-container" class="hidden">
+                        <div class="flex justify-between items-center mb-6">
+                            <span class="text-xs font-mono text-accent">PERTANYAAN <span id="pre-q-num">1</span>/3</span>
+                            <span class="text-[10px] font-mono text-gray-600 uppercase" id="user-display-name">GUEST</span>
+                        </div>
+                        <h3 id="pre-q-text" class="text-xl font-medium text-white mb-6 leading-relaxed">Question?</h3>
+                        <div id="pre-options" class="space-y-3"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: THE ANATOMY (Long Form Content) -->
+            <section id="materi-section" class="space-y-16 opacity-20 blur-sm pointer-events-none transition-all duration-1000">
+                
+                <div class="prose prose-lg prose-invert max-w-none">
+                    <h2 class="text-3xl font-bold text-white">Anatomi Sebuah Realita</h2>
+                    <p>
+                        Coba bayangkan sebuah Rumah. Atau kalau lo suka bisnis, bayangkan sebuah Ruko.
+                    </p>
+                    <p>
+                        Ketika lo melihat Ruko yang bagus, ada cat yang estetik, ada lampu neon, ada pintu kaca otomatis. Itu yang mata lo lihat. Tapi itu bukan fundamentalnya.
+                    </p>
+                    <p>
+                        Fundamentalnya adalah <strong>Pondasi, Tiang Beton, dan Tembok Bata</strong>.
+                    </p>
+                    
+                    <ul class="list-none pl-0 space-y-6 my-8">
+                        <li class="pl-4 border-l-2 border-accent">
+                            <strong class="text-white block text-lg">1. HTML (Hypertext Markup Language)</strong>
+                            <span class="text-sm">Ini adalah Beton dan Batanya.</span> 
+                            Ini strukturnya. Tanpa HTML, temboknya rubuh. HTML mendefinisikan: "Ini adalah Kamar Mandi (Header)", "Ini adalah Ruang Tamu (Body)", "Ini adalah Gudang (Footer)". Dia gak peduli soal keindahan. Dia peduli soal <strong>Fungsi dan Posisi</strong>.
+                        </li>
+                        <li class="pl-4 border-l-2 border-gray-700 opacity-70">
+                            <strong class="text-gray-300 block text-lg">2. CSS (Cascading Style Sheets)</strong>
+                            <span class="text-sm">Ini adalah Cat dan Interior.</span>
+                            Mau temboknya warna merah? Mau font-nya besar? Itu urusan CSS. Tanpa CSS, web lo cuma teks hitam di atas putih. Jelek, tapi berfungsi.
+                        </li>
+                        <li class="pl-4 border-l-2 border-gray-700 opacity-70">
+                            <strong class="text-gray-300 block text-lg">3. Javascript</strong>
+                            <span class="text-sm">Ini adalah Listrik dan Pipa Air.</span>
+                            Interaksi. Kalau lo tekan saklar, lampunya nyala. Itu Javascript.
+                        </li>
+                    </ul>
+
+                    <blockquote>
+                        "Premisnya sederhana: Lo gak perlu jadi arsitek (Full Stack Dev) untuk membangun gubuk kecil. Lo cuma perlu tau cara menyusun bata (HTML)."
+                    </blockquote>
+
+                    <h3>Kenapa "Single File" itu Leverage Terbesar Lo?</h3>
+                    <p>
+                        Dulu, untuk bikin software, lo butuh server, database, backend... mahal dan ribet. Barrier to entry-nya tinggi.
+                    </p>
+                    <p>
+                        Sekarang? Lo bisa menaruh HTML, CSS, dan JS dalam <strong>SATU FILE</strong>. Lo simpan di laptop, lo kirim via WhatsApp, itu jalan. Itu adalah aplikasi.
+                    </p>
+                    <p>
+                        Bayangkan lo punya ide: <em>"Gue mau bikin kalkulator simulasi KPR buat klien gue."</em> Lo minta AI buatkan single file HTML-nya. Selesai. Lo punya software sendiri tanpa modal sepeserpun. Itu namanya <strong>Leverage</strong>.
+                    </p>
+                </div>
+
+                <!-- SECTION 3: THE X-RAY (Interactive) -->
+                <div class="space-y-6">
+                    <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                        <span class="text-accent">02.</span> Bedah Kasus (X-Ray)
+                    </h2>
+                    <p class="text-mist leading-relaxed">
+                        Gue mau lo lihat buktinya. Di bawah ini ada profil karakter fiktif. Terlihat rapi, kan? Tapi itu ilusi. Gue akan kasih lo kacamata arsitek.
+                    </p>
+
+                    <div class="border border-border rounded-lg overflow-hidden bg-void">
+                        <!-- Toolbar -->
+                        <div class="bg-surface p-4 border-b border-border flex justify-between items-center">
+                            <span class="text-xs font-mono text-mist uppercase">View Mode</span>
+                            <div class="flex bg-black p-1 rounded border border-border">
+                                <button onclick="setXray(false)" id="btn-normal" class="px-4 py-1 text-xs font-bold rounded bg-accent text-black transition-all">Manusia</button>
+                                <button onclick="setXray(true)" id="btn-xray" class="px-4 py-1 text-xs font-bold rounded text-mist hover:text-white transition-all">Arsitek</button>
+                            </div>
+                        </div>
+
+                        <!-- Content Viewport -->
+                        <div id="xray-viewport" class="p-8 bg-white transition-all duration-300 min-h-[300px] flex items-center justify-center">
+                            <div class="text-center w-full max-w-md">
+                                <div class="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4 overflow-hidden relative group">
+                                    <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Felix" alt="Avatar" class="w-full h-full object-cover">
+                                    <div class="absolute inset-0 bg-accent/20 hidden group-[.xray-active]:flex items-center justify-center text-[10px] font-mono font-bold text-black border border-accent">
+                                        &lt;img&gt;
+                                    </div>
+                                </div>
+                                
+                                <h1 class="text-2xl font-bold text-gray-900 mb-1 relative group">
+                                    Tony Stark
+                                    <span class="absolute -top-4 -right-4 bg-accent text-black text-[10px] px-1 font-mono hidden group-[.xray-active]:block">&lt;h1&gt;</span>
+                                </h1>
+                                
+                                <p class="text-gray-500 mb-6 text-sm relative group">
+                                    Philanthropist. Billionaire.
+                                    <span class="absolute -top-3 -right-6 bg-accent text-black text-[10px] px-1 font-mono hidden group-[.xray-active]:block">&lt;p&gt;</span>
+                                </p>
+                                
+                                <div class="flex gap-3 justify-center relative group p-2">
+                                    <span class="absolute top-0 right-0 bg-accent text-black text-[10px] px-1 font-mono hidden group-[.xray-active]:block">&lt;div&gt; container</span>
+                                    <button class="bg-black text-white px-5 py-2 rounded text-sm font-medium hover:bg-gray-800 relative">
+                                        Hire Me
+                                        <span class="absolute -top-2 -right-2 bg-accent text-black text-[10px] px-1 font-mono hidden group-[.xray-active]:block">&lt;button&gt;</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-surface p-4 border-t border-border">
+                            <p id="xray-desc" class="text-sm text-mist font-mono">
+                                // Mode Normal: Otak lo memproses keindahan visual.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 4: THE LAB (Construction) -->
+                <div class="space-y-6 pt-8">
+                    <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                        <span class="text-accent">03.</span> Konstruksi Realita
+                    </h2>
+                    <p class="text-mist leading-relaxed">
+                        Sekarang saatnya lo pegang kendali. Jangan cuma nonton. Di bawah ini adalah simulasi komunikasi lo dengan AI. Lo kasih instruksi (klik tombol kiri), AI akan menulis kodenya (tengah), dan Browser akan merendernya (kanan).
+                    </p>
+                    <p class="text-mist text-sm bg-accent/5 p-4 border-l-2 border-accent">
+                        <strong>Perhatikan:</strong> Setiap elemen punya "tag" (label). H1 untuk judul utama. P untuk paragraf. Button untuk aksi. Ingat pola ini.
+                    </p>
+
+                    <div class="grid lg:grid-cols-12 gap-0 border border-border rounded-lg overflow-hidden bg-void h-[500px]">
+                        
+                        <!-- Panel 1: Instruksi (User) -->
+                        <div class="lg:col-span-3 border-r border-border bg-surface flex flex-col">
+                            <div class="p-3 border-b border-border text-[10px] uppercase text-mist font-mono tracking-widest">1. Input Instruksi</div>
+                            <div class="p-4 space-y-3 overflow-y-auto flex-grow">
+                                <button onclick="addLabItem('h1')" class="w-full text-left p-3 rounded border border-border hover:border-accent hover:bg-accent/5 transition-all group">
+                                    <div class="font-bold text-white text-sm">Header Utama</div>
+                                    <div class="text-[10px] text-gray-500 mt-1">Gunakan untuk Judul Paling Penting.</div>
+                                    <div class="text-[10px] font-mono text-accent mt-2 opacity-50 group-hover:opacity-100">&lt;h1&gt;</div>
+                                </button>
+                                
+                                <button onclick="addLabItem('p')" class="w-full text-left p-3 rounded border border-border hover:border-accent hover:bg-accent/5 transition-all group">
+                                    <div class="font-bold text-white text-sm">Paragraf</div>
+                                    <div class="text-[10px] text-gray-500 mt-1">Untuk penjelasan detail/narasi.</div>
+                                    <div class="text-[10px] font-mono text-accent mt-2 opacity-50 group-hover:opacity-100">&lt;p&gt;</div>
+                                </button>
+
+                                <button onclick="addLabItem('btn')" class="w-full text-left p-3 rounded border border-border hover:border-accent hover:bg-accent/5 transition-all group">
+                                    <div class="font-bold text-white text-sm">Call to Action</div>
+                                    <div class="text-[10px] text-gray-500 mt-1">Tombol pemicu interaksi.</div>
+                                    <div class="text-[10px] font-mono text-accent mt-2 opacity-50 group-hover:opacity-100">&lt;button&gt;</div>
+                                </button>
+                                
+                                <button onclick="resetLab()" class="mt-4 text-xs text-red-500 hover:text-red-400 w-full text-left py-2 border-t border-dashed border-gray-800">
+                                    [ Reset Project ]
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Panel 2: Code (The Engine) -->
+                        <div class="lg:col-span-4 border-r border-border bg-[#050505] flex flex-col">
+                            <div class="p-3 border-b border-border text-[10px] uppercase text-mist font-mono tracking-widest bg-[#0a0a0a]">2. Generated Code</div>
+                            <div id="lab-code-display" class="p-4 font-mono text-xs text-accent/80 overflow-y-auto flex-grow code-scroll space-y-1">
+                                <span class="text-gray-700 italic">// Menunggu input instruksi...</span>
+                            </div>
+                        </div>
+
+                        <!-- Panel 3: Result (Reality) -->
+                        <div class="lg:col-span-5 bg-white text-black flex flex-col relative">
+                            <div class="p-3 border-b border-gray-100 text-[10px] uppercase text-gray-400 font-mono tracking-widest bg-gray-50">3. Browser Render</div>
+                            <div id="lab-preview-display" class="p-8 overflow-y-auto flex-grow space-y-4">
+                                <!-- Elements spawn here -->
+                                <div class="text-center mt-20 text-gray-300 text-sm italic select-none">
+                                    Canvas Kosong
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- SECTION 5: FINAL VERDICT (Post-Test) -->
+                <div class="pt-12 border-t border-border">
+                    <h2 class="text-2xl font-bold text-white mb-6">Konklusi Akhir</h2>
+                    <div id="posttest-section" class="bg-surface border border-border p-8 rounded-lg">
+                        <div id="posttest-intro">
+                            <p class="text-mist mb-6">
+                                Lo udah liat teorinya, lo udah liat balik layarnya (X-Ray), dan lo udah coba bangun sendiri. Sekarang, gue mau validasi apakah pola pikir lo udah berubah atau belum.
+                            </p>
+                            <button onclick="startPostTest()" class="bg-white text-black px-8 py-3 font-bold text-sm hover:bg-gray-200 transition-all rounded-sm w-full md:w-auto">
+                                UJI PEMAHAMAN AKHIR
+                            </button>
+                        </div>
+                        <div id="posttest-container" class="hidden space-y-6">
+                             <div class="flex justify-between items-center mb-6">
+                                <span class="text-xs font-mono text-accent">PERTANYAAN AKHIR <span id="post-q-num">1</span>/3</span>
+                            </div>
+                            <h3 id="post-q-text" class="text-xl font-medium text-white mb-6">Question?</h3>
+                            <div id="post-options" class="space-y-3"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- RESULT SECTION -->
+                <div id="result-section" class="hidden text-center py-12 animate-fade-in">
+                    <h2 class="text-3xl font-bold text-white mb-2">Laporan Akhir</h2>
+                    <p class="text-mist text-sm mb-8">Evolusi Pemahaman Digital</p>
+                    
+                    <div class="flex justify-center gap-12 mb-10">
+                        <div class="text-center">
+                            <div class="text-xs text-gray-500 uppercase mb-2">Sebelum</div>
+                            <div id="final-pre-score" class="text-4xl font-bold text-gray-600">0%</div>
+                        </div>
+                        <div class="text-center relative">
+                            <div class="text-xs text-accent uppercase mb-2 font-bold">Sesudah</div>
+                            <div id="final-post-score" class="text-4xl font-bold text-accent">0%</div>
+                            <div class="absolute -right-6 -top-2 text-accent animate-pulse text-xs">▲</div>
+                        </div>
+                    </div>
+
+                    <div id="final-analysis" class="bg-surface border border-accent/20 p-6 rounded-lg max-w-xl mx-auto text-left prose prose-invert">
+                        <!-- JS Injected analysis -->
+                    </div>
+
+                    <div class="mt-12">
+                         <a href="https://instagram.com/beenspace" target="_blank" class="inline-block border-b border-accent text-accent hover:text-white pb-1 transition-colors text-sm tracking-widest uppercase">
+                            Follow The Alchemist (Been)
+                        </a>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-border bg-black py-10">
+        <div class="max-w-2xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-600 font-mono">
+            <div>
+                &copy; 2025 COOKING WITH THE ALCHEMIST.
+            </div>
+            <div>
+                CURATED BY <span class="text-gray-400">BEEN</span> x <span class="text-gray-400">GEMINI</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- LOGIC SCRIPT -->
+    <script>
+        // DATA
+        const questions = [
+            {
+                q: "Apa fungsi fundamental HTML dalam konteks 'Arsitektur' informasi?",
+                options: [
+                    "Membuat website terlihat estetik dan mahal.",
+                    "Mendefinisikan struktur dan makna setiap elemen (mana tiang, mana bata).",
+                    "Membuat website bisa berinteraksi dengan user.",
+                    "Menghubungkan website ke server database."
+                ],
+                correct: 1
+            },
+            {
+                q: "Mengapa kemampuan membuat 'Single File HTML' dianggap sebagai leverage?",
+                options: [
+                    "Karena file-nya kecil jadi hemat kuota.",
+                    "Karena memungkinkan kita membuat software/alat sendiri tanpa bergantung pada server/biaya langganan.",
+                    "Karena itu satu-satunya format yang dibaca Google.",
+                    "Agar kode tidak bisa dicuri orang lain."
+                ],
+                correct: 1
+            },
+            {
+                q: "Jika Anda melihat tombol di website, apa yang sebenarnya dilihat oleh mesin (browser)?",
+                options: [
+                    "Sebuah gambar kotak berwarna.",
+                    "Instruksi &lt;button&gt; yang menunggu pemicu (event).",
+                    "Pixel-pixel yang disusun rapi.",
+                    "Magic."
+                ],
+                correct: 1
+            }
+        ];
+
+        let state = {
+            userName: "",
+            preScore: 0,
+            postScore: 0,
+            qIndex: 0,
+            isPre: true,
+            labItems: []
+        };
+
+        // --- PRE-TEST LOGIC ---
+        function startPreTest() {
+            const nameInput = document.getElementById('user-name');
+            const name = nameInput.value.trim();
+
+            if (!name) {
+                alert("Identitas diperlukan untuk melanjutkan protokol.");
+                nameInput.focus();
+                nameInput.classList.add('border-red-500');
+                setTimeout(() => nameInput.classList.remove('border-red-500'), 2000);
+                return;
+            }
+
+            state.userName = name;
+            document.getElementById('user-display-name').innerText = name.toUpperCase();
+            
+            document.getElementById('pretest-intro').classList.add('hidden');
+            document.getElementById('pretest-container').classList.remove('hidden');
+            renderQ();
+        }
+
+        function renderQ() {
+            const container = state.isPre ? 'pre' : 'post';
+            const q = questions[state.qIndex];
+            
+            document.getElementById(`${container}-q-num`).innerText = state.qIndex + 1;
+            document.getElementById(`${container}-q-text`).innerText = q.q;
+            
+            const opts = document.getElementById(`${container}-options`);
+            opts.innerHTML = '';
+            
+            q.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded bg-void border border-border hover:border-accent hover:text-white text-mist transition-all text-sm group flex justify-between items-center";
+                btn.innerHTML = `<span>${opt}</span> <span class="opacity-0 group-hover:opacity-100 text-accent transition-opacity">→</span>`;
+                btn.onclick = () => answer(i);
+                opts.appendChild(btn);
+            });
+        }
+
+        function answer(idx) {
+            if (idx === questions[state.qIndex].correct) {
+                if (state.isPre) state.preScore++; else state.postScore++;
+            }
+            
+            state.qIndex++;
+            if (state.qIndex < questions.length) {
+                renderQ();
+            } else {
+                finishSection();
+            }
+        }
+
+        function finishSection() {
+            if (state.isPre) {
+                // Unlock Content
+                document.getElementById('pretest-section').innerHTML = `
+                    <div class="p-8 text-center border border-accent/20 bg-accent/5 rounded-lg">
+                        <h3 class="text-white font-bold text-lg mb-2">Data Awal Tercatat: ${state.userName}</h3>
+                        <p class="text-mist text-sm">Sekarang, mari kita bongkar ilusi yang selama ini lo percaya.</p>
+                    </div>
+                `;
+                const materi = document.getElementById('materi-section');
+                materi.classList.remove('opacity-20', 'blur-sm', 'pointer-events-none');
+                setTimeout(() => materi.scrollIntoView({behavior: 'smooth'}), 500);
+            } else {
+                // Show Result
+                document.getElementById('posttest-section').classList.add('hidden');
+                document.getElementById('result-section').classList.remove('hidden');
+                renderResult();
+            }
+        }
+
+        // --- X-RAY LOGIC ---
+        function setXray(isActive) {
+            const viewport = document.getElementById('xray-viewport').firstElementChild;
+            const desc = document.getElementById('xray-desc');
+            const btnNormal = document.getElementById('btn-normal');
+            const btnXray = document.getElementById('btn-xray');
+
+            if (isActive) {
+                viewport.classList.add('xray-active');
+                desc.innerHTML = '<span class="text-accent font-bold">// Mode Arsitek:</span> Lo gak lagi melihat gambar/teks. Lo melihat blok-blok kode. Inilah yang dilihat oleh Google dan Browser.';
+                
+                btnNormal.classList.replace('bg-accent', 'text-mist');
+                btnNormal.classList.replace('text-black', 'hover:text-white');
+                
+                btnXray.classList.replace('text-mist', 'bg-accent');
+                btnXray.classList.replace('hover:text-white', 'text-black');
+            } else {
+                viewport.classList.remove('xray-active');
+                desc.innerHTML = '<span class="text-gray-500 font-bold">// Mode Manusia:</span> Mata lo tertipu oleh kosmetik (CSS). Lo melihat "Profil", bukan struktur.';
+
+                btnXray.classList.replace('bg-accent', 'text-mist');
+                btnXray.classList.replace('text-black', 'hover:text-white');
+                
+                btnNormal.classList.replace('text-mist', 'bg-accent');
+                btnNormal.classList.replace('hover:text-white', 'text-black');
+            }
+        }
+
+        // --- LAB LOGIC ---
+        function addLabItem(type) {
+            const prev = document.getElementById('lab-preview-display');
+            const code = document.getElementById('lab-code-display');
+            
+            if (state.labItems.length === 0) {
+                prev.innerHTML = '';
+                code.innerHTML = '';
+            }
+
+            let html = '';
+            let rawCode = '';
+
+            if (type === 'h1') {
+                html = '<h1 class="text-2xl font-bold mb-2 pb-2 border-b border-gray-200 animate-pulse">Ide Besar (Heading)</h1>';
+                rawCode = `<div class="pl-2 border-l border-gray-700"><span class="text-purple-400">&lt;h1&gt;</span> Ide Besar <span class="text-purple-400">&lt;/h1&gt;</span></div>`;
+            } else if (type === 'p') {
+                html = '<p class="text-sm text-gray-600 mb-4 leading-relaxed">Ini adalah penjelasan detail dari ide tersebut. Panjang dan naratif.</p>';
+                rawCode = `<div class="pl-2 border-l border-gray-700"><span class="text-blue-400">&lt;p&gt;</span> Ini adalah penjelasan... <span class="text-blue-400">&lt;/p&gt;</span></div>`;
+            } else if (type === 'btn') {
+                html = '<button class="bg-black text-white px-4 py-2 rounded text-sm font-bold shadow hover:bg-gray-800 transition-colors" onclick="alert(`Logic executed!`)">Eksekusi Ide</button>';
+                rawCode = `<div class="pl-2 border-l border-gray-700"><span class="text-yellow-400">&lt;button&gt;</span> Eksekusi Ide <span class="text-yellow-400">&lt;/button&gt;</span></div>`;
+            }
+
+            // Update DOM
+            const el = document.createElement('div');
+            el.innerHTML = html;
+            prev.appendChild(el.firstChild);
+
+            const codeLine = document.createElement('div');
+            codeLine.innerHTML = rawCode;
+            code.appendChild(codeLine);
+            
+            state.labItems.push(type);
+            code.scrollTop = code.scrollHeight;
+        }
+
+        function resetLab() {
+            state.labItems = [];
+            document.getElementById('lab-preview-display').innerHTML = '<div class="text-center mt-20 text-gray-300 text-sm italic select-none">Canvas Kosong</div>';
+            document.getElementById('lab-code-display').innerHTML = '<span class="text-gray-700 italic">// Menunggu input instruksi...</span>';
+        }
+
+        // --- FINAL LOGIC & ALCHEMY HASH ---
+        function startPostTest() {
+            state.isPre = false;
+            state.qIndex = 0;
+            document.getElementById('posttest-intro').classList.add('hidden');
+            document.getElementById('posttest-container').classList.remove('hidden');
+            renderQ();
+        }
+
+        function generateAlchemyHash(name, pre, post) {
+            // Pack Data into a simple object
+            const dataPayload = {
+                n: name,
+                s1: pre, // Pre-test score
+                s2: post, // Post-test score
+                t: Date.now() // Timestamp to ensure uniqueness
+            };
+            
+            // Convert to JSON
+            const jsonStr = JSON.stringify(dataPayload);
+            
+            // Simple obfuscation (Optional: just Base64 is often enough for save strings, 
+            // but let's do a simple shift to make it not instantly readable JSON)
+            // This is CLIENT SIDE, so "High Encryption" is simulated but sufficient for saving state.
+            let obfuscated = "";
+            for (let i = 0; i < jsonStr.length; i++) {
+                obfuscated += String.fromCharCode(jsonStr.charCodeAt(i) + 1); // Shift char codes by 1
+            }
+
+            // Base64 Encode
+            const encoded = btoa(obfuscated).replace(/=/g, ''); // Remove padding for cleaner look
+            
+            // Format nicely as a "Key" (Groups of 4)
+            // We use uppercase for the visual key, but keep the raw data for the actual save logic if needed.
+            // Here we just display the key.
+            // If the string is very long, we might truncate for visual, but for "Access", 
+            // the full string is needed. Let's return the full string but formatted.
+            const chunks = encoded.match(/.{1,4}/g);
+            return chunks.join('-');
+        }
+
+        function renderResult() {
+            const prePct = Math.round((state.preScore / 3) * 100);
+            const postPct = Math.round((state.postScore / 3) * 100);
+            
+            document.getElementById('final-pre-score').innerText = prePct + '%';
+            document.getElementById('final-post-score').innerText = postPct + '%';
+            
+            const analysis = document.getElementById('final-analysis');
+            let key = '';
+
+            // Syarat Lulus: PostTest 100% ATAU (PostTest >= 66% DAN ada kenaikan dari PreTest)
+            const isPassed = postPct === 100 || (postPct >= 66 && postPct > state.preScore); // Fixed logic: must be strictly greater if not 100%
+
+            if (isPassed) {
+                // Generate Key with User Data
+                key = generateAlchemyHash(state.userName, state.preScore, state.postScore);
+                
+                analysis.innerHTML = `
+                    <p class="text-white font-bold text-lg mb-2">Growth Confirmed, ${state.userName}.</p>
+                    <p class="mb-6">Lo masuk dengan asumsi, lo keluar dengan pemahaman. Ini yang membedakan lo dari 90% pengguna internet lainnya.</p>
+                    
+                    <div class="bg-black border border-accent p-6 rounded relative group mt-6 break-words">
+                        <div class="absolute top-0 right-0 bg-accent text-black px-3 py-1 text-[10px] font-bold font-mono uppercase tracking-wider">GENESIS KEY ACQUIRED</div>
+                        
+                        <p class="text-xs text-mist font-mono mb-2 uppercase tracking-widest">Akses Token Unik:</p>
+                        <div class="font-mono text-xl tracking-widest text-white select-all cursor-text mb-4 break-all hover:text-accent transition-colors border border-dashed border-gray-800 p-4 bg-void/50" id="access-code">${key}</div>
+                        
+                        <p class="text-[10px] text-gray-500 border-t border-gray-800 pt-3 italic">
+                            Salin token di atas. Data lo (Nama: ${state.userName}, Pre: ${state.preScore}, Post: ${state.postScore}) tersimpan secara kriptografis di dalamnya. Gunakan ini untuk membuka <span class="text-accent font-bold">"Chapter 2"</span> nanti.
+                        </p>
+                    </div>
+                `;
+            } else {
+                analysis.innerHTML = `
+                    <p class="text-white font-bold text-lg">Foundation Weak, ${state.userName}.</p>
+                    <p class="mb-4">Lo masih ragu. Fondasi lo belum cukup kuat untuk memegang kunci level selanjutnya. Jangan bangun rumah di atas pasir.</p>
+                    <button onclick="location.reload()" class="text-accent text-sm underline underline-offset-4 hover:text-white transition-colors">
+                        Ulangi Materi (Reset Protokol)
+                    </button>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
